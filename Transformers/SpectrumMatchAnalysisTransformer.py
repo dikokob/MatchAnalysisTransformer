@@ -5,11 +5,8 @@ import logging
 import json
 import xmltodict
 
-from ..SppApi import SppApi
-from ..Transformer import Transformer
 
-
-class SpectrumMatchAnalysisTransformer(Transformer):
+class SpectrumMatchAnalysisTransformer:
     logger = None
     data_source = None
 
@@ -27,7 +24,7 @@ class SpectrumMatchAnalysisTransformer(Transformer):
         except ValueError:
             return False
 
-    def transform(self, session: str, files: str):
+    def transform(self, session: str, files: list):
 
         if len(files) < 1:
             self.logger.error('There are %d files in the Spectrum session directory %s. There must be exactly one '

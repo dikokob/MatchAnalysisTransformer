@@ -13,9 +13,10 @@ class OPTATransformer:
     logger = None
     data_source = None
     match_date = None
+    formations = '{"formations_id":{"0":2,"1":3,"2":4,"3":5,"4":6,"5":7,"6":8,"7":9,"8":10,"9":11,"10":12,"11":13,"12":14,"13":15,"14":16,"15":17,"16":18,"17":19,"18":20,"19":21,"20":22,"21":23,"22":24,"23":25},"formation":{"0":442,"1":41212,"2":433,"3":451,"4":4411,"5":4141,"6":4231,"7":4321,"8":532,"9":541,"10":352,"11":343,"12":31312,"13":4222,"14":3511,"15":3421,"16":3412,"17":3142,"18":343,"19":4132,"20":4240,"21":4312,"22":3241,"23":3331}}'
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
+        #self.config = config
         self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
     def opta_core_stats(self, df_opta_events, opta_match_info, df_player_names_raw, players_df_lineup, match_info):
@@ -377,7 +378,6 @@ class OPTATransformer:
 
         return data_shots
 
-
     @staticmethod
     def only_open_play_crosses(data):# TODO check if it matches new version crosses loop in tracking data.py
         # if we have a pass
@@ -605,9 +605,17 @@ class OPTATransformer:
 
     @staticmethod
     def merge_qualifiers(dat): # TODO check if it matches new version line 96 set_pieces_classification.py
+        '''
+        :param dat:
+        :type dat:
+        :return:
+        :rtype:
+        '''
         dat['qualifier_ids'] = ', '.join([str(int(x)) for x in dat.qualifier_id.tolist()])
         dat['qualifier_values'] = ', '.join([str(x) for x in dat['value'].tolist()])
+        if np.any(dat['qualifier_id']==55):
+            dat['qualifier_55_value'] = int(dat['value'].loc[dat['qualifier_id']==55].iloc[0])
+        else:
+            dat['qualifier_55_value'] = 0
         dat = dat.drop(columns=['qualifier_id', 'value']).drop_duplicates()
         return dat
-
-

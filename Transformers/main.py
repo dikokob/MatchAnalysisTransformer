@@ -25,7 +25,7 @@ if __name__ == "__main__":
         # Get all files for the specific session
         files_folder = os.path.join(input_data_dir, session, '*')
         files = glob.glob(files_folder)
-
+        print("files = {}".format(files))
         # ===========================================================================================================================
 
         # Process Spectrum Match Analysis
@@ -53,8 +53,15 @@ if __name__ == "__main__":
         if any(x is None for x in [df_track_players, df_player_names_raw, players_df_lineup, match_info ,
                                         df_opta_events, opta_match_info,
                                         df_time_possession]):
-            df_track_players, df_player_names_raw, players_df_lineup, match_info , df_opta_events, opta_match_info, \
-            df_time_possession = spectrumTransformer.transform(session, files)
+            (
+                df_track_players,
+                df_player_names_raw,
+                players_df_lineup,
+                match_info,
+                df_opta_events,
+                opta_match_info,
+                df_time_possession
+            ) = spectrumTransformer.transform(session, files)
     
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)

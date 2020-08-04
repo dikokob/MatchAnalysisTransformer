@@ -2,53 +2,10 @@
 import os 
 import pandas as pd 
 import xmltodict
-import numpy as np 
+import numpy as np
 
-os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
-
-from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
-from crosses_loop_in_tracking_data import only_open_play_crosses, cross_label, cross_label_v3, cross_label_v4, crosses_classification
-
-#path_events = file_event
-#path_match_results = file_results
-#path_track_meta = file_meta
-
-path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
-
-try:
-    with open(path_squads, encoding = 'utf-8') as fd:
-        opta_squads = xmltodict.parse(fd.read())
-except UnicodeDecodeError:
-    with open(path_squads, encoding = 'latin-1') as fd:
-        opta_squads = xmltodict.parse(fd.read())
-
-list_squads = []
-for i in range(20):
-    data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
-    if '@loan' in data_players_in.columns:
-        data_players_in = data_players_in.drop(['@loan'], axis = 1)
-    data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
-    if '@loan' in data_players_out.columns:
-        data_players_out = data_players_out.drop(['@loan'], axis = 1)
-    data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
-    data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
-    list_squads.append(data_players)
-
-data_squads = pd.concat(list_squads).reset_index(drop=True)
-data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
-data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
-
-# writer = pd.ExcelWriter('\\\ctgshares\\Drogba\\Analysts\\FB\\2019-20\\set pieces classification\\Players Squads File.xlsx', engine='xlsxwriter')
-# data_squads.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-# worksheet = writer.sheets['Sheet1']  # pull worksheet object
-# for idx, col in enumerate(data_squads):  # loop through all columns
-#     series = data_squads[col]
-#     max_len = max((
-#         series.astype(str).map(len).max(),  # len of largest item
-#         len(str(series.name))  # len of column name/header
-#         )) + 1  # adding a little extra space
-#     worksheet.set_column(idx, idx, max_len)  # set column width
-# writer.save()
+from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
+from scripts_from_fed.crosses_loop_in_tracking_data import only_open_play_crosses, cross_label, cross_label_v3, cross_label_v4, crosses_classification
 
 
 def edge_box_linear(y, x_tresh = 75, y_tresh = 50, x0 = 83):
@@ -86,22 +43,26 @@ def edge_box_elliptical(y, x_tresh = 75, y0 = 50, x0 = 83, y_tresh = 21.1):
 
     return x
 
+def merge_qualifiers(dat: pd.DataFrame) -> pd.DataFrame:
+    """extract whether data has qualifier 55
+
+    Args:
+        dat (pd.DataFrame): [description]
+
+    Returns:
+        pd.DataFrame: [description]
+    """
+    dat['qualifier_ids'] = ', '.join([str(int(x)) for x in dat.qualifier_id.tolist()])
+    dat['qualifier_values'] = ', '.join([str(x) for x in dat['value'].tolist()])
+    if np.any(dat['qualifier_id']==55):
+        dat['qualifier_55_value'] = int(dat['value'].loc[dat['qualifier_id']==55].iloc[0])
+    else:
+        dat['qualifier_55_value'] = 0
+    dat = dat.drop(columns=['qualifier_id', 'value']).drop_duplicates()
+    return dat
 
 #get all shot events
 def get_shots(path_events, path_match_results):
-    import pandas as pd
-    import numpy as np 
-    import xmltodict
-
-    def merge_qualifiers (dat):
-        dat['qualifier_ids'] = ', '.join([str(int(x)) for x in dat.qualifier_id.tolist()])
-        dat['qualifier_values'] = ', '.join([str(x) for x in dat['value'].tolist()])
-        if np.any(dat['qualifier_id']==55):
-            dat['qualifier_55_value'] = int(dat['value'].loc[dat['qualifier_id']==55].iloc[0])
-        else:
-            dat['qualifier_55_value'] = 0
-        dat = dat.drop(columns=['qualifier_id', 'value']).drop_duplicates()
-        return dat
 
     data, game_id, game_date, away_score, away_team_id, away_team_name, home_score, home_team_id, home_team_name = opta_event_file_manipulation(path_events)
     referee_id, referee_name, venue, players_df_lineup, home_formation, away_formation, player_names_raw = match_results_file_manipulation(path_match_results)
@@ -2786,3 +2747,50 @@ for season in seasons:
 # aerial_duels_set_pieces_player = aerial_duels_set_pieces_player.fillna(0).drop(['unsuccessful_player_name', 'unsuccessful_situation'], axis = 1)
 
 # aerial_duels_set_pieces_player[aerial_duels_set_pieces_player.situation=='defensive']
+
+
+
+if __name__ == '__main__':
+
+    #path_events = file_event
+    #path_match_results = file_results
+    #path_track_meta = file_meta
+
+    # os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
+
+    # path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
+
+    try:
+        with open(path_squads, encoding = 'utf-8') as fd:
+            opta_squads = xmltodict.parse(fd.read())
+    except UnicodeDecodeError:
+        with open(path_squads, encoding = 'latin-1') as fd:
+            opta_squads = xmltodict.parse(fd.read())
+
+    list_squads = []
+    for i in range(20):
+        data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
+        if '@loan' in data_players_in.columns:
+            data_players_in = data_players_in.drop(['@loan'], axis = 1)
+        data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+        if '@loan' in data_players_out.columns:
+            data_players_out = data_players_out.drop(['@loan'], axis = 1)
+        data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+        data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
+        list_squads.append(data_players)
+
+    data_squads = pd.concat(list_squads).reset_index(drop=True)
+    data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+    data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+
+    # writer = pd.ExcelWriter('\\\ctgshares\\Drogba\\Analysts\\FB\\2019-20\\set pieces classification\\Players Squads File.xlsx', engine='xlsxwriter')
+    # data_squads.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+    # worksheet = writer.sheets['Sheet1']  # pull worksheet object
+    # for idx, col in enumerate(data_squads):  # loop through all columns
+    #     series = data_squads[col]
+    #     max_len = max((
+    #         series.astype(str).map(len).max(),  # len of largest item
+    #         len(str(series.name))  # len of column name/header
+    #         )) + 1  # adding a little extra space
+    #     worksheet.set_column(idx, idx, max_len)  # set column width
+    # writer.save()

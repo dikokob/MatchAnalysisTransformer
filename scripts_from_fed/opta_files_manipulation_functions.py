@@ -1,6 +1,6 @@
 #script for the OPTA files manipulation
 
-def opta_event_file_manipulation (path_events):
+def opta_event_file_manipulation(path_events):
     import xmltodict
     import numpy as np
     import pandas as pd
@@ -118,7 +118,7 @@ def opta_event_file_manipulation (path_events):
 
 
 
-def match_results_file_manipulation (path_match_results):
+def match_results_file_manipulation(path_match_results):
     import xmltodict
     import pandas as pd 
     import numpy as np

@@ -297,18 +297,21 @@ class OPTATransformer:
             drop=True)
 
     #get all shot events
-    def opta_shots(self, df_opta_events, df_player_names_raw, opta_match_info): # TODO check line 91 set_pieces_classification.py
-        '''
+    def opta_shots(
+            self,
+            df_opta_events: pd.DataFrame,
+            df_player_names_raw, opta_match_info: pd.DataFrame
+    ) -> pd.DataFrame: # TODO check line 91 set_pieces_classification.py
+        """
+            Extracts all shot events from opta_events
+            Args:
+                df_opta_events (pd.DataFrame): [description]
+                df_player_names_raw ([type]): [description]
+                opta_match_info ([type]): [description]
 
-        :param df_opta_events:
-        :type df_opta_events:
-        :param df_player_names_raw:
-        :type df_player_names_raw:
-        :param opta_match_info:
-        :type opta_match_info:
-        :return:
-        :rtype:
-        '''
+            Returns:
+                pd.DataFrame: [description]
+        """
 
         data = df_opta_events
         player_names_raw = df_player_names_raw

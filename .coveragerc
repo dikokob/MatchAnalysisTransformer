@@ -1,0 +1,6 @@
+[run]
+include =
+    Sandbox/*
+
+[html]
+directory = coverage_html_report

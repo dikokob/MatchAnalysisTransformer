@@ -7,6 +7,7 @@ SHELL := /bin/bash
 PROJECT_NAME = match-analysis-transformer-refactoring
 PYTHON = python3
 PIP = pip
+COVERAGE_THRESHOLD ?= 90
 
 #################################################################################
 # COMMANDS                                                                      #
@@ -30,3 +31,8 @@ clean:
 lint:
 	pip install pylint;
 	find . -type f -name "*.py" -not -path "./development_env/*" -not -path "Transfomers" | xargs pylint;
+
+test:
+	pip install pytest mock pytest-mock coverage;
+	coverage run -m pytest;
+	coverage report --fail-under=${COVERAGE_THRESHOLD}

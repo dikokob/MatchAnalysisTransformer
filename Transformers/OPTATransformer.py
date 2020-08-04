@@ -296,19 +296,22 @@ class OPTATransformer:
         return data_output[(data_output['Our Cross Qualifier'] == 1) & (data_output.cross_to_remove == 0)].reset_index(
             drop=True)
 
-    #get all shot events
-    def opta_shots(self, df_opta_events, df_player_names_raw, opta_match_info): # TODO check line 91 set_pieces_classification.py
-        '''
+    def opta_shots(
+            self,
+            df_opta_events: pd.DataFrame,
+            df_player_names_raw: pd.DataFrame,
+            opta_match_info: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+            Extracts all shot events from opta_events
+            Args:
+                df_opta_events (pd.DataFrame): [description]
+                df_player_names_raw ([type]): [description]
+                opta_match_info ([type]): [description]
 
-        :param df_opta_events:
-        :type df_opta_events:
-        :param df_player_names_raw:
-        :type df_player_names_raw:
-        :param opta_match_info:
-        :type opta_match_info:
-        :return:
-        :rtype:
-        '''
+            Returns:
+                pd.DataFrame: [description]
+        """
 
         data = df_opta_events
         player_names_raw = df_player_names_raw
@@ -352,7 +355,8 @@ class OPTATransformer:
                 data_shots.loc[data_shots.unique_event_id==i, 'value'] = int(related_event_id_og)
 
         data_shots['related_event_team_id'] = np.where(data_shots['own_goal'] == 0, data_shots['team_id'], np.where(data_shots['team_id']==opta_match_info['home_team_id'], opta_match_info['away_team_id'], opta_match_info['home_team_id']))
-
+        data_shots['left_foot'] = [int(72 in [int(y) for y in x.split(', ')]) for x in data_shots['qualifier_ids']]
+        data_shots['right_foot'] = [int(20 in [int(y) for y in x.split(', ')]) for x in data_shots['qualifier_ids']]
         data_shots['headed'] = [int(15 in [int(y) for y in x.split(', ')]) for x in data_shots['qualifier_ids']]
         data_shots['other_body_part'] = [int(21 in [int(y) for y in x.split(', ')]) for x in data_shots['qualifier_ids']]
         data_shots['big_chance'] = [int(214 in [int(y) for y in x.split(', ')]) for x in data_shots['qualifier_ids']]
@@ -370,11 +374,9 @@ class OPTATransformer:
         data_shots['goal'] = np.where(data_shots['type_id'] == 16, 1, 0)
         data_shots['on_target'] = np.where(((data_shots['type_id']==15) | (data_shots['type_id']==16)) & ((data_shots['blocked']==0) | (data_shots['saved_off_line']==1)), 1, 0)
         data_shots['off_target'] = np.where((data_shots['type_id']==13) | (data_shots['type_id']==14), 1, 0)
-        #data_shots['chance_missed'] = np.where(data_shots['type_id'] == 60, 1, 0)
+        data_shots['chance_missed'] = np.where(data_shots['type_id'] == 60, 1, 0)
 
         data_shots['direct_shot'] = np.where(data_shots['value'] > 0, 1, 0)
-
-
 
         return data_shots
 

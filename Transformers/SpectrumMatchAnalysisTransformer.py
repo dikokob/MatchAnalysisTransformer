@@ -275,7 +275,7 @@ class SpectrumMatchAnalysisTransformer:
             with open(event_path, encoding = 'latin-1') as fd:
                 opta_event = xmltodict.parse(fd.read())
 
-            # start rearranging the file in a nicer format
+        # start rearranging the file in a nicer format
         opta_event_data = []
         competition_id = int(opta_event['Games']['Game']['@competition_id'])
         competition_name = opta_event['Games']['Game']['@competition_name']
@@ -287,15 +287,20 @@ class SpectrumMatchAnalysisTransformer:
         period_1_start = opta_event['Games']['Game']['@period_1_start']
         period_2_start = opta_event['Games']['Game']['@period_2_start']
         away_score = '0'
+
         if '@away_score' in list(opta_event['Games']['Game'].keys()):
             away_score = int(opta_event['Games']['Game']['@away_score'])
+
         away_team_id = int(opta_event['Games']['Game']['@away_team_id'])
         away_team_name = opta_event['Games']['Game']['@away_team_name']
         home_score = '0-0'
+
         if '@home_score' in list(opta_event['Games']['Game'].keys()):
             home_score = int(opta_event['Games']['Game']['@home_score'])
+
         home_team_id = int(opta_event['Games']['Game']['@home_team_id'])
         home_team_name = opta_event['Games']['Game']['@home_team_name']
+
         fixture = home_team_name + ' v ' + away_team_name
         result = '0'
         if (home_score is not None) & (away_score is not None):

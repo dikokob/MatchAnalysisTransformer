@@ -1,13 +1,14 @@
+"""
+    TestGetShots: Verification tests to base OptaTransformer.opta_shots tests from
+"""
 import pandas as pd
-from Sandbox.set_pieces_classification import get_shots
-
-
+from sandbox.set_pieces_classification import get_shots
 
 class TestGetShots:
     """Test the get shots functionality from set_pieces_classification
     """
-    path_match_results = 'tests/fixtures/raw_data/g1059702/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/raw_data/g1059702/f24-8-2019-1059702-eventdetails.xml'
+    path_match_results = 'tests/fixtures/inputs/g1059702/srml-8-2019-f1059702-matchresults.xml'
+    path_events = 'tests/fixtures/inputs/g1059702/f24-8-2019-1059702-eventdetails.xml'
 
     def test_output_is_dataframe(self):
         """test that output is a pd.Dataframe
@@ -37,7 +38,7 @@ class TestGetShots:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/processed/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
 
         output = get_shots(self.path_events, self.path_match_results)
 
@@ -49,7 +50,7 @@ class TestGetShots:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/processed/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
 
         output = get_shots(self.path_events, self.path_match_results)
 

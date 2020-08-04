@@ -296,13 +296,12 @@ class OPTATransformer:
         return data_output[(data_output['Our Cross Qualifier'] == 1) & (data_output.cross_to_remove == 0)].reset_index(
             drop=True)
 
-    #get all shot events
     def opta_shots(
             self,
             df_opta_events: pd.DataFrame,
             df_player_names_raw: pd.DataFrame,
             opta_match_info: pd.DataFrame
-    ) -> pd.DataFrame: # TODO check line 91 set_pieces_classification.py
+    ) -> pd.DataFrame:
         """
             Extracts all shot events from opta_events
             Args:
@@ -376,11 +375,8 @@ class OPTATransformer:
         data_shots['on_target'] = np.where(((data_shots['type_id']==15) | (data_shots['type_id']==16)) & ((data_shots['blocked']==0) | (data_shots['saved_off_line']==1)), 1, 0)
         data_shots['off_target'] = np.where((data_shots['type_id']==13) | (data_shots['type_id']==14), 1, 0)
         data_shots['chance_missed'] = np.where(data_shots['type_id'] == 60, 1, 0)
-        
 
         data_shots['direct_shot'] = np.where(data_shots['value'] > 0, 1, 0)
-
-
 
         return data_shots
 

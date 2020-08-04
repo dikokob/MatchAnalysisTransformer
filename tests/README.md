@@ -2,10 +2,15 @@
 
 Contains a set of tests created to confirm success of code migrations.
 
-## To Implement
+## Types of tests for dataframes
 
-- opta_files_manipuldation functions output
+- correct data output shape
+- correct element values
+- correct column names
+- returned type should be dataframe
 
-```
-Given a set of raw_data files (events.xml) confirm a set of dataframes are produced.
-```
+## Fundamentals
+
+- use a tiny sample that can mimic your production data
+- use a tiny sample that produces the required output
+- compare output against it's own type

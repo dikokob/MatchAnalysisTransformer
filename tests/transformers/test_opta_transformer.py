@@ -11,9 +11,9 @@ import json
 class TestOptaTransformer:
     """Test the opta transformer
     """
-    path_match_results = 'tests/fixtures/raw_data/g1059702/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/raw_data/g1059702/f24-8-2019-1059702-eventdetails.xml'
-    metadata_path='tests/fixtures/raw_data/g1059702/g1059702_SecondSpectrum_Metadata.json'
+    path_match_results = 'tests/fixtures/inputs/g1059702/srml-8-2019-f1059702-matchresults.xml'
+    path_events = 'tests/fixtures/inputs/g1059702/f24-8-2019-1059702-eventdetails.xml'
+    metadata_path='tests/fixtures/inputs/g1059702/g1059702_SecondSpectrum_Metadata.json'
 
     spectrumTransformer = SpectrumMatchAnalysisTransformer('SpectrumMatchAnalysis')
 
@@ -73,7 +73,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/processed/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
         df_player_names_raw, _, _ = self.spectrumTransformer.get_player_match_data(
@@ -100,7 +100,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/processed/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
 
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=self.path_events)

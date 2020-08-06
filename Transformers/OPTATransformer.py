@@ -19,7 +19,26 @@ class OPTATransformer:
         #self.config = config
         self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
-    def opta_core_stats(self, df_opta_events, opta_match_info, df_player_names_raw, players_df_lineup, match_info):
+    def opta_core_stats(
+        self,
+        df_opta_events: pd.DataFrame,
+        opta_match_info: pd.DataFrame,
+        df_player_names_raw: pd.DataFrame,
+        players_df_lineup: pd.DataFrame,
+        match_info: dict
+    ) -> pd.DataFrame:
+        """[summary]
+
+        Args:
+            df_opta_events (pd.DataFrame): [description]
+            opta_match_info (pd.DataFrame): [description]
+            df_player_names_raw (pd.DataFrame): [description]
+            players_df_lineup (pd.DataFrame): [description]
+            match_info (dict): [description]
+
+        Returns:
+            pd.DataFrame: [description]
+        """
         #season_id, competition_id, add t to team id and opp team_id, add f to game_id, add p to player_id, opp team formation id, opp team formation
 
         formations = pd.read_json(self.formations)
@@ -149,8 +168,21 @@ class OPTATransformer:
                                                            'Start', 'Substitute On', 'Substitute Off'])
         return summary_df
 
-    def opta_core_stats_with_time_possession(self, df_time_possession, df_opta_core_stats):
-        #time_possession_df['game_id'] = time_possession_df['game_id'].astype(int)
+    def opta_core_stats_with_time_possession(
+        self,
+        df_time_possession: pd.DataFrame,
+        df_opta_core_stats: pd.DataFrame
+    ) -> pd.DataFrame:
+        """Builds a dataframe of time in possession stats
+
+        Args:
+            df_time_possession (pd.DataFrame): time possession data
+            df_opta_core_stats (pd.DataFrame): core stats
+
+        Returns:
+            pd.DataFrame: time in possession statistics
+        """
+
         df_time_possession['Player_ID'] = df_time_possession['Player_ID'].astype(int)
         df_time_possession['Player_ID'] = ['p' + str(x) for x in df_time_possession['Player_ID']]
 
@@ -165,12 +197,20 @@ class OPTATransformer:
                                 inplace = True)
         return df_opta_core_stats
 
-    def opta_crosses_classification(self, df_opta_events): # TODO check if it matches new version line 155 crosses loop in tracking data.py
+    def opta_crosses_classification(self, df_opta_events: pd.DataFrame) -> pd.DataFrame: # TODO check if it matches new version line 155 crosses loop in tracking data.py
+        """builds a dataframe of cross statistics, extracting them from the events dataframe
 
+        Args:
+            df_opta_events (pd.DataFrame): events dataframe derived from events.xml
+
+        Returns:
+            pd.DataFrame: cross statistics
+        """
 
         df_opta_events['Time_in_Seconds'] = df_opta_events['min'] * 60.0 + df_opta_events['sec']
         event_data_open_play_crosses_big = df_opta_events.groupby(['unique_event_id']).apply(
-            self.only_open_play_crosses)  # .drop_duplicates(['unique_event_id'])
+            self.only_open_play_crosses
+        )
 
         event_data_open_play_crosses = event_data_open_play_crosses_big.drop_duplicates(['unique_event_id']).reset_index(
             drop=True)
@@ -273,11 +313,15 @@ class OPTATransformer:
                                                       data_output['away_team_name'], data_output['home_team_name'])
 
         # crosses can't be switch of play or through balls
-        data_output['cross_to_remove'] = [(len(set([196, 4]).intersection(set([int(y) for y in x.split(', ')]))) > 0) for x
-                                          in data_output['qualifier_ids']]
+        data_output['cross_to_remove'] = [
+            (
+                len(set([196, 4]).intersection(set([int(y) for y in x.split(', ')]))) > 0
+            ) for x in data_output['qualifier_ids']
+        ]
+
         data_output['cross_to_remove'] = np.where(
             (data_output['cross_to_remove'] == 1) & (data_output['corner_taken'] == 1), 0, data_output['cross_to_remove'])
-        # final_df['cross_to_remove'] = np.where(final_df['x']==0,1,final_df['cross_to_remove'])
+
         data_output['cross_to_remove'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 0,
                                                   np.where(data_output['cross_to_remove'] == 1, 1,
                                                            np.where(
@@ -294,8 +338,12 @@ class OPTATransformer:
                     np.sign(data_output['y'] - 50.0) != np.sign(data_output['y_end'] - 50.0)), 1, 0)
 
         data_output['OPTA Pull Back Qualifier'] = [int(195 in [int(y) for y in x.split(', ')]) for x in data_output['qualifier_ids']]
-        return data_output[(data_output['Our Cross Qualifier'] == 1) & (data_output.cross_to_remove == 0)].reset_index(
-            drop=True)
+        return data_output[
+            (
+                data_output['Our Cross Qualifier'] == 1
+            ) & (
+                data_output.cross_to_remove == 0
+            )].reset_index(drop=True)
 
     def opta_shots(
             self,
@@ -607,13 +655,15 @@ class OPTATransformer:
         return data_output
 
     @staticmethod
-    def merge_qualifiers(dat): # TODO check if it matches new version line 96 set_pieces_classification.py
-        '''
-        :param dat:
-        :type dat:
-        :return:
-        :rtype:
-        '''
+    def merge_qualifiers(dat: pd.DataFrame) -> pd.DataFrame: # TODO check if it matches new version line 96 set_pieces_classification.py
+        """Builds a column for whether qualifier 55 is present for a given row.
+
+        Args:
+            dat (pd.DataFrame): data with columns qualifier_ids & qualifier_values
+
+        Returns:
+            pd.DataFrame: data with additoinal qualifier_55_value column
+        """
         dat['qualifier_ids'] = ', '.join([str(int(x)) for x in dat.qualifier_id.tolist()])
         dat['qualifier_values'] = ', '.join([str(x) for x in dat['value'].tolist()])
         if np.any(dat['qualifier_id']==55):

@@ -23,7 +23,7 @@ class TestOptaTransformer:
         opta_transformer = OPTATransformer()
         return opta_transformer
 
-    def test_output_is_dataframe(self):
+    def test_get_shots_output_is_dataframe(self):
         """test that output is a pd.Dataframe
         """
 
@@ -44,7 +44,7 @@ class TestOptaTransformer:
             "Failed: Output was not of type pd.dataframe"
         )
 
-    def test_output_contains_required_fields(self):
+    def test_get_shots_output_contains_required_fields(self):
         """test that output contains required fields
         """
         validation_fields = [
@@ -116,6 +116,62 @@ class TestOptaTransformer:
 
         print(verification_result, output)
         # (verification_result.values == output.values).all()
+        assert (verification_result.values == output.values).all(), (
+            "Failed: did not return required output dataframe"
+        )
+
+    def test_opta_cross_classification_output_is_dataframe(self):
+        """test that output is a pd.Dataframe
+        """
+        opta_transformer = self.get_opta_transformers()
+        opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
+        output = opta_transformer.opta_crosses_classification(opta_event_data_df)
+
+        assert (type(output) is pd.DataFrame),(
+            "Failed: Output was not of type pd.dataframe"
+        )
+
+    def test_opta_cross_classification_output_contains_required_fields(self):
+        """test that output contains required fields
+        """
+        validation_fields = [
+            'competition_id', 'competition_name', 'season_id', 'season_name',
+            'game_id', 'match_day', 'game_date', 'cross_to_remove',
+            'out_of_pitch', 'ending_too_wide', 'OPTA Pull Back Qualifier'
+        ]
+        opta_transformer = self.get_opta_transformers()
+        opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
+        output = opta_transformer.opta_crosses_classification(opta_event_data_df)
+
+        for field in validation_fields:
+            assert (field in output.columns),(
+                "Failed: Output did not contain = {}".format(field)
+            )
+
+    def test_opta_cross_classification_output_columns_as_expected(self):
+        """test output is as expected
+        """
+
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+
+        opta_transformer = self.get_opta_transformers()
+        opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
+        output = opta_transformer.opta_crosses_classification(opta_event_data_df)
+
+        assert all(verification_result.columns == output.columns), (
+            "Failed: did not return required output dataframe"
+        )
+
+    def test_opta_cross_classification_output_as_expected(self):
+        """test output is as expected
+        """
+
+        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+
+        opta_transformer = self.get_opta_transformers()
+        opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
+        output = opta_transformer.opta_crosses_classification(opta_event_data_df)
+
         assert (verification_result.values == output.values).all(), (
             "Failed: did not return required output dataframe"
         )

@@ -30,7 +30,7 @@ clean:
 
 lint:
 	pip install pylint;
-	find . -type f -name "*.py" -not -path "./development_env/*" -not -path "Transfomers" | xargs pylint;
+	find . -type f -name "*.py" -not -path "./development_env/*" -not -path "*scripts_from_fed/*" | xargs pylint;
 
 test:
 	pip install pytest mock pytest-mock coverage;

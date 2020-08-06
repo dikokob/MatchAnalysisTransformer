@@ -1,6 +1,6 @@
 [run]
 include =
-    Sandbox/*
+    sandbox/*
     transformers/*
 
 [html]

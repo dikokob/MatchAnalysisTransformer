@@ -293,6 +293,7 @@ class OPTATransformer:
                     data_output['y_end'] > 0.0) & (data_output['x_end'] < 100.0) & (
                     np.sign(data_output['y'] - 50.0) != np.sign(data_output['y_end'] - 50.0)), 1, 0)
 
+        data_output['OPTA Pull Back Qualifier'] = [int(195 in [int(y) for y in x.split(', ')]) for x in data_output['qualifier_ids']]
         return data_output[(data_output['Our Cross Qualifier'] == 1) & (data_output.cross_to_remove == 0)].reset_index(
             drop=True)
 

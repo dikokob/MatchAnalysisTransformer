@@ -430,7 +430,15 @@ class OPTATransformer:
         return data_shots
 
     @staticmethod
-    def only_open_play_crosses(data):# TODO check if it matches new version crosses loop in tracking data.py
+    def only_open_play_crosses(data: pd.DataFrame) -> pd.DataFrame:
+        """builds a dataframe of the open play crosses only
+
+        Args:
+            data (pd.DataFrame): opta_event_data_df
+
+        Returns:
+            pd.DataFrame: open play crosses data
+        """
         # if we have a pass
         if (data.type_id.unique()[0] == 1) | (data.type_id.unique()[0] == 2):
             # if we have a cross

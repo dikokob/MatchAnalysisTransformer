@@ -1,11 +1,12 @@
 """
     Test OPTA transformer
 """
-from transformers.SpectrumMatchAnalysisTransformer import SpectrumMatchAnalysisTransformer
-from transformers.OPTATransformer import OPTATransformer
 import os
 import pandas as pd
 import json
+from transformers.SpectrumMatchAnalysisTransformer import SpectrumMatchAnalysisTransformer
+from transformers.OPTATransformer import OPTATransformer
+from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_manipulation
 
 
 class TestOptaTransformer:
@@ -173,5 +174,67 @@ class TestOptaTransformer:
         output = opta_transformer.opta_crosses_classification(opta_event_data_df)
 
         assert (verification_result.values == output.values).all(), (
+            "Failed: did not return required output dataframe"
+        )
+
+    def test_opta_only_open_play_crosses_output_is_dataframe(self):
+        """test that output is a pd.Dataframe
+        """
+        data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
+
+        output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
+        assert (type(output) is pd.DataFrame),(
+            "Failed: Output was not of type pd.dataframe"
+        )
+
+    def test_opta_only_open_play_crosses_output_contains_required_fields(self):
+        """test that output contains required fields
+        """
+        validation_fields = [
+            'competition_id', 'competition_name', 'season_id', 'season_name',
+            'game_id', 'match_day', 'game_date', 'period_1_start', 'period_2_start',
+            'home_score', 'home_team_id', 'home_team_name', 'away_score',
+            'away_team_id', 'away_team_name', 'fixture', 'result',
+            'unique_event_id', 'event_id', 'period_id', 'min', 'sec', 'timestamp',
+            'type_id', 'player_id', 'team_id', 'outcome', 'keypass', 'assist', 'x',
+            'y', 'qualifier_id', 'value', 'open_play_cross'
+        ]
+        data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
+
+        output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
+
+        print(output)
+        print(output.columns)
+        for field in validation_fields:
+            assert (field in output.columns),(
+                "Failed: Output did not contain = {}".format(field)
+            )
+
+    def test_opta_only_open_play_crosses_output_columns_as_expected(self):
+        """test output is as expected
+        """
+        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = verification_df.where(pd.notnull(verification_df), None)
+        data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
+
+        output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
+        output = output.where(pd.notnull(output), None)
+
+        assert all(verification_df.columns == output.columns), (
+            "Failed: did not return required output dataframe"
+        )
+
+    def test_opta_only_open_play_crosses_output_as_expected(self):
+        """test output is as expected
+        """
+
+        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = verification_df.where(pd.notnull(verification_df), None)
+        data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
+
+        output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
+        output = output.where(pd.notnull(output), None)
+        print("{}\n\n\n\n{}".format(verification_df.head().values, output.head().values))
+        assert (verification_df.values == output.values).all(), (
             "Failed: did not return required output dataframe"
         )

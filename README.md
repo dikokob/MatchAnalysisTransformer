@@ -15,7 +15,7 @@ Continue below to run the tests and confirm the task completion.
 
 #### setup your development environment
 
-- Create a virtualenv with python 3.7 or older. I have used either [virtualenv & pip](https://virtualenv.pypa.io/en/latest/installation.html) or [pipenv](https://docs.python-guide.org/dev/virtualenvs/)
+- Create a virtualenv with python 3.7 or newer. I have used either [virtualenv & pip](https://virtualenv.pypa.io/en/latest/installation.html) or [pipenv](https://docs.python-guide.org/dev/virtualenvs/)
 
 #### Running tests
 

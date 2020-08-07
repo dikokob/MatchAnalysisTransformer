@@ -15,7 +15,7 @@ COVERAGE_THRESHOLD ?= 90
 
 build:
 	make install-requirements;
-	make lint;
+	make test;
 	make clean;
 
 ## Install Python Dependencies

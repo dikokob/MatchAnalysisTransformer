@@ -120,3 +120,13 @@ class TestCrossesClassification:
         assert (verification_df.values == output.values).all(), (
             "Failed: did not return required output dataframe"
         )
+
+
+    def test_cross_label_v4_output_is_dataframe(self):
+        """test that output is a pd.Dataframe
+        """
+        output = crosses_classification(self.path_events)
+
+        assert (type(output) is pd.DataFrame),(
+            "Failed: Output was not of type pd.dataframe"
+        )

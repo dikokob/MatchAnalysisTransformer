@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2001-2019 Opta Sportsdata Ltd. All rights reserved. -->
+
+<!-- PRODUCTION HEADER
+     produced on:        valde-jobq-a03.nexus.opta.net
+     production time:    20190811T094401,11Z
+     production module:  Opta::Feed::XML::Soccer::F24
+-->
+<Games timestamp="2019-08-11T10:44:00">
+  <Game id="1059702" away_score="1" away_team_id="45" away_team_name="Norwich City" competition_id="8" competition_name="English Premier League" game_date="2019-08-09T20:00:00" home_score="4" home_team_id="14" home_team_name="Liverpool" matchday="1" period_1_start="2019-08-09T20:00:17" period_2_start="2019-08-09T21:08:50" season_id="2019" season_name="Season 2019/2020">
+    <Event id="353393289" event_id="487" type_id="14" period_id="2" min="47" sec="28" player_id="92217" team_id="14" outcome="1" x="96.4" y="54.2" timestamp="2019-08-09T21:11:18.778" last_modified="2019-08-10T10:13:27" version="1565428406885">
+      <Q id="1071710212" qualifier_id="231" value="49.1" />
+      <Q id="986228069" qualifier_id="29" />
+      <Q id="638828379" qualifier_id="102" value="55.7" />
+      <Q id="641194835" qualifier_id="16" />
+      <Q id="811610188" qualifier_id="22" />
+      <Q id="2044571924" qualifier_id="72" />
+      <Q id="650647476" qualifier_id="56" value="Center" />
+      <Q id="1938606878" qualifier_id="55" value="486" />
+      <Q id="2115468924" qualifier_id="73" />
+      <Q id="187032344" qualifier_id="103" value="8.9" />
+      <Q id="250852890" qualifier_id="230" value="99.1" />
+      <Q id="1115317465" qualifier_id="214" />
+      <Q id="1101478023" qualifier_id="154" />
+    </Event>
+        <Event id="374106982" event_id="556" type_id="14" period_id="2" min="61" sec="57" player_id="87396" team_id="45" outcome="1" x="90.5" y="27.0" timestamp="2019-08-09T21:25:48.307" last_modified="2019-08-10T10:38:47" version="1565429927542">
+      <Q id="1561615601" qualifier_id="63" />
+      <Q id="8776176" qualifier_id="20" />
+      <Q id="299459486" qualifier_id="231" value="54.5" />
+      <Q id="109072644" qualifier_id="56" value="Center" />
+      <Q id="822373137" qualifier_id="103" value="40.5" />
+      <Q id="1504524262" qualifier_id="230" value="1.5" />
+      <Q id="2027914599" qualifier_id="22" />
+      <Q id="402381821" qualifier_id="102" value="46.6" />
+      <Q id="325828309" qualifier_id="215" />
+      <Q id="1545574312" qualifier_id="29" />
+      <Q id="104355294" qualifier_id="55" value="555" />
+      <Q id="2063482309" qualifier_id="74" />
+    </Event>
+        <Event id="234052326" event_id="55" type_id="13" period_id="1" min="4" sec="7" player_id="71738" team_id="45" outcome="1" x="86.9" y="62.9" timestamp="2019-08-09T20:04:25.156" last_modified="2019-08-10T08:32:46" version="1565422366129">
+      <Q id="1043389826" qualifier_id="17" />
+      <Q id="949660423" qualifier_id="55" value="54" />
+      <Q id="1081625710" qualifier_id="77" />
+      <Q id="486488581" qualifier_id="231" value="53.4" />
+      <Q id="1930523180" qualifier_id="328" />
+      <Q id="869543947" qualifier_id="22" />
+      <Q id="614852071" qualifier_id="29" />
+      <Q id="1465388956" qualifier_id="72" />
+      <Q id="547255845" qualifier_id="103" value="84.7" />
+      <Q id="1864246949" qualifier_id="56" value="Center" />
+      <Q id="1707315797" qualifier_id="102" value="56.8" />
+      <Q id="875047620" qualifier_id="154" />
+      <Q id="64934075" qualifier_id="230" value="98.0" />
+    </Event>
+  </Game>
+</Games>

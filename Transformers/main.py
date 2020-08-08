@@ -12,8 +12,8 @@ optaTransformer = OPTATransformer()
 if __name__ == "__main__":
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    input_data_dir = 'data/raw_data'
-    processed_data_dir = 'data/processed'
+    input_data_dir = '..\\data\\raw_data'
+    processed_data_dir = '..\\data\\processed'
     # Loop through all rawdata
     for session in os.listdir(input_data_dir):
 

@@ -11,12 +11,17 @@ class SpectrumMatchAnalysisTransformer:
     data_source = None
 
     def __init__(self, data_source: str):
+        """
+
+        Args:
+            data_source ():
+        """
         self.data_source = data_source
         self.logger = logging.getLogger(
             '{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
     @staticmethod
-    def is_numeric(s):
+    def is_numeric(s) -> bool:
 
         try:
             float(s)
@@ -24,8 +29,16 @@ class SpectrumMatchAnalysisTransformer:
         except ValueError:
             return False
 
-    def transform(self, session: str, files: list):
+    def transform(self, session: str, files: list) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, dict, pd.DataFrame, dict, pd.DataFrame):
+        """
 
+        Args:
+            session ():
+            files ():
+
+        Returns:
+
+        """
         if len(files) < 1:
             self.logger.error('There are %d files in the Spectrum session directory %s. There must be exactly one '
                               'or more files: .jsonl data file, a .json metadata file and xml. The files in the '
@@ -33,7 +46,7 @@ class SpectrumMatchAnalysisTransformer:
                               (len(files), session, str(files)))
             return None, None
 
-        df_track_players, df_player_names_raw, players_df_lineup, match_info , \
+        df_track_players, df_player_names_raw, players_df_lineup, match_info, \
         df_opta_events, opta_match_info, df_time_possession = [None for i in range(7)]
 
         # Let's make sure the file that have been uploaded match the format we expect.
@@ -65,8 +78,9 @@ class SpectrumMatchAnalysisTransformer:
                 'There are no .jsonl data files in the Spectrum session directory %s. There are %d file(s) '
                 'in the session directory: %s.' % (session, len(files), str(files)))
         elif len(data_file) > 1:
-            self.logger.warning('There is more than one .jsonl data file in the Spectrum session directory %s. %d .jsonl '
-                              'files were found: %s.' % (session, len(data_file), str(data_file)))
+            self.logger.warning(
+                'There is more than one .jsonl data file in the Spectrum session directory %s. %d .jsonl '
+                'files were found: %s.' % (session, len(data_file), str(data_file)))
         else:
             self.logger.info('Loading tracking data from {}'.format(data_file[0]))
             df_track_players = self.get_track_player_data(data_file[0])
@@ -77,8 +91,8 @@ class SpectrumMatchAnalysisTransformer:
                 'in the session directory: %s.' % (session, len(files), str(files)))
         elif len(meta_file_json) > 1:
             self.logger.warning('There is more than one .json metadata file in the Spectrum session directory %s. %d '
-                              'Metadata.json files were found: %s.' %
-                              (session, len(meta_file_json), str(meta_file_json)))
+                                'Metadata.json files were found: %s.' %
+                                (session, len(meta_file_json), str(meta_file_json)))
         elif len(metadata_xml) > 1:
             self.logger.warning('There is more than one .xml metadata file in the Spectrum session directory %s. %d '
                                 'Metadata.xml files were found: %s.' %
@@ -95,9 +109,10 @@ class SpectrumMatchAnalysisTransformer:
                 'There are no .xml matchresults data files in the Spectrum session directory %s. There are %d file(s) '
                 'in the session directory: %s.' % (session, len(files), str(files)))
         elif len(match_results) > 1:
-            self.logger.warning('There is more than one .xml matchresults file in the Spectrum session directory %s. %d '
-                              'Metadata.json files were found: %s.' %
-                              (session, len(match_results), str(match_results)))
+            self.logger.warning(
+                'There is more than one .xml matchresults file in the Spectrum session directory %s. %d '
+                'Metadata.json files were found: %s.' %
+                (session, len(match_results), str(match_results)))
         elif meta_file is not None:
             self.logger.info('Loading player and match meta_data from from {}'.format(match_results[0]))
             df_player_names_raw, players_df_lineup, match_info = self.get_player_match_data(match_results[0], meta_file)
@@ -111,9 +126,10 @@ class SpectrumMatchAnalysisTransformer:
                 'There are no .xml eventdetails files in the Spectrum session directory %s. There are %d file(s) '
                 'in the session directory: %s.' % (session, len(files), str(files)))
         elif len(event_details) > 1:
-            self.logger.warning('There is more than one .xml eventdetails file in the Spectrum session directory %s. %d '
-                              'Metadata.json files were found: %s.' %
-                              (session, len(event_details), str(event_details)))
+            self.logger.warning(
+                'There is more than one .xml eventdetails file in the Spectrum session directory %s. %d '
+                'Metadata.json files were found: %s.' %
+                (session, len(event_details), str(event_details)))
         else:
             self.logger.info('Loading opta event data from {}'.format(event_details[0]))
             df_opta_events, opta_match_info = self.get_opta_events(event_details[0])
@@ -132,7 +148,16 @@ class SpectrumMatchAnalysisTransformer:
         return df_track_players, df_player_names_raw, players_df_lineup, match_info, df_opta_events, opta_match_info, df_time_possession
 
     @staticmethod
-    def get_track_player_data(track_path, track_metadata_path = None):
+    def get_track_player_data(track_path: str, track_metadata_path=None) -> pd.DataFrame:
+        """
+
+        Args:
+            track_path ():
+            track_metadata_path ():
+
+        Returns:
+
+        """
 
         if track_path.endswith('.dat'):
 
@@ -141,30 +166,33 @@ class SpectrumMatchAnalysisTransformer:
                 for cnt, line in enumerate(fp):
                     x.append(line)
 
-            #x[0].split(':')[0] #gives frame id
-            #x[0].split(':')[1].split(';')[:(len(x[0].split(':')[1].split(';'))-1)] #gives all players tracking info
-            #x[0].split(':')[2].split(';')[0] #gives ball tracking info
+            # x[0].split(':')[0] #gives frame id
+            # x[0].split(':')[1].split(';')[:(len(x[0].split(':')[1].split(';'))-1)] #gives all players tracking info
+            # x[0].split(':')[2].split(';')[0] #gives ball tracking info
 
-            #let's try to extract the player data sensibly from the array and turn them into a long dataframe
+            # let's try to extract the player data sensibly from the array and turn them into a long dataframe
             all_players_and_frames = []
 
             for k in range(len(x)):
                 all_players = []
-                for i in range(len(x[k].split(':')[1].split(';')[:(len(x[k].split(':')[1].split(';'))-1)])):
-                    player_values = [float(item) for item in x[k].split(':')[1].split(';')[:(len(x[k].split(':')[1].split(';'))-1)][i].split(',')]
+                for i in range(len(x[k].split(':')[1].split(';')[:(len(x[k].split(':')[1].split(';')) - 1)])):
+                    player_values = [float(item) for item in
+                                     x[k].split(':')[1].split(';')[:(len(x[k].split(':')[1].split(';')) - 1)][i].split(
+                                         ',')]
                     player_values.append(int(x[k].split(':')[0]))
-                    player_values = [player_values[j] for j in [6,0,1,2,3,4,5]]
+                    player_values = [player_values[j] for j in [6, 0, 1, 2, 3, 4, 5]]
                     all_players.append(player_values)
-                    del(player_values)
+                    del (player_values)
                 all_players_and_frames.append(all_players)
-                del(all_players)
+                del (all_players)
 
-            #we first need to flatten the array
+            # we first need to flatten the array
             all_players_and_frames_flattened = [item for sublist in all_players_and_frames for item in sublist]
-            track_players_df = pd.DataFrame(all_players_and_frames_flattened, columns = ['Frame_Count', 'Team_ID', 'System_Target_ID', 'Jersey_Number', 'x_Player', 'y_Player', 'Speed_Player'])
+            track_players_df = pd.DataFrame(all_players_and_frames_flattened,
+                                            columns=['Frame_Count', 'Team_ID', 'System_Target_ID', 'Jersey_Number',
+                                                     'x_Player', 'y_Player', 'Speed_Player'])
 
-
-            #let's try to use the same approach to get ball tracking data in a nicer format
+            # let's try to use the same approach to get ball tracking data in a nicer format
             all_balls_and_frames = []
 
             for k in range(len(x)):
@@ -172,25 +200,26 @@ class SpectrumMatchAnalysisTransformer:
 
             track_ball_df = pd.DataFrame(all_balls_and_frames)
             if track_ball_df.shape[1] > 7:
-                track_ball_df = track_ball_df.iloc[:,:7].reset_index(drop=True)
-            track_ball_df.columns = ['X_coord_ball', 'Y_coord_ball', 'Z_coord_ball', 'Speed_ball', 'Team_Possession', 'Ball_Status', 'Ball_contact_dev_info']
+                track_ball_df = track_ball_df.iloc[:, :7].reset_index(drop=True)
+            track_ball_df.columns = ['X_coord_ball', 'Y_coord_ball', 'Z_coord_ball', 'Speed_ball', 'Team_Possession',
+                                     'Ball_Status', 'Ball_contact_dev_info']
 
             for col in ['X_coord_ball', 'Y_coord_ball', 'Z_coord_ball', 'Speed_ball']:
                 track_ball_df[col] = track_ball_df[col].astype(float)
 
-            #we now add the frame_count column
+            # we now add the frame_count column
             track_ball_df['Frame_Count'] = [int(x[k].split(':')[0]) for k in range(len(all_balls_and_frames))]
-            track_ball_df['Is_Ball_Live'] = np.where(track_ball_df['Ball_Status']=='Alive', 'true', 'false')
+            track_ball_df['Is_Ball_Live'] = np.where(track_ball_df['Ball_Status'] == 'Alive', 'true', 'false')
             track_ball_df['Last_Touched'] = track_ball_df['Team_Possession']
-            #track_ball_df['Is_Home_Away'] = np.where()
+            # track_ball_df['Is_Home_Away'] = np.where()
 
+            # we now join the data
+            all_tracking_data = track_players_df.merge(track_ball_df, how='inner', left_on=['Frame_Count'],
+                                                       right_on=['Frame_Count'])
 
-            #we now join the data
-            all_tracking_data = track_players_df.merge(track_ball_df, how = 'inner', left_on = ['Frame_Count'], right_on = ['Frame_Count'])
+            # we need start and end frames for first and second half
 
-            #we need start and end frames for first and second half
-
-            with open(track_metadata_path, encoding = 'utf-8') as fd:
+            with open(track_metadata_path, encoding='utf-8') as fd:
                 tracab_metadata = xmltodict.parse(fd.read())
 
             frame_starts = []
@@ -200,15 +229,16 @@ class SpectrumMatchAnalysisTransformer:
                 frame_starts.append(int(tracab_metadata['TracabMetaData']['match']['period'][i]['@iStartFrame']))
                 frame_ends.append(int(tracab_metadata['TracabMetaData']['match']['period'][i]['@iEndFrame']))
 
-
             all_tracking_data_splits = []
             for i in range(len(frame_starts)):
-                all_tracking_data_splits.append(all_tracking_data[(all_tracking_data.Frame_Count >= frame_starts[i]) & (all_tracking_data.Frame_Count <= frame_ends[i]) & (~all_tracking_data.Team_ID.isin([-1,4]))].reset_index(drop = True))
+                all_tracking_data_splits.append(all_tracking_data[(all_tracking_data.Frame_Count >= frame_starts[i]) & (
+                            all_tracking_data.Frame_Count <= frame_ends[i]) & (~all_tracking_data.Team_ID.isin(
+                    [-1, 4]))].reset_index(drop=True))
 
             df = pd.concat(all_tracking_data_splits)
-            #all_tracking_data_final.drop_duplicates(['Frame_Count']).Team_Possession.value_counts()
+            # all_tracking_data_final.drop_duplicates(['Frame_Count']).Team_Possession.value_counts()
 
-        else: #json file
+        else:  # json file
 
             track_file = open(track_path)
 
@@ -218,46 +248,58 @@ class SpectrumMatchAnalysisTransformer:
 
             result = [json.loads(jline) for jline in str(raw_data).split('\n')]
 
-            def is_none (x):
+            def is_none(x):
                 return (x is None)
 
-            ball_df = pd.DataFrame(result)[['ball', 'frameIdx', 'period','gameClock','wallClock', 'lastTouch', 'live']]
+            ball_df = pd.DataFrame(result)[
+                ['ball', 'frameIdx', 'period', 'gameClock', 'wallClock', 'lastTouch', 'live']]
             ball_df['is_ball_none'] = list(map(is_none, ball_df['ball']))
-            ball_df['ball'] = np.where(ball_df['is_ball_none'], {'xyz': [None, None, None], 'speed': None}, ball_df['ball'])
+            ball_df['ball'] = np.where(ball_df['is_ball_none'], {'xyz': [None, None, None], 'speed': None},
+                                       ball_df['ball'])
             ball_df = pd.concat([ball_df, pd.json_normalize(ball_df['ball'])], axis=1, sort=False)
-            ball_df = pd.concat([ball_df, pd.DataFrame(ball_df.xyz.values.tolist(), index= ball_df.index, columns=['ball_x', 'ball_y', 'ball_z'])], axis=1, sort=False)
+            ball_df = pd.concat([ball_df, pd.DataFrame(ball_df.xyz.values.tolist(), index=ball_df.index,
+                                                       columns=['ball_x', 'ball_y', 'ball_z'])], axis=1, sort=False)
             ball_df['ball_speed'] = ball_df['speed']
             ball_df = ball_df.drop(columns=['speed', 'xyz', 'ball', 'is_ball_none'])
 
-            homePlayers_df = pd.json_normalize(result, 'homePlayers', ['frameIdx', 'period','gameClock','wallClock', 'lastTouch', 'live'])
-            homePlayers_df = pd.concat([homePlayers_df, pd.DataFrame(homePlayers_df.xyz.values.tolist(), index= homePlayers_df.index, columns=['x', 'y', 'z'])], axis=1, sort=False)
+            homePlayers_df = pd.json_normalize(result, 'homePlayers',
+                                               ['frameIdx', 'period', 'gameClock', 'wallClock', 'lastTouch', 'live'])
+            homePlayers_df = pd.concat([homePlayers_df,
+                                        pd.DataFrame(homePlayers_df.xyz.values.tolist(), index=homePlayers_df.index,
+                                                     columns=['x', 'y', 'z'])], axis=1, sort=False)
             homePlayers_df['is_home'] = True
 
-            awayPlayers_df = pd.json_normalize(result, 'awayPlayers', ['frameIdx', 'period','gameClock','wallClock', 'lastTouch', 'live'])
-            awayPlayers_df = pd.concat([awayPlayers_df, pd.DataFrame(awayPlayers_df.xyz.values.tolist(), index= awayPlayers_df.index, columns=['x', 'y', 'z'])], axis=1, sort=False)
+            awayPlayers_df = pd.json_normalize(result, 'awayPlayers',
+                                               ['frameIdx', 'period', 'gameClock', 'wallClock', 'lastTouch', 'live'])
+            awayPlayers_df = pd.concat([awayPlayers_df,
+                                        pd.DataFrame(awayPlayers_df.xyz.values.tolist(), index=awayPlayers_df.index,
+                                                     columns=['x', 'y', 'z'])], axis=1, sort=False)
             awayPlayers_df['is_home'] = False
 
             players_df = homePlayers_df.append(awayPlayers_df, sort=False)
             players_df = players_df.drop(columns=['xyz'])
 
-            df = pd.merge(players_df, ball_df, on=['frameIdx', 'period','gameClock','wallClock', 'lastTouch', 'live'])
+            df = pd.merge(players_df, ball_df, on=['frameIdx', 'period', 'gameClock', 'wallClock', 'lastTouch', 'live'])
 
             # Dataframe Clean
-            #df = df.rename(columns={"playerId": "source_player_id", "number": "jersey", "wallClock": "session_elapsed_time"})
+            # df = df.rename(columns={"playerId": "source_player_id", "number": "jersey", "wallClock": "session_elapsed_time"})
 
-            #df['session_elapsed_time'] = pd.to_datetime(df.session_elapsed_time, unit='ms')
+            # df['session_elapsed_time'] = pd.to_datetime(df.session_elapsed_time, unit='ms')
 
             df['live'] = np.where(df['live'], 'true', 'false')
             df['is_home'] = np.where(df['is_home'], 'home', 'away')
-            #df.loc[(df.live == 0), 'ball_status'] = 'Dead'
-            #df.loc[(df.live == 1), 'ball_status'] = 'Alive'
-            #df.loc[(df.lastTouch == 'home'), 'ball_possession'] = 'H'
-            #df.loc[(df.lastTouch == 'away'), 'ball_possession'] = 'A'
+            # df.loc[(df.live == 0), 'ball_status'] = 'Dead'
+            # df.loc[(df.live == 1), 'ball_status'] = 'Alive'
+            # df.loc[(df.lastTouch == 'home'), 'ball_possession'] = 'H'
+            # df.loc[(df.lastTouch == 'away'), 'ball_possession'] = 'A'
 
             # Dataframe Clean
             df = df.drop(columns=['optaUuid', 'ssiID', 'name', 'wallClock', 'number'], errors='ignore')
-            df.columns = ['Player_ID', 'Speed_Player', 'Frame_ID', 'Period_ID', 'Time', 'Last_Touched', 'Is_Ball_Live', 'x_Player', 'y_Player', 'z_Player', 'Is_Home_Away', 'x_Ball', 'y_Ball', 'z_Ball', 'Speed_Ball']
-            df = df[['Period_ID', 'Frame_ID', 'Time', 'Player_ID', 'Is_Home_Away', 'x_Player', 'y_Player', 'z_Player', 'Speed_Player', 'x_Ball', 'y_Ball', 'z_Ball', 'Speed_Ball', 'Is_Ball_Live', 'Last_Touched']]
+            df.columns = ['Player_ID', 'Speed_Player', 'Frame_ID', 'Period_ID', 'Time', 'Last_Touched', 'Is_Ball_Live',
+                          'x_Player', 'y_Player', 'z_Player', 'Is_Home_Away', 'x_Ball', 'y_Ball', 'z_Ball',
+                          'Speed_Ball']
+            df = df[['Period_ID', 'Frame_ID', 'Time', 'Player_ID', 'Is_Home_Away', 'x_Player', 'y_Player', 'z_Player',
+                     'Speed_Player', 'x_Ball', 'y_Ball', 'z_Ball', 'Speed_Ball', 'Is_Ball_Live', 'Last_Touched']]
             df['Period_ID'] = df['Period_ID'].astype(int)
             df['Frame_ID'] = df['Frame_ID'].astype(int)
             df['Time'] = df['Time'].astype(float)
@@ -266,13 +308,21 @@ class SpectrumMatchAnalysisTransformer:
         return df
 
     @staticmethod
-    def get_opta_events(event_path):
+    def get_opta_events(event_path: str) -> (pd.DataFrame, dict):
+        """
+
+        Args:
+            event_path ():
+
+        Returns:
+
+        """
 
         try:
             with open(event_path, encoding='utf-8') as fd:
                 opta_event = xmltodict.parse(fd.read())
         except UnicodeDecodeError:
-            with open(event_path, encoding = 'latin-1') as fd:
+            with open(event_path, encoding='latin-1') as fd:
                 opta_event = xmltodict.parse(fd.read())
 
         # start rearranging the file in a nicer format
@@ -405,15 +455,23 @@ class SpectrumMatchAnalysisTransformer:
         return opta_event_data_df, opta_match_info
 
     @staticmethod
-    def get_player_match_data(match_results_xml, path_track_meta):
+    def get_player_match_data(match_results_xml, path_track_meta) -> (pd.DataFrame, pd.DataFrame, dict):
+        """
+
+        Args:
+            match_results_xml ():
+            path_track_meta ():
+
+        Returns:
+
+        """
 
         try:
             with open(match_results_xml, encoding='utf-8') as fd:  # encoding essential for special characters in names
                 opta_results = xmltodict.parse(fd.read())
         except UnicodeDecodeError:
-            with open(match_results_xml, encoding = 'latin-1') as fd:
+            with open(match_results_xml, encoding='latin-1') as fd:
                 opta_results = xmltodict.parse(fd.read())
-
 
         if type(opta_results['SoccerFeed']['SoccerDocument']) != list:
             game_id = int(opta_results['SoccerFeed']['SoccerDocument']['@uID'].strip('f'))
@@ -440,7 +498,8 @@ class SpectrumMatchAnalysisTransformer:
                      'team_id']]
             else:
                 players_df_home = players_df_home[
-                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status', '@SubPosition',
+                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status',
+                     '@SubPosition',
                      'team_id']]
 
             if '@Formation_Place' not in list(players_df_away):
@@ -449,19 +508,24 @@ class SpectrumMatchAnalysisTransformer:
                      'team_id']]
             else:
                 players_df_away = players_df_away[
-                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status', '@SubPosition',
+                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status',
+                     '@SubPosition',
                      'team_id']]
 
             players_df_lineup = players_df_home.append(players_df_away, sort=False)
 
-            if '@Formation' not in list(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0].keys()):
+            if '@Formation' not in list(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0].keys()):
                 home_formation = None
             else:
-                home_formation = int(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0]['@Formation'])
-            if '@Formation' not in list(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1].keys()):
+                home_formation = int(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0]['@Formation'])
+            if '@Formation' not in list(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1].keys()):
                 away_formation = None
             else:
-                away_formation = int(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1]['@Formation'])
+                away_formation = int(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1]['@Formation'])
 
             player_names_home_raw = pd.DataFrame(opta_results['SoccerFeed']['SoccerDocument']['Team'][0]['Player'])
             player_names_away_raw = pd.DataFrame(opta_results['SoccerFeed']['SoccerDocument']['Team'][1]['Player'])
@@ -479,8 +543,8 @@ class SpectrumMatchAnalysisTransformer:
             player_names_raw['full_name'] = [(player_names_raw['PersonName'].iloc[i]['First'] + ' ' +
                                               player_names_raw.PersonName.iloc[i]['Last']) if len(
                 set(list(player_names_raw.PersonName.iloc[i].keys())).intersection(set(['Known']))) == 0 else
-                                               player_names_raw.PersonName.iloc[i]['Known'] for i in
-                                               range(player_names_raw.shape[0])]
+                                             player_names_raw.PersonName.iloc[i]['Known'] for i in
+                                             range(player_names_raw.shape[0])]
 
         else:  # take only first coming up
             game_id = int(opta_results['SoccerFeed']['SoccerDocument'][0]['@uID'].strip('f'))
@@ -489,9 +553,9 @@ class SpectrumMatchAnalysisTransformer:
             referee_id = int(
                 opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['MatchOfficial']['@uID'].strip('o'))
             referee_name = \
-            opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['MatchOfficial']['OfficialName'][
-                'First'] + ' ' + \
-            opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['MatchOfficial']['OfficialName']['Last']
+                opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['MatchOfficial']['OfficialName'][
+                    'First'] + ' ' + \
+                opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['MatchOfficial']['OfficialName']['Last']
             venue = opta_results['SoccerFeed']['SoccerDocument'][0]['Venue']['Name']
             team_data = pd.DataFrame(opta_results['SoccerFeed']['SoccerDocument'][0]['MatchData']['TeamData'])
             players_df_home = pd.DataFrame(team_data.PlayerLineUp.iloc[0]['MatchPlayer'])
@@ -507,7 +571,8 @@ class SpectrumMatchAnalysisTransformer:
                      'team_id']]
             else:
                 players_df_home = players_df_home[
-                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status', '@SubPosition',
+                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status',
+                     '@SubPosition',
                      'team_id']]
 
             if '@Formation_Place' not in list(players_df_away):
@@ -516,21 +581,24 @@ class SpectrumMatchAnalysisTransformer:
                      'team_id']]
             else:
                 players_df_away = players_df_away[
-                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status', '@SubPosition',
+                    ['@Captain', '@PlayerRef', '@Formation_Place', '@Position', '@ShirtNumber', '@Status',
+                     '@SubPosition',
                      'team_id']]
 
             players_df_lineup = pd.concat([players_df_home, players_df_away])
 
-            if '@Formation' not in list(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0].keys()):
+            if '@Formation' not in list(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0].keys()):
                 home_formation = None
             else:
-                home_formation = int(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0]['@Formation'])
-            if '@Formation' not in list(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1].keys()):
+                home_formation = int(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][0]['@Formation'])
+            if '@Formation' not in list(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1].keys()):
                 away_formation = None
             else:
-                away_formation = int(opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1]['@Formation'])
-
-
+                away_formation = int(
+                    opta_results['SoccerFeed']['SoccerDocument']['MatchData']['TeamData'][1]['@Formation'])
 
             player_names_home_raw = pd.DataFrame(opta_results['SoccerFeed']['SoccerDocument'][0]['Team'][0]['Player'])
             player_names_away_raw = pd.DataFrame(opta_results['SoccerFeed']['SoccerDocument'][0]['Team'][1]['Player'])
@@ -546,11 +614,10 @@ class SpectrumMatchAnalysisTransformer:
                                              range(player_names_raw.shape[0])]
 
             player_names_raw['full_name'] = [(player_names_raw['PersonName'].iloc[i]['First'] + ' ' +
-                                             player_names_raw.PersonName.iloc[i]['Last']) if len(
+                                              player_names_raw.PersonName.iloc[i]['Last']) if len(
                 set(list(player_names_raw.PersonName.iloc[i].keys())).intersection(set(['Known']))) == 0 else
-                                               player_names_raw.PersonName.iloc[i]['Known'] for i in
-                                               range(player_names_raw.shape[0])]
-
+                                             player_names_raw.PersonName.iloc[i]['Known'] for i in
+                                             range(player_names_raw.shape[0])]
 
         players_df_lineup = players_df_lineup.rename(columns={"@PlayerRef": "player_id", "@ShirtNumber": "jersey",
                                                               "@Position": "start_position", "@Status": "status",
@@ -558,12 +625,14 @@ class SpectrumMatchAnalysisTransformer:
                                                               "@SubPosition": "sub_position",
                                                               "@Captain": "captain"})
         players_df_lineup['player_id'] = [int(x.replace('p', '')) for x in players_df_lineup['player_id']]
-        players_df_lineup['position_in_pitch'] = np.where(players_df_lineup['sub_position'].notnull(), players_df_lineup['sub_position'], players_df_lineup['start_position'])
+        players_df_lineup['position_in_pitch'] = np.where(players_df_lineup['sub_position'].notnull(),
+                                                          players_df_lineup['sub_position'],
+                                                          players_df_lineup['start_position'])
 
         df_player_names_raw = player_names_raw.drop(columns=['PersonName'])
         df_player_names_raw = df_player_names_raw.rename(columns={"@Position": "position", "@uID": "player_id"})
         df_player_names_raw['player_id'] = [int(x.replace('p', '')) for x in df_player_names_raw['player_id']]
-        #df_player_info = pd.merge(players_df_lineup, player_names_raw, on=['player_id'])
+        # df_player_info = pd.merge(players_df_lineup, player_names_raw, on=['player_id'])
 
         if path_track_meta.endswith('json'):
             with open(path_track_meta, 'r') as f:
@@ -576,16 +645,15 @@ class SpectrumMatchAnalysisTransformer:
             length_pitch = float(opta_meta['TracabMetaData']['match']['@fPitchXSizeMeters'])
             width_pitch = float(opta_meta['TracabMetaData']['match']['@fPitchYSizeMeters'])
 
-
         match_info = {}
-        #match_info['description'] = meta_data['description']
-        #match_info['home_team_name'] = meta_data['description'].split(':')[0].split(' - ')[0]
-        #match_info['away_team_name'] = meta_data['description'].split(':')[0].split(' - ')[1]
-        #match_info['home_opta_id'] = meta_data['homeOptaId']
-        #match_info['away_opta_id'] = meta_data['awayOptaId']
-        #match_info['match_start_datetime'] = meta_data['startTime']
-        #match_info['match_fps'] = meta_data['fps']
-        #match_info['match_opta_id'] = meta_data['optaId']
+        # match_info['description'] = meta_data['description']
+        # match_info['home_team_name'] = meta_data['description'].split(':')[0].split(' - ')[0]
+        # match_info['away_team_name'] = meta_data['description'].split(':')[0].split(' - ')[1]
+        # match_info['home_opta_id'] = meta_data['homeOptaId']
+        # match_info['away_opta_id'] = meta_data['awayOptaId']
+        # match_info['match_start_datetime'] = meta_data['startTime']
+        # match_info['match_fps'] = meta_data['fps']
+        # match_info['match_opta_id'] = meta_data['optaId']
         match_info['pitchLength'] = length_pitch
         match_info['pitchWidth'] = width_pitch
         match_info['referee_id'] = referee_id
@@ -599,6 +667,15 @@ class SpectrumMatchAnalysisTransformer:
 
     @staticmethod
     def time_possession(track_players_df, file_results):
+        """
+
+        Args:
+            track_players_df ():
+            file_results ():
+
+        Returns:
+
+        """
 
         if 'System_Target_ID' not in list(track_players_df.columns): #means we have output from second spectrum file
             #time played by players

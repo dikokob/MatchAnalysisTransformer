@@ -305,7 +305,7 @@ class OPTATransformer:
                                                data_output['qualifier_ids']]
         data_output['Headed Pass'] = [int(3 in [int(y) for y in x.split(', ')]) for x in data_output['qualifier_ids']]
 
-        data_output = self.cross_label_v4(data_output)
+        data_output = self.cross_label(data_output)
 
         data_output['Attacking Team Name'] = np.where(data_output['team_id'] == data_output['home_team_id'],
                                                       data_output['home_team_name'], data_output['away_team_name'])
@@ -477,192 +477,6 @@ class OPTATransformer:
         return data
 
     @staticmethod
-    def cross_label(data_output): #TODO change to cross_label_v4 crosses loop in tracking data.py
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      # if there is cross qualifier then 1
-                                                      np.where(data_output['x'] < 60.0, 0,
-                                                               # if the pas starts from behind the halfway line then 0
-                                                               np.where((data_output['y'] > 100 / 3.0) & (
-                                                                       data_output['y'] < 100 / 1.5), 0,
-                                                                        # if the pass starts too frontal then 0
-                                                                        np.where(data_output['x_end'] < 80.0, 0,
-                                                                                 # if the pass ends too behind then 0
-                                                                                 np.where((np.abs(
-                                                                                     data_output['y'] - 50.0) < np.abs(
-                                                                                     data_output['y_end'] - 50.0)) & (
-                                                                                                  np.sign(data_output[
-                                                                                                              'y'] - 50.0) == np.sign(
-                                                                                              data_output[
-                                                                                                  'y_end'] - 50.0)), 0,
-                                                                                          # if the pass is directed wide then 0
-                                                                                          np.where((np.abs(
-                                                                                              data_output['y'] -
-                                                                                              data_output[
-                                                                                                  'y_end']) < 25.0) & (((
-                                                                                                                                data_output[
-                                                                                                                                    'y'] < 21.1) | (
-                                                                                                                                data_output[
-                                                                                                                                    'y'] > 78.9)) | (
-                                                                                                                               data_output[
-                                                                                                                                   'x'] < 83.0)),
-                                                                                                   0, 1))))))
-        # np.where((data_output['y_end'] < 18.1) | (data_output['y_end'] > 81.9), 0, 1))))))) #if the ball ends up too wide then 0
-
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where(
-                                                          (data_output['y_end'] < 18.1) | (data_output['y_end'] > 81.9), 0,
-                                                          data_output['Our Cross Qualifier']))
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['chipped_pass'] == 0) & (
-                                                              (data_output['x'] < 75.0) | (
-                                                              (data_output['y'] < 0.5 * 21.1) | (
-                                                              data_output['y'] > 0.5 * (100 + 78.9)))), 0,
-                                                               data_output[
-                                                                   'Our Cross Qualifier']))  # low passes should start not too behind or not too wide
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((np.abs(
-                                                          data_output['x_end'] - data_output['x']) > 1.05 * np.abs(
-                                                          data_output['y_end'] - data_output['y'])) & (
-                                                                       data_output['x'] < 70.0) & (
-                                                                       data_output['blocked_pass'] == 0), 0,
-                                                               data_output['Our Cross Qualifier']))
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((np.abs(
-                                                          data_output['x_end'] - data_output['x']) > 0.75 * np.abs(
-                                                          data_output['y_end'] - data_output['y'])) & (
-                                                                       data_output['x'] < 80.0) & (
-                                                                       data_output['x'] >= 70.0) & (
-                                                                       data_output['blocked_pass'] == 0), 0,
-                                                               data_output[
-                                                                   'Our Cross Qualifier']))  # we set an upper bound on the distance travelled on the x axis proportional to the distance travelled on the y axis
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((np.abs(
-                                                          data_output['x_end'] - data_output['x']) > 0.5 * np.abs(
-                                                          data_output['y_end'] - data_output['y'])) & (
-                                                                       data_output['x'] >= 80.0) & (
-                                                                       data_output['blocked_pass'] == 0), 0,
-                                                               data_output['Our Cross Qualifier']))
-
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['chipped_pass'] == 0) & (
-                                                              data_output['pass_situation'] == 'open play') & (
-                                                                       (data_output['x_end'] < 83.0) | (
-                                                                       (data_output['y_end'] > 78.9) | (
-                                                                       data_output['y_end'] < 21.1))), 0,
-                                                               data_output[
-                                                                   'Our Cross Qualifier']))  # all low passes from open play ending outside the box are not crosses
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['chipped_pass'] == 0) & (
-                                                              data_output['pass_situation'] == 'open play') & (
-                                                                       data_output['x'] < 83.0) & (
-                                                                       data_output['y'] >= 21.1) & (
-                                                                       data_output['y'] <= 78.9), 0,
-                                                               data_output[
-                                                                   'Our Cross Qualifier']))  # all low passes from open play ending outside the box are not crosses
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['pass_situation'] != 'open play') & (
-                                                              data_output['chipped_pass'] == 0) & (((data_output[
-                                                                                                         'y'] < 21.1) | (
-                                                                                                            data_output[
-                                                                                                                'y'] > 78.9)) | (
-                                                                                                           data_output[
-                                                                                                               'x'] < 83.0)) & (
-                                                                       ((data_output['y_end'] < 100 / 3.0) & (
-                                                                               data_output['y'] < 100 / 3.0)) | ((
-                                                                                                                         data_output[
-                                                                                                                             'y_end'] > 100 / 1.5) & (
-                                                                                                                         data_output[
-                                                                                                                             'y'] > 100 / 1.5))),
-                                                               0,
-                                                               data_output[
-                                                                   'Our Cross Qualifier']))  # all low passes from set piece situation not being wide enough and ending outside box are not crosses
-
-        # data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier']==1, 1,
-        #    np.where((data_output['x'] < 83.0) & (data_output['x_end'] < 83.0), 0,
-        #        np.where((data_output['x'] < 83.0) & (data_output['chipped_pass']==0), 0, data_output['Our Cross Qualifier']))) #any pass starting and ending before box horizontal line is not a cross and any low pass starting before the box horizontal line is not a cross as well
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where(((data_output['y_end'] > 63.2) | (
-                                                              data_output['y_end'] < 36.8)) & (
-                                                                       np.sign(data_output['y'] - 50.0) == np.sign(
-                                                                   data_output['y_end'] - 50.0)), 0,
-                                                               data_output['Our Cross Qualifier']))
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((((data_output['y'] <= 78.9) & (
-                                                              data_output['y'] > 100 / 1.5)) | (
-                                                                        (data_output['y'] < 100 / 3.0) & (
-                                                                        data_output['y'] >= 21.1))) & (
-                                                                       data_output['x'] < 83.0) & (
-                                                                       (data_output['y_end'] >= 100 / 1.5) | (
-                                                                       data_output['y_end'] <= 100 / 3.0)),
-                                                               0, data_output['Our Cross Qualifier']))
-        # data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier']==1, 1,
-        #    np.where((data_output['chipped_pass']==0) & (data_output['x'] < 94.2) & (data_output['x_end'] < 83.0) & (data_output['pass_situation']=='open play'), 0, data_output['Our Cross Qualifier']))
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['pass_situation'] == 'open play') & (
-                                                              data_output['x'] < 82.0) & (data_output['x_end'] < 88.5),
-                                                               0, data_output['Our Cross Qualifier']))
-
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where((data_output['x'] >= 83.0) & (data_output['x'] < 88.5) & (
-                                                              data_output['y'] <= 78.9) & (data_output['y'] >= 21.1) & (
-                                                                       np.abs(data_output['y'] - data_output[
-                                                                           'y_end']) < 20.0), 0,
-                                                               np.where((data_output['x'] >= 88.5) & (
-                                                                       data_output['x'] < 94.2) & (
-                                                                                data_output['y'] <= 78.9) & (
-                                                                                data_output['y'] >= 21.1) & (np.abs(
-                                                                   data_output['y'] - data_output['y_end']) < 15.0), 0,
-                                                                        np.where((data_output['x'] >= 94.2) & (
-                                                                                data_output['y'] <= 78.9) & (
-                                                                                         data_output['y'] >= 21.1) & (
-                                                                                         np.abs(data_output['y'] -
-                                                                                                data_output[
-                                                                                                    'y_end']) < 10.0),
-                                                                                 0,
-                                                                                 data_output['Our Cross Qualifier']))))
-
-        data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier'] == 1, 1,
-                                                      np.where(((data_output['Headed Pass'] == 1) | (
-                                                              data_output['throw_in_taken'] == 1)), 0, data_output[
-                                                                   'Our Cross Qualifier']))  # if the pass is headed then 0
-
-        data_output['cutback'] = [int(195 in [int(y) for y in x.split(', ')]) for x in data_output['qualifier_ids']]
-        data_output['Our Cross Qualifier'] = np.where(data_output['cutback'] == 1, 1, data_output['Our Cross Qualifier'])
-        data_output['cutback'] = np.where(data_output['x'] < 83.0, 0,
-                                          np.where((data_output['y'] >= 95.0) | (data_output['y'] <= 5.0), 0,
-                                                   np.where(data_output['cutback'] == 1, 1,
-                                                            np.where((data_output['Our Cross Qualifier'] == 1) & (
-                                                                    data_output['x'] >= 88.5) & (
-                                                                             data_output['x'] <= 94.2) & (
-                                                                             data_output['y'] >= 0.5 * 21.1) & (
-                                                                             data_output['y'] <= 0.5 * 178.9) & (
-                                                                             data_output['x_end'] >= 80.0) & (
-                                                                             data_output['y_end'] <= 78.9) & (
-                                                                             data_output['y_end'] >= 21.1) & (
-                                                                             data_output['x'] - data_output[
-                                                                         'x_end'] >= 2.0),
-                                                                     1,
-                                                                     np.where((data_output['Our Cross Qualifier'] == 1) & (
-                                                                             data_output['x'] > 94.2) & (
-                                                                                      data_output['x_end'] < 94.2) & (
-                                                                                      data_output[
-                                                                                          'y'] >= 0.5 * 21.1) & (
-                                                                                      data_output[
-                                                                                          'y'] <= 0.5 * 178.9) & (
-                                                                                      data_output['x_end'] >= 80.0) & (
-                                                                                      data_output['y_end'] <= 78.9) & (
-                                                                                      data_output['y_end'] >= 21.1) & (
-                                                                                      data_output['x'] - data_output[
-                                                                                  'x_end'] >= 2.0),
-                                                                              1, 0)))))
-        data_output['cutback'] = np.where((data_output['cutback'] == 1) & (data_output['chipped_pass'] == 1) & (
-                data_output['x'] - data_output['x_end'] < 5.0) & (np.array(
-            [int(195 in [int(y) for y in x.split(', ')]) for x in data_output['qualifier_ids']]) == 0),
-                                          0, data_output['cutback'])
-
-        return data_output
-
-    @staticmethod
     def y_threshold(x_coordinate: float, y_coordinate: float) -> int:
         """Computes whether y_threshold was met for a cross.
 
@@ -699,7 +513,7 @@ class OPTATransformer:
 
         return is_cross
 
-    def cross_label_v4(self, data_output: pd.DataFrame) -> pd.DataFrame:
+    def cross_label(self, data_output: pd.DataFrame) -> pd.DataFrame:
         """[summary]
 
         Args:

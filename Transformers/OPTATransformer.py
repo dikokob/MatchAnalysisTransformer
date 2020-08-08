@@ -662,7 +662,8 @@ class OPTATransformer:
 
         return data_output
 
-    def y_threshold (x_coordinate: float, y_coordinate: float) -> int:
+    @staticmethod
+    def y_threshold(x_coordinate: float, y_coordinate: float) -> int:
         """Computes whether y_threshold was met for a cross.
 
             note:
@@ -687,7 +688,7 @@ class OPTATransformer:
                 y1 = 100/1.5
             slope = (x1 - x0)/(y1 - y0)
             intercept = y0 - slope*x0
-            y_threshold = intercept + slope*x
+            y_threshold = intercept + slope*x_coordinate
             if ((y_coordinate <= y_threshold) & (y_coordinate < 50)) | ((y_coordinate >= y_threshold) & (y_coordinate > 50)):
                 is_cross = 1
             else:
@@ -698,8 +699,7 @@ class OPTATransformer:
 
         return is_cross
 
-    @staticmethod
-    def cross_label_v4 (data_output: pd.DataFrame) -> pd.DataFrame:
+    def cross_label_v4(self, data_output: pd.DataFrame) -> pd.DataFrame:
         """[summary]
 
         Args:
@@ -776,7 +776,7 @@ class OPTATransformer:
             0, data_output['cutback'])
         data_output['Our Cross Qualifier'] = np.where(data_output['cutback']==1, 1, data_output['Our Cross Qualifier'])
 
-        data_output['y_threshold'] = list(map(lambda x,y: y_threshold(x_coordinate=x,y_coordinate=y), data_output['x'], data_output['y']))
+        data_output['y_threshold'] = list(map(lambda x,y: self.y_threshold(x_coordinate=x, y_coordinate=y), data_output['x'], data_output['y']))
         data_output['Our Cross Qualifier'] = np.where(data_output['OPTA Cross Qualifier']==1, 1, 
             np.where(data_output['y_threshold']==0, 0, data_output['Our Cross Qualifier']))
         data_output = data_output.drop(['y_threshold'], axis = 1)

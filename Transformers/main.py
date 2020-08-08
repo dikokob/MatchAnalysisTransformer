@@ -34,11 +34,11 @@ if __name__ == "__main__":
 
         # Get processed files 
         try:            
-            df_track_players = pd.read_csv(os.path.join(processed_folder,'df_track_players.csv')).iloc[:,1:]
-            df_player_names_raw = pd.read_csv(os.path.join(processed_folder, 'df_player_names_raw.csv')).iloc[:,1:]
-            players_df_lineup = pd.read_csv(os.path.join(processed_folder, 'players_df_lineup.csv')).iloc[:,1:]
-            df_opta_events = pd.read_csv(os.path.join(processed_folder, 'df_opta_events.csv')).iloc[:,1:]
-            df_time_possession = pd.read_csv(os.path.join(processed_folder, 'df_time_possession.csv')).iloc[:,1:]
+            df_track_players = pd.read_csv(os.path.join(processed_folder,'df_track_players.csv'))
+            df_player_names_raw = pd.read_csv(os.path.join(processed_folder, 'df_player_names_raw.csv'))
+            players_df_lineup = pd.read_csv(os.path.join(processed_folder, 'players_df_lineup.csv'))
+            df_opta_events = pd.read_csv(os.path.join(processed_folder, 'df_opta_events.csv'))
+            df_time_possession = pd.read_csv(os.path.join(processed_folder, 'df_time_possession.csv'))
 
             with open(os.path.join(processed_folder,'match_info.json'), 'r') as f: 
                 match_info = json.load(f)

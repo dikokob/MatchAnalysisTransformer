@@ -11,10 +11,10 @@ class SpectrumMatchAnalysisTransformer:
     data_source = None
 
     def __init__(self, data_source: str):
-        """
+        """[summary]
 
         Args:
-            data_source ():
+            data_source (str): [description]
         """
         self.data_source = data_source
         self.logger = logging.getLogger(
@@ -22,21 +22,37 @@ class SpectrumMatchAnalysisTransformer:
 
     @staticmethod
     def is_numeric(s) -> bool:
+        """[summary]
 
+        Args:
+            s (): [description]
+
+        Returns:
+            bool: [description]
+
+        """
         try:
             float(s)
             return True
         except ValueError:
             return False
 
-    def transform(self, session: str, files: list) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, dict, pd.DataFrame, dict, pd.DataFrame):
-        """
+    def transform(self, session: str, files: list) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, dict, pd.DataFrame,
+                                                       dict, pd.DataFrame):
+        """[summary]
 
         Args:
-            session ():
-            files ():
+            session (str): [description]
+            files (list): [description]
 
         Returns:
+            pd.DataFrame: [df_track_players]
+            pd.DataFrame: [df_player_names_raw]
+            pd.DataFrame: [players_df_lineup]
+            dict: [match_info]
+            pd.DataFrame: [df_opta_events]
+            dict: [opta_match_info]
+            pd.DataFrame: [df_time_possession]
 
         """
         if len(files) < 1:
@@ -145,17 +161,19 @@ class SpectrumMatchAnalysisTransformer:
             self.logger.info('Calculation time possession')
             df_time_possession = self.time_possession(df_track_players, match_results[0])
 
-        return df_track_players, df_player_names_raw, players_df_lineup, match_info, df_opta_events, opta_match_info, df_time_possession
+        return df_track_players, df_player_names_raw, players_df_lineup, match_info, df_opta_events, opta_match_info, \
+               df_time_possession
 
     @staticmethod
     def get_track_player_data(track_path: str, track_metadata_path=None) -> pd.DataFrame:
-        """
+        """[summary]
 
         Args:
-            track_path ():
-            track_metadata_path ():
+            track_path (str): [description]
+            track_metadata_path (str): [description]
 
         Returns:
+            pd.DataFrame: [df]
 
         """
 
@@ -309,12 +327,14 @@ class SpectrumMatchAnalysisTransformer:
 
     @staticmethod
     def get_opta_events(event_path: str) -> (pd.DataFrame, dict):
-        """
+        """[summary]
 
         Args:
-            event_path ():
+            event_path (str): [description]
 
         Returns:
+            pd.DataFrame: [opta_event_data_df]
+            dict: [opta_match_info]
 
         """
 
@@ -456,13 +476,16 @@ class SpectrumMatchAnalysisTransformer:
 
     @staticmethod
     def get_player_match_data(match_results_xml, path_track_meta) -> (pd.DataFrame, pd.DataFrame, dict):
-        """
+        """[summary]
 
         Args:
-            match_results_xml ():
-            path_track_meta ():
+            match_results_xml (str): [description]
+            path_track_meta (str): [description]
 
         Returns:
+            pd.DataFrame: [df_player_names_raw]
+            pd.DataFrame: [players_df_lineup]
+            dict: [match_info]
 
         """
 
@@ -666,14 +689,15 @@ class SpectrumMatchAnalysisTransformer:
         return df_player_names_raw, players_df_lineup, match_info
 
     @staticmethod
-    def time_possession(track_players_df, file_results):
-        """
+    def time_possession(track_players_df: pd.DataFrame, file_results: str) -> pd.DataFrame:
+        """[summary]
 
         Args:
-            track_players_df ():
-            file_results ():
+            track_players_df (pd.DataFrame): [description]
+            file_results (str): [description]
 
         Returns:
+            pd.DataFrame: [final_data_pivot]
 
         """
 

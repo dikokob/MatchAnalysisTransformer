@@ -1,13 +1,15 @@
-from SpectrumMatchAnalysisTransformer import SpectrumMatchAnalysisTransformer
-from OPTATransformer import OPTATransformer
 import os
 import glob
 import pandas as pd
 import json
 
+from SpectrumMatchAnalysisTransformer import SpectrumMatchAnalysisTransformer
+from OPTATransformer import OPTATransformer
+from SetPieceClassificationTansformer import SetPieceClassificationTansformer
 
 spectrumTransformer = SpectrumMatchAnalysisTransformer('SpectrumMatchAnalysis')
 optaTransformer = OPTATransformer()
+setPieceTransformer = SetPieceClassificationTansformer()
 
 if __name__ == "__main__":
 
@@ -107,7 +109,34 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession.to_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession.csv'), index=False)
             df_opta_crosses.to_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'), index=False)
             df_opta_shots.to_csv(os.path.join(processed_folder, 'df_opta_shots.csv'), index=False)
-        
+
+        # ===========================================================================================================================
+
+        df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners = [None for i in range(3)]
+
+        # Get processed files
+        try:
+            df_opta_output_final_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_final_corners.csv'))
+            df_opta_output_shots_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_shots_corners.csv'))
+            df_opta_output_aerial_duels_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_corners.csv'))
+
+        except Exception as e:
+            print('Getting raw processed files from local, however failed to load them: {}'.format(e))
+
+        # If processed files don't exsit process
+        if any(x is None for x in [df_opta_output_final_corners, df_opta_output_shots_corners,
+                                   df_opta_output_aerial_duels_corners]):
+
+            df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners = \
+                setPieceTransformer.corners_classification(df_opta_events, df_player_names_raw, match_info,
+                                                           opta_match_info, df_opta_crosses, df_opta_shots)
+
+            if not os.path.exists(processed_folder):
+                os.makedirs(processed_folder)
+
+            df_opta_output_final_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_final_corners.csv'), index=False)
+            df_opta_output_shots_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_shots_corners.csv'), index=False)
+            df_opta_output_aerial_duels_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_corners.csv'), index=False)
 
        
        

@@ -7,6 +7,9 @@ import xmltodict
 
 
 class SpectrumMatchAnalysisTransformer:
+    """
+
+    """
     logger = None
     data_source = None
 
@@ -36,6 +39,18 @@ class SpectrumMatchAnalysisTransformer:
             return True
         except ValueError:
             return False
+
+    @staticmethod
+    def is_none(x):
+        """[summary]
+
+        Args:
+            x (): [description]
+
+        Returns:
+
+        """
+        return x is None
 
     def transform(self, session: str, files: list) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame, dict, pd.DataFrame,
                                                        dict, pd.DataFrame):
@@ -164,8 +179,7 @@ class SpectrumMatchAnalysisTransformer:
         return df_track_players, df_player_names_raw, players_df_lineup, match_info, df_opta_events, opta_match_info, \
                df_time_possession
 
-    @staticmethod
-    def get_track_player_data(track_path: str, track_metadata_path=None) -> pd.DataFrame:
+    def get_track_player_data(self, track_path: str, track_metadata_path=None) -> pd.DataFrame:
         """[summary]
 
         Args:
@@ -266,12 +280,11 @@ class SpectrumMatchAnalysisTransformer:
 
             result = [json.loads(jline) for jline in str(raw_data).split('\n')]
 
-            def is_none(x):
-                return (x is None)
+
 
             ball_df = pd.DataFrame(result)[
                 ['ball', 'frameIdx', 'period', 'gameClock', 'wallClock', 'lastTouch', 'live']]
-            ball_df['is_ball_none'] = list(map(is_none, ball_df['ball']))
+            ball_df['is_ball_none'] = list(map(self.is_none, ball_df['ball']))
             ball_df['ball'] = np.where(ball_df['is_ball_none'], {'xyz': [None, None, None], 'speed': None},
                                        ball_df['ball'])
             ball_df = pd.concat([ball_df, pd.json_normalize(ball_df['ball'])], axis=1, sort=False)
@@ -657,7 +670,10 @@ class SpectrumMatchAnalysisTransformer:
         df_player_names_raw['player_id'] = [int(x.replace('p', '')) for x in df_player_names_raw['player_id']]
         # df_player_info = pd.merge(players_df_lineup, player_names_raw, on=['player_id'])
 
-        if path_track_meta.endswith('json'):
+        if path_track_meta is None:
+            length_pitch = 105.0
+            width_pitch = 68.0
+        elif path_track_meta.endswith('json'):
             with open(path_track_meta, 'r') as f:
                 datastore = json.load(f)
             length_pitch = float(datastore['pitchLength'])

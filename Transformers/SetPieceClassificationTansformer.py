@@ -18,10 +18,11 @@ class SetPieceClassificationTansformer:
 
 
     @staticmethod
-    def get_opta_squad_data():
+    def get_opta_squad_data() -> pd.DataFrame:
         """
 
         Returns:
+            pd.DataFrame: [description]
 
         """
 
@@ -52,18 +53,27 @@ class SetPieceClassificationTansformer:
         data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
         return data_squads
 
-    def extract_set_piece_statistics(self, df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)-> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
-        """
+    def extract_set_piece_statistics(self, df_opta_output_final_freekicks: pd.DataFrame,
+                                     df_opta_output_shots_freekicks: pd.DataFrame,
+                                     df_opta_output_aerial_duels_freekicks: pd.DataFrame,
+                                     df_opta_output_final_corners: pd.DataFrame,
+                                     df_opta_output_shots_corners: pd.DataFrame,
+                                     df_opta_output_aerial_duels_corners: pd.DataFrame) -> \
+            (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        """[summary]
 
         Args:
-            df_opta_output_final_freekicks ():
-            df_opta_output_shots_freekicks ():
-            df_opta_output_aerial_duels_freekicks ():
-            df_opta_output_final_corners ():
-            df_opta_output_shots_corners ():
-            df_opta_output_aerial_duels_corners ():
+            df_opta_output_final_freekicks (pd.DataFrame): [description]
+            df_opta_output_shots_freekicks (pd.DataFrame): [description]
+            df_opta_output_aerial_duels_freekicks (pd.DataFrame): [description]
+            df_opta_output_final_corners (pd.DataFrame): [description]
+            df_opta_output_shots_corners (pd.DataFrame): [description]
+            df_opta_output_aerial_duels_corners (pd.DataFrame): [description]
 
         Returns:
+            pd.DataFrame: [description]
+            pd.DataFrame: [description]
+            pd.DataFrame: [description]
 
         """
 
@@ -118,7 +128,26 @@ class SetPieceClassificationTansformer:
 
             return final_df_set_pieces, final_df_shots, final_df_aerial_duels
 
-    def set_piece_classification(self, df_opta_events, match_info, opta_match_info, df_opta_crosses, df_opta_shots, df_player_names_raw):
+    def set_piece_classification(self, df_opta_events: pd.DataFrame, match_info: dict,
+                                 opta_match_info: dict, df_opta_crosses: pd.DataFrame,
+                                 df_opta_shots: pd.DataFrame,
+                                 df_player_names_raw: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        """[summary]
+
+        Args:
+            df_opta_events (pd.DataFrame): [description]
+            match_info (dict): [description]
+            opta_match_info (dict): [description]
+            df_opta_crosses (pd.DataFrame): [description]
+            df_opta_shots (pd.DataFrame): [description]
+            df_player_names_raw (pd.DataFrame): [description]
+
+        Returns:
+            pd.DataFrame: [description]
+            pd.DataFrame: [description]
+            pd.DataFrame: [description]
+
+        """
     
         opta_event_data_df = df_opta_events
 

@@ -113,8 +113,9 @@ if __name__ == "__main__":
         # ===========================================================================================================================
 
         df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners, \
-        df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks= \
-            [None for i in range(6)]
+        df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks, \
+        final_df_set_pieces, final_df_shots, final_df_aerial_duels = \
+            [None for i in range(9)]
 
         # Get processed files
         try:
@@ -124,6 +125,9 @@ if __name__ == "__main__":
             df_opta_output_final_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_final_freekicks.csv'))
             df_opta_output_shots_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_shots_freekicks.csv'))
             df_opta_output_aerial_duels_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_freekicks.csv'))
+            final_df_set_pieces = pd.read_csv(os.path.join(processed_folder, 'final_df_set_pieces.csv'))
+            final_df_shots = pd.read_csv(os.path.join(processed_folder, 'final_df_shots.csv'))
+            final_df_aerial_duels = pd.read_csv(os.path.join(processed_folder, 'final_df_aerial_duels.csv'))
 
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
@@ -131,7 +135,8 @@ if __name__ == "__main__":
         # If processed files don't exsit process
         if any(x is None for x in [df_opta_output_final_corners, df_opta_output_shots_corners,
                                    df_opta_output_aerial_duels_corners, df_opta_output_final_freekicks,
-                                   df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks]):
+                                   df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks,
+                                   final_df_set_pieces, final_df_shots, final_df_aerial_duels]):
 
             df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners = \
                 setPieceTransformer.corners_classification(df_opta_events, df_player_names_raw, match_info,
@@ -140,6 +145,11 @@ if __name__ == "__main__":
             df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks = \
                 setPieceTransformer.set_piece_classification(df_opta_events, match_info, opta_match_info,
                                                              df_opta_crosses, df_opta_shots, df_player_names_raw)
+
+            final_df_set_pieces, final_df_shots, final_df_aerial_duels = setPieceTransformer.\
+                extract_set_piece_statistics(df_opta_output_final_freekicks, df_opta_output_shots_freekicks,
+                                             df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners,
+                                             df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)
 
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
@@ -150,6 +160,10 @@ if __name__ == "__main__":
             df_opta_output_final_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_final_freekicks.csv'), index=False)
             df_opta_output_shots_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_shots_freekicks.csv'), index=False)
             df_opta_output_aerial_duels_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_freekicks.csv'), index=False)
+            final_df_set_pieces.to_csv(os.path.join(processed_folder, 'final_df_set_pieces.csv'), index=False)
+            final_df_shots.to_csv(os.path.join(processed_folder, 'final_df_shots.csv'), index=False)
+            final_df_aerial_duels.to_csv(os.path.join(processed_folder, 'final_df_aerial_duels.csv'), index=False)
+
 
        
        

@@ -16,11 +16,109 @@ class SetPieceClassificationTansformer:
         # self.config = config
         self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
-    # def extract_set_piece_statistics(self, df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)-> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
 
-    # def set_piece_classification (self, df_opta_events, match_info, opta_match_info, df_opta_crosses, df_opta_shots)-> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+    @staticmethod
+    def get_opta_squad_data():
+        """
 
-    def set_piece_classification (self, df_opta_events, match_info, opta_match_info, df_opta_crosses, df_opta_shots, df_player_names_raw):
+        Returns:
+
+        """
+
+        path_squads = '..\\scripts_from_fed\\srml-8-2019-squads.xml'
+
+        try:
+            with open(path_squads, encoding = 'utf-8') as fd:
+                opta_squads = xmltodict.parse(fd.read())
+        except UnicodeDecodeError:
+            with open(path_squads, encoding = 'latin-1') as fd:
+                opta_squads = xmltodict.parse(fd.read())
+
+        list_squads = []
+
+        for i in range(20):
+            data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
+            if '@loan' in data_players_in.columns:
+                data_players_in = data_players_in.drop(['@loan'], axis = 1)
+            data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+            if '@loan' in data_players_out.columns:
+                data_players_out = data_players_out.drop(['@loan'], axis = 1)
+            data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+            data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
+            list_squads.append(data_players)
+
+        data_squads = pd.concat(list_squads).reset_index(drop=True)
+        data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+        data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+        return data_squads
+
+    def extract_set_piece_statistics(self, df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)-> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        """
+
+        Args:
+            df_opta_output_final_freekicks ():
+            df_opta_output_shots_freekicks ():
+            df_opta_output_aerial_duels_freekicks ():
+            df_opta_output_final_corners ():
+            df_opta_output_shots_corners ():
+            df_opta_output_aerial_duels_corners ():
+
+        Returns:
+
+        """
+
+        data_squads = self.get_opta_squad_data()
+
+        list_of_dfs_shots = []
+        list_of_dfs_shots.append(df_opta_output_shots_freekicks)
+        list_of_dfs_shots.append(df_opta_output_shots_corners)
+
+        list_of_dfs_aerial_duels = []
+        list_of_dfs_aerial_duels.append(df_opta_output_aerial_duels_freekicks)
+        list_of_dfs_aerial_duels.append(df_opta_output_aerial_duels_corners)
+
+
+        if df_opta_output_final_corners is not None :
+            final_df_freekicks = df_opta_output_final_freekicks
+            final_df_corners = df_opta_output_final_corners
+            final_df_shots = pd.concat(list_of_dfs_shots)
+            final_df_aerial_duels = pd.concat(list_of_dfs_aerial_duels)
+
+            final_df_freekicks['Frontal/Lateral End'] = np.where(final_df_freekicks['Frontal/Lateral End'] == 'End Shot', None, final_df_freekicks['Frontal/Lateral End'])
+
+            final_df_freekicks = final_df_freekicks.rename(columns = {'Same Side':'Ending Side'})
+
+            #final_df_freekicks_pivoted = pd.get_dummies(final_df_freekicks, prefix = '', prefix_sep='', columns=['Start Area Of Pitch', 'Frontal/Lateral Start', 'Frontal/Lateral End']).reset_index(drop = True)
+
+
+            #final_df_freekicks = final_df_freekicks.merge(final_df_freekicks_pivoted, how = 'inner').sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+
+            final_df_set_pieces = pd.concat([final_df_freekicks, final_df_corners], axis = 0, ignore_index = True,
+                                            sort = False).sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+
+
+            final_df_set_pieces = final_df_set_pieces.merge(data_squads.drop(['Position'], axis =1), how = 'left', left_on = ['Attacking Team ID', 'Player ID'],
+                                                            right_on = ['team_id', '@uID']).drop(['@uID', 'team_id', 'Name'], axis = 1).sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+            final_df_set_pieces = final_df_set_pieces.merge(data_squads.drop(['Position'], axis =1), how = 'left', left_on = ['Attacking Team ID', 'Relevant Player ID'],
+                                                            right_on = ['team_id', '@uID'], suffixes = ('', '_relevant')).drop(['@uID', 'team_id', 'Name'], axis = 1).sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+
+            final_df_set_pieces['Actual Delivery Type'] = np.where(final_df_set_pieces['Set Piece Type'] == 'Corner',
+                                                                   final_df_set_pieces['Actual Delivery Type'],
+                                                                   np.where(final_df_set_pieces['Set Piece Type'].isin(['Free Kick Outside Target Zone', 'Free Kick Shot']), None,
+                                                                            np.where(final_df_set_pieces['Side']=='No Side', None,
+                                                                                     np.where(final_df_set_pieces['Side'] == final_df_set_pieces['preferred_foot_relevant'],
+                                                                                              'Outswing', 'Inswing'))))
+            final_df_set_pieces = final_df_set_pieces.rename(columns = {'preferred_foot': 'Preferred Foot',
+                                                                        'preferred_foot_relevant': 'Relevant Preferred Foot'})
+
+            final_df_shots = final_df_shots.merge(data_squads.drop(['Position'], axis =1), how = 'left', left_on = ['Shot Team ID', 'Shot Player ID'],
+                                                  right_on = ['team_id', '@uID']).drop(['@uID', 'team_id', 'Name'], axis = 1).reset_index(drop=True)
+            final_df_shots = final_df_shots.rename(columns = {'preferred_foot': 'Preferred Foot'})
+
+
+            return final_df_set_pieces, final_df_shots, final_df_aerial_duels
+
+    def set_piece_classification(self, df_opta_events, match_info, opta_match_info, df_opta_crosses, df_opta_shots, df_player_names_raw):
     
         opta_event_data_df = df_opta_events
 
@@ -1060,7 +1158,6 @@ class SetPieceClassificationTansformer:
     
         #return summary_df[summary_df['Type Of FreeKick'] != 'None'].drop(['Type Of FreeKick'], axis = 1).reset_index(drop=True)
         return summary_df.drop(['Type Of FreeKick'], axis = 1).reset_index(drop=True), summary_df_all_shots.reset_index(drop=True), summary_df_aerial_duels.reset_index(drop=True)
-
 
     def corners_classification(self, df_opta_events: pd.DataFrame, df_player_names_raw: pd.DataFrame, match_info: dict,
                                opta_match_info: dict, df_opta_crosses: pd.DataFrame, df_opta_shots: pd.DataFrame) -> \

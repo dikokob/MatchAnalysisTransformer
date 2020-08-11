@@ -2344,7 +2344,7 @@ class SetPieceClassificationTansformer:
         data_crosses['Game State'] = None
         data_crosses['Defending Team ID'] = None
         data_crosses['Time Between Relevant Pass And Cross'] = None
-        data_crosses['Number Events Between Relevant And Cross'] = None
+        data_crosses['Number Events Between Relevant Pass And Cross'] = None
         data_crosses['Defending Goalkeeper ID'] = None
         data_crosses['Defending Goalkeeper Name'] = None
         data_crosses['Linked 2nd Phase Cross IDs'] = None
@@ -3084,7 +3084,7 @@ class SetPieceClassificationTansformer:
                                                                       'Assist', None))
 
         data_crosses = data_crosses.rename(columns = {'fixture': 'Fixture', 'unique_event_id': 'OPTA Event ID',
-                                                      'player_id': 'Player ID', 'team_id': 'Attacking Team ID',
+                                                      '@uID': 'Player ID', 'team_id': 'Attacking Team ID',
                                                       'Attacking Team Name': 'Attacking Team', 'Defending Team Name': 'Defending Team',
                                                       'x': 'X Coordinate', 'y': 'Y Coordinate', 'x_end': 'End X Coordinate', 'y_end': 'End Y Coordinate',
                                                       'preferred_foot': 'Preferred Foot', 'Time Between Relevant Pass And Cross': 'Time Between Set Piece And Cross',

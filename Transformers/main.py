@@ -19,8 +19,8 @@ if __name__ == "__main__":
     # Loop through all rawdata
     for session in os.listdir(input_data_dir):
 
-        
-        print('Processing Session: {}'.format(session))  
+
+        print('Processing Session: {}'.format(session))
         # Set processed folder
         processed_folder = os.path.join(processed_data_dir, session)
 
@@ -32,20 +32,20 @@ if __name__ == "__main__":
 
         # Process Spectrum Match Analysis
         df_track_players, df_player_names_raw, players_df_lineup, match_info , df_opta_events, opta_match_info, \
-        df_time_possession  = [None for i in range(7)] 
+        df_time_possession  = [None for i in range(7)]
 
         # Get processed files 
-        try:            
+        try:
             df_track_players = pd.read_csv(os.path.join(processed_folder,'df_track_players.csv'))
             df_player_names_raw = pd.read_csv(os.path.join(processed_folder, 'df_player_names_raw.csv'))
             players_df_lineup = pd.read_csv(os.path.join(processed_folder, 'players_df_lineup.csv'))
             df_opta_events = pd.read_csv(os.path.join(processed_folder, 'df_opta_events.csv'))
             df_time_possession = pd.read_csv(os.path.join(processed_folder, 'df_time_possession.csv'))
 
-            with open(os.path.join(processed_folder,'match_info.json'), 'r') as f: 
+            with open(os.path.join(processed_folder,'match_info.json'), 'r') as f:
                 match_info = json.load(f)
 
-            with open(os.path.join(processed_folder,'opta_match_info.json'), 'r') as f: 
+            with open(os.path.join(processed_folder,'opta_match_info.json'), 'r') as f:
                 opta_match_info = json.load(f)
 
         except Exception as e:
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                 opta_match_info,
                 df_time_possession
             ) = spectrumTransformer.transform(session, files)
-    
+
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
 
@@ -83,14 +83,14 @@ if __name__ == "__main__":
         # ===========================================================================================================================
 
         df_opta_core_stats, df_opta_core_stats_time_possession, df_opta_crosses, df_opta_shots = [None for i in range(4)]
-        
+
         # Get processed files 
-        try:            
+        try:
             df_opta_core_stats = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats.csv'))
             df_opta_core_stats_time_possession = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession.csv'))
             df_opta_crosses = pd.read_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'))
             df_opta_shots = pd.read_csv(os.path.join(processed_folder, 'df_opta_shots.csv'))
-            
+
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
 
@@ -112,24 +112,58 @@ if __name__ == "__main__":
 
         # ===========================================================================================================================
 
-        df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners = [None for i in range(3)]
+        df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners, \
+        df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks, \
+        df_set_pieces, df_shots_from_set_pieces, df_aerial_duels_from_set_pieces, \
+        df_crosses_output, df_second_phase_set_pieces, df_second_phase_set_pieces_shots, \
+        df_shots_from_crosses, df_aerial_duels_from_crosses = \
+            [None for i in range(14)]
 
         # Get processed files
         try:
             df_opta_output_final_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_final_corners.csv'))
             df_opta_output_shots_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_shots_corners.csv'))
             df_opta_output_aerial_duels_corners = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_corners.csv'))
+            df_opta_output_final_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_final_freekicks.csv'))
+            df_opta_output_shots_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_shots_freekicks.csv'))
+            df_opta_output_aerial_duels_freekicks = pd.read_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_freekicks.csv'))
+            df_set_pieces = pd.read_csv(os.path.join(processed_folder, 'df_set_pieces.csv'))
+            df_shots_from_set_pieces = pd.read_csv(os.path.join(processed_folder, 'df_shots_from_set_pieces.csv'))
+            df_aerial_duels_from_set_pieces = pd.read_csv(os.path.join(processed_folder, 'df_aerial_duels_from_set_pieces.csv'))
+            df_crosses_output = pd.read_csv(os.path.join(processed_folder, 'df_crosses_output.csv'))
+            df_second_phase_set_pieces = pd.read_csv(os.path.join(processed_folder, 'df_second_phase_set_pieces.csv'))
+            df_second_phase_set_pieces_shots = pd.read_csv(os.path.join(processed_folder, 'df_second_phase_set_pieces_shots.csv'))
+            df_shots_from_crosses = pd.read_csv(os.path.join(processed_folder, 'df_shots_from_crosses.csv'))
+            df_aerial_duels_from_crosse = pd.read_csv(os.path.join(processed_folder, 'df_aerial_duels_from_crosses.csv'))
 
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
 
         # If processed files don't exsit process
         if any(x is None for x in [df_opta_output_final_corners, df_opta_output_shots_corners,
-                                   df_opta_output_aerial_duels_corners]):
+                                   df_opta_output_aerial_duels_corners, df_opta_output_final_freekicks,
+                                   df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks,
+                                   df_set_pieces, df_shots_from_set_pieces, df_aerial_duels_from_set_pieces]):
 
             df_opta_output_final_corners, df_opta_output_shots_corners, df_opta_output_aerial_duels_corners = \
                 setPieceTransformer.corners_classification(df_opta_events, df_player_names_raw, match_info,
                                                            opta_match_info, df_opta_crosses, df_opta_shots)
+
+            df_opta_output_final_freekicks, df_opta_output_shots_freekicks, df_opta_output_aerial_duels_freekicks = \
+                setPieceTransformer.set_piece_classification(df_opta_events, match_info, opta_match_info,
+                                                             df_opta_crosses, df_opta_shots, df_player_names_raw)
+
+            df_set_pieces, df_shots_from_set_pieces, df_aerial_duels_from_set_pieces = setPieceTransformer.\
+                extract_set_piece_statistics(df_opta_output_final_freekicks, df_opta_output_shots_freekicks,
+                                             df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners,
+                                             df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)
+
+            df_crosses_output, df_second_phase_set_pieces, df_second_phase_set_pieces_shots, \
+            df_shots_from_crosses, df_aerial_duels_from_crosses = \
+            setPieceTransformer.crosses_contextualisation(match_info, opta_match_info, df_player_names_raw,
+                                                          df_opta_events, df_opta_crosses, df_opta_shots,
+                                                          df_set_pieces, df_shots_from_set_pieces)
+
 
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
@@ -137,7 +171,19 @@ if __name__ == "__main__":
             df_opta_output_final_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_final_corners.csv'), index=False)
             df_opta_output_shots_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_shots_corners.csv'), index=False)
             df_opta_output_aerial_duels_corners.to_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_corners.csv'), index=False)
+            df_opta_output_final_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_final_freekicks.csv'), index=False)
+            df_opta_output_shots_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_shots_freekicks.csv'), index=False)
+            df_opta_output_aerial_duels_freekicks.to_csv(os.path.join(processed_folder, 'df_opta_output_aerial_duels_freekicks.csv'), index=False)
+            df_set_pieces.to_csv(os.path.join(processed_folder, 'df_set_pieces.csv'), index=False)
+            df_shots_from_set_pieces.to_csv(os.path.join(processed_folder, 'df_shots_from_set_pieces.csv'), index=False)
+            df_aerial_duels_from_set_pieces.to_csv(os.path.join(processed_folder, 'df_aerial_duels_from_set_pieces.csv'), index=False)
+            df_crosses_output.to_csv(os.path.join(processed_folder, 'df_crosses_output.csv'), index=False)
+            df_second_phase_set_pieces.to_csv(os.path.join(processed_folder, 'df_second_phase_set_pieces.csv'), index=False)
+            df_second_phase_set_pieces_shots.to_csv(os.path.join(processed_folder, 'df_second_phase_set_pieces_shots.csv'), index=False)
+            df_shots_from_crosses.to_csv(os.path.join(processed_folder, 'df_shots_from_crosses.csv'), index=False)
+            df_aerial_duels_from_crosses.to_csv(os.path.join(processed_folder, 'df_aerial_duels_from_crosses.csv'), index=False)
 
-       
-       
-        
+
+
+
+

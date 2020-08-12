@@ -197,7 +197,7 @@ class OPTATransformer:
                                 inplace = True)
         return df_opta_core_stats
 
-    def opta_crosses_classification(self, df_opta_events: pd.DataFrame) -> pd.DataFrame: # TODO check if it matches new version line 155 crosses loop in tracking data.py
+    def opta_crosses_classification(self, df_opta_events: pd.DataFrame) -> pd.DataFrame:
         """builds a dataframe of cross statistics, extracting them from the events dataframe
 
         Args:
@@ -368,7 +368,7 @@ class OPTATransformer:
         data['Time_in_Seconds'] = data['min']*60.0 + data['sec']
         data['player_id'] = data['player_id'].fillna(0)
         #data['player_id'] = ['p' + str(int(x)) for x in data.player_id]
-        data['player_id'] = list(map(lambda x: 'p' + str(int(x)), data.player_id)) # TODO Check
+        data['player_id'] = list(map(lambda x: 'p' + str(int(x)), data.player_id))
         data['player_name'] = [player_names_raw.full_name.loc[player_names_raw['player_id']==int(x[1:])].iloc[0] if int(x[1:]) in player_names_raw['player_id'].tolist() else None for x in data.player_id]
 
         data_shots = data[((data.period_id==1) | (data.period_id==2) | (data.period_id==3) | (data.period_id==4)) & (data.type_id.isin([13,14,15,16]))].reset_index(drop = True)
@@ -599,7 +599,7 @@ class OPTATransformer:
         return data_output
 
     @staticmethod
-    def merge_qualifiers(dat: pd.DataFrame) -> pd.DataFrame: # TODO check if it matches new version line 96 set_pieces_classification.py
+    def merge_qualifiers(dat: pd.DataFrame) -> pd.DataFrame:
         """Builds a column for whether qualifier 55 is present for a given row.
 
         Args:

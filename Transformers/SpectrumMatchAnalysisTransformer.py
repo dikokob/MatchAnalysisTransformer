@@ -774,7 +774,7 @@ class SpectrumMatchAnalysisTransformer:
                         if match_results['SoccerFeed']['SoccerDocument'][k]['@uID'] == 'f' + str(track_players_df.game_id.iloc[0]):
                             break
 
-                    home_away = match_results['SoccerFeed']['SoccerDocument'][k]['MatchData']['TeamData'][i]['@Side'][0].upper()
+                    home_away = match_results['SoccerFeed']['SoccerDocument'][k]['MatchData']['TeamData'][i]['@Side'][0].upper() # Todo fix k being refrenced outside the loop
                     for j in range(len(match_results['SoccerFeed']['SoccerDocument'][k]['MatchData']['TeamData'][i]['PlayerLineUp']['MatchPlayer'])):
                         player_id = match_results['SoccerFeed']['SoccerDocument'][k]['MatchData']['TeamData'][i]['PlayerLineUp']['MatchPlayer'][j]['@PlayerRef']
                         shirt_number = int(match_results['SoccerFeed']['SoccerDocument'][k]['MatchData']['TeamData'][i]['PlayerLineUp']['MatchPlayer'][j]['@ShirtNumber'])

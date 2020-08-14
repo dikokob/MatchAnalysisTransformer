@@ -27,7 +27,8 @@ class SetPieceClassificationTansformer:
 
         """
 
-        path_squads = '..\\scripts_from_fed\\srml-8-2019-squads.xml'
+        # always assume to run from root
+        path_squads = os.path.join("scripts_from_fed", "srml-8-2019-squads.xml")
 
         try:
             with open(path_squads, encoding = 'utf-8') as fd:
@@ -166,7 +167,9 @@ class SetPieceClassificationTansformer:
         length_pitch = match_info['pitchLength']
         width_pitch = match_info['pitchWidth']
         
-        event_type_id = pd.read_excel('..\\scripts_from_fed\\f24 - ID definitions.xlsx')   
+        # always assume running from root
+        # this should also be data found in data/raw_data/
+        event_type_id = pd.read_excel(os.path.join('scripts_from_fed', 'f24 - ID definitions.xlsx'))   
       
     
         #here teh actual loop starts
@@ -1208,8 +1211,9 @@ class SetPieceClassificationTansformer:
             pd.DataFrame: [description]
 
         """
-
-        event_type_id = pd.read_excel('..\\scripts_from_fed\\f24 - ID definitions.xlsx')
+        # always assume running from root
+        # this should be loaded from data/
+        event_type_id = pd.read_excel(os.path.join('scripts_from_fed', 'f24 - ID definitions.xlsx'))
 
         opta_event_data_df = df_opta_events
 
@@ -2279,7 +2283,7 @@ class SetPieceClassificationTansformer:
         length_pitch = match_info['pitchLength']
         width_pitch = match_info['pitchWidth']
 
-        event_type_id = pd.read_excel('..\\scripts_from_fed\\f24 - ID definitions.xlsx')
+        event_type_id = pd.read_excel(os.path.join('scripts_from_fed', 'f24 - ID definitions.xlsx'))
 
         # Prep opta_event_data_df
         opta_event_data_df = df_opta_events

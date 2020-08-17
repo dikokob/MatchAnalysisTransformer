@@ -22,7 +22,7 @@ class OPTATransformer:
     def opta_core_stats(
         self,
         df_opta_events: pd.DataFrame,
-        opta_match_info: pd.DataFrame,
+        opta_match_info: dict,
         df_player_names_raw: pd.DataFrame,
         players_df_lineup: pd.DataFrame,
         match_info: dict
@@ -31,7 +31,7 @@ class OPTATransformer:
 
         Args:
             df_opta_events (pd.DataFrame): [description]
-            opta_match_info (pd.DataFrame): [description]
+            opta_match_info (dict): [description]
             df_player_names_raw (pd.DataFrame): [description]
             players_df_lineup (pd.DataFrame): [description]
             match_info (dict): [description]
@@ -166,6 +166,15 @@ class OPTATransformer:
                                                            'Team ID', 'Team Name', 'Opposition Team ID', 'Opposition Team Name', 'Home/Away', 'Team Formation ID',
                                                            'Team Formation', 'Opposition Team Formation ID', 'Opposition Team Formation', 'Position ID',
                                                            'Start', 'Substitute On', 'Substitute Off'])
+
+        ###here we add two columns about players being sent off or retiring
+        all_player_sent_off = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(df_opta_events.player_id.loc[(df_opta_events.type_id==17) & (df_opta_events.qualifier_id.isin([32,33]))].unique().tolist()))) == 1, 1, 0).tolist() for x in summary_df['Player ID'].tolist()]
+        all_player_retired = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(df_opta_events.player_id.loc[df_opta_events.type_id==20].unique().tolist()))) == 1, 1, 0).tolist() for x in summary_df['Player ID'].tolist()]
+        all_player_sub_off = summary_df['Substitute Off'].tolist()
+
+        summary_df['Sent Off'] = np.where(np.array(all_player_sub_off)==1, 0, np.array(all_player_sent_off)).tolist()
+        summary_df['Retired'] = all_player_retired
+        
         return summary_df
 
     def opta_core_stats_with_time_possession(
@@ -195,7 +204,140 @@ class OPTATransformer:
         df_opta_core_stats['Time Out Of Possession'] = df_opta_core_stats['time out possession for the team']
         df_opta_core_stats.drop(['time played', 'time in possession for the team', 'time out possession for the team'], axis = 1,
                                 inplace = True)
+        df_opta_core_stats['Time Played Calculated From Tracking Data'] = 'Yes'
+
         return df_opta_core_stats
+
+    def opta_core_stats_with_time_possession_from_events(self, df_opta_core_stats: pd.DataFrame,
+                                                         df_opta_events: pd.DataFrame) -> pd.DataFrame:
+        """[summary]
+
+        Args:
+            df_opta_core_stats (pd.DataFrame): [description]
+            df_opta_events (pd.DataFrame): [description]
+
+        Returns:
+            pd.DataFrame: [description]
+
+        """
+
+        opta_event_data_df = df_opta_events
+        core_stats = df_opta_core_stats
+
+        #core_stats['Sent Off'] = 0
+        #core_stats['Retired'] = 0
+        core_stats['Time Played'] = np.nan
+        core_stats['Time In Possession'] = None
+        core_stats['Time Out Of Possession'] = None
+        core_stats['Time Played Calculated From Tracking Data'] = 'Yes'
+
+        cnt = 0
+        for game in core_stats['Game ID'].unique():
+
+            opta_event_data_df = opta_event_data_df[opta_event_data_df.period_id <= 4].reset_index(drop=True)
+            opta_event_data_df['time_in_seconds'] = opta_event_data_df['min']*60.0 + opta_event_data_df['sec']
+
+            all_player_ids = core_stats[core_stats['Game ID']==game]['Player ID'].tolist()
+            all_player_names = core_stats[core_stats['Game ID']==game]['Player Name'].tolist()
+            all_player_team_id = core_stats[core_stats['Game ID']==game]['Team ID'].tolist()
+            all_player_team_name = core_stats[core_stats['Game ID']==game]['Team Name'].tolist()
+            all_player_start = core_stats[core_stats['Game ID']==game]['Start'].tolist()
+            all_player_sub_on = core_stats[core_stats['Game ID']==game]['Substitute On'].tolist()
+            all_player_sub_off = core_stats[core_stats['Game ID']==game]['Substitute Off'].tolist()
+            all_player_sent_off = core_stats[core_stats['Game ID']==game]['Sent Off'].tolist()
+            all_player_retired = core_stats[core_stats['Game ID']==game]['Retired'].tolist()
+            all_player_off_pitch = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==77].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+            all_player_back_on_pitch = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==21].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+
+            #all_player_sent_off = np.where(np.array(all_player_sub_off)==1, 0, np.array(all_player_sent_off)).tolist()
+            #core_stats.loc[core_stats['Game ID']==game, 'Sent Off'] = all_player_sent_off
+            #core_stats.loc[core_stats['Game ID']==game, 'Retired'] = all_player_retired
+            #core_stats.loc[core_stats['Game ID']==game, 'Off Pitch'] = all_player_off_pitch
+
+
+            if sum(core_stats[core_stats['Game ID']==game]['Time Played'].isnull()) == 0:
+                continue
+
+            else:
+                for i in range(len(all_player_ids)):
+                    if (np.isnan(core_stats[(core_stats['Game ID']==game) & (core_stats['Player ID']==all_player_ids[i])]['Time Played'].iloc[0])) | (core_stats[(core_stats['Game ID']==game) & (core_stats['Player ID']==all_player_ids[i])]['Time Played'].iloc[0] is None):
+                        if all_player_start[i] == 1:
+                            time_player_in = 0
+                            period_player_in = 1
+                        else: 
+                            time_player_in = opta_event_data_df[(opta_event_data_df.type_id==19) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                            period_player_in = opta_event_data_df[(opta_event_data_df.type_id==19) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                    
+                        if (all_player_sub_off[i] + all_player_sent_off[i] + all_player_retired[i] >=1):
+                        
+                            if all_player_sub_off[i] == 1:
+                                time_player_out = opta_event_data_df[(opta_event_data_df.type_id==18) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                                period_player_out = opta_event_data_df[(opta_event_data_df.type_id==18) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                            elif all_player_retired[i] == 1:
+                                time_player_out = opta_event_data_df[(opta_event_data_df.type_id==20) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                                period_player_out = opta_event_data_df[(opta_event_data_df.type_id==20) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+
+                            elif all_player_sent_off[i] == 1:
+                                time_player_out = opta_event_data_df[(opta_event_data_df.type_id==17) & (opta_event_data_df.qualifier_id.isin([32,33])) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                                period_player_out = opta_event_data_df[(opta_event_data_df.type_id==17) & (opta_event_data_df.qualifier_id.isin([32,33])) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                            else:
+                                time_player_out = None 
+                                period_player_out = None 
+
+                        else:
+                            time_player_out = opta_event_data_df[(opta_event_data_df.period_id==opta_event_data_df.period_id.max()) & (opta_event_data_df.type_id==30)]['time_in_seconds'].max()
+                            period_player_out = opta_event_data_df.period_id.max()
+
+                        if (all_player_off_pitch[i] == 1) & (all_player_back_on_pitch[i] == 1):
+                            time_player_off_temp = opta_event_data_df[(opta_event_data_df.type_id==77) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                            period_player_off_temp = opta_event_data_df[(opta_event_data_df.type_id==77) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+                            time_player_back = opta_event_data_df[(opta_event_data_df.type_id==21) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                            period_player_back = opta_event_data_df[(opta_event_data_df.type_id==21) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                        else:
+                            time_player_off_temp = None
+                            period_player_off_temp = None
+                            time_player_back = None
+                            period_player_back = None
+
+                        
+
+                        if period_player_out==period_player_in:
+                            time_played = (time_player_out - time_player_in)
+                            if time_player_off_temp is not None:
+                                time_played -= (time_player_back - time_player_off_temp)
+
+                        else:
+                            time_played = 0
+                            for period_id in np.linspace(period_player_in, period_player_out, period_player_out - period_player_in + 1).tolist():
+                                if period_id == period_player_in:
+                                    time_played += (opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==30)]['time_in_seconds'].max() - time_player_in)
+                                elif period_id == period_player_out:
+                                    time_played += (time_player_out - opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==32)]['time_in_seconds'].min())
+                                else:
+                                    time_played += (opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==30)]['time_in_seconds'].max() - opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==32)]['time_in_seconds'].min())
+
+                                if time_player_off_temp is not None:
+                                    if period_player_off_temp == period_player_back:
+                                        if period_player_off_temp == period_id:
+                                            time_played -= (time_player_back - time_player_off_temp)
+                                    else:
+                                        if period_player_off_temp == period_id:
+                                            time_played -= (opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==30)]['time_in_seconds'].max() - time_player_off_temp)
+                                        if period_player_back == period_id:
+                                            time_played -= (time_player_back - opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.type_id==32)]['time_in_seconds'].min())
+
+                        core_stats.loc[(core_stats['Game ID']==game) & (core_stats['Player ID']==all_player_ids[i]), 'Time Played'] = time_played
+                        core_stats.loc[(core_stats['Game ID']==game) & (core_stats['Player ID']==all_player_ids[i]), 'Time Played Calculated From Tracking Data'] = 'No'
+            
+            cnt += 1
+           
+        
+        return core_stats
 
     def opta_crosses_classification(self, df_opta_events: pd.DataFrame) -> pd.DataFrame:
         """builds a dataframe of cross statistics, extracting them from the events dataframe

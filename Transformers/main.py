@@ -82,12 +82,14 @@ if __name__ == "__main__":
 
         # ===========================================================================================================================
 
-        df_opta_core_stats, df_opta_core_stats_time_possession, df_opta_crosses, df_opta_shots = [None for i in range(4)]
+        df_opta_core_stats, df_opta_core_stats_time_possession, \
+        df_opta_core_stats_time_possession_from_event, df_opta_crosses, df_opta_shots = [None for i in range(5)]
 
         # Get processed files 
         try:
             df_opta_core_stats = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats.csv'))
             df_opta_core_stats_time_possession = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession.csv'))
+            df_opta_core_stats_time_possession_from_event = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'))
             df_opta_crosses = pd.read_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'))
             df_opta_shots = pd.read_csv(os.path.join(processed_folder, 'df_opta_shots.csv'))
 
@@ -95,10 +97,11 @@ if __name__ == "__main__":
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
 
         # If processed files don't exsit process
-        if any(x is None for x in [df_opta_core_stats, df_opta_core_stats_time_possession, df_opta_crosses, df_opta_shots]):
+        if any(x is None for x in [df_opta_core_stats, df_opta_core_stats_time_possession, df_opta_core_stats_time_possession_from_event, df_opta_crosses, df_opta_shots]):
 
             df_opta_core_stats = optaTransformer.opta_core_stats(df_opta_events, opta_match_info, df_player_names_raw, players_df_lineup, match_info)
             df_opta_core_stats_time_possession = optaTransformer.opta_core_stats_with_time_possession(df_time_possession, df_opta_core_stats)
+            df_opta_core_stats_time_possession_from_event = optaTransformer.opta_core_stats_with_time_possession_from_events(df_opta_core_stats, df_opta_events)
             df_opta_crosses = optaTransformer.opta_crosses_classification(df_opta_events)
             df_opta_shots = optaTransformer.opta_shots(df_opta_events, df_player_names_raw, opta_match_info)
 
@@ -107,6 +110,7 @@ if __name__ == "__main__":
 
             df_opta_core_stats.to_csv(os.path.join(processed_folder, 'df_opta_core_stats.csv'), index=False)
             df_opta_core_stats_time_possession.to_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession.csv'), index=False)
+            df_opta_core_stats_time_possession_from_event.to_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'), index=False)
             df_opta_crosses.to_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'), index=False)
             df_opta_shots.to_csv(os.path.join(processed_folder, 'df_opta_shots.csv'), index=False)
 

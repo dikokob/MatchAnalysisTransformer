@@ -14,8 +14,10 @@ setPieceTransformer = SetPieceClassificationTansformer()
 if __name__ == "__main__":
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    input_data_dir = '..\\data\\raw_data'
-    processed_data_dir = '..\\data\\processed'
+    # we should always try and run from root directory here
+    # os path will deal with the windows paths
+    input_data_dir = os.path.join('data', 'raw_data')
+    processed_data_dir = os.path.join('data', 'processed')
     # Loop through all rawdata
     for session in os.listdir(input_data_dir):
 

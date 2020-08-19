@@ -36,3 +36,4 @@ Check what is being tested in the `tests/` directory.
 ## References
 
 - [Why virtual environments in python](https://realpython.com/python-virtual-environments-a-primer/)
+- [Dealing with OS paths between MAC & Windows & LINUX](https://medium.com/@ageitgey/python-3-quick-tip-the-easy-way-to-deal-with-file-paths-on-windows-mac-and-linux-11a072b58d5f)

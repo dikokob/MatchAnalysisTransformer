@@ -33,6 +33,8 @@ BEGIN
 
     INSERT [dbo].[AerialDuelsSetPieces](
 	[Set Piece OPTA Event ID],
+	[Aerial Duel OPTA ID],
+
 
 	)
     SELECT * FROM @AerialDuelsSetPiecesData

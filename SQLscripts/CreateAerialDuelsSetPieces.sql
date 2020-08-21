@@ -7,6 +7,7 @@ GO
 CREATE TABLE [dbo].[AerialDuelsSetPieces](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
     [Set Piece OPTA Event ID] [int] NULL,
+    [Aerial Duel OPTA ID] [int] NULL,
 
  CONSTRAINT [PK_AerialDuelsSetPieces] PRIMARY KEY CLUSTERED
 (

@@ -33,9 +33,17 @@ BEGIN
 
     INSERT [dbo].[AerialDuelsSetPieces](
 	[Set Piece OPTA Event ID],
-	[Aerial Duel OPTA ID],
-
-
+    [Aerial Duel OPTA ID],
+	[Aerial Duel Player ID],
+	[Aerial Duel Player Name],
+	[Aerial Duel Team ID],
+	[Aerial Duel Team Name],
+    [Successful/Unsuccessful],
+	[Other Aerial Duel Payer ID],
+	[Other Aerial Duel Player Name],
+	[Other Aerial Duel Team ID],
+	[Other Aerial Duel Team Name],
+	[Aerial Duel Is Shot],
 	)
     SELECT * FROM @AerialDuelsSetPiecesData
 END

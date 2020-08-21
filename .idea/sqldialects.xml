@@ -4,5 +4,8 @@
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/AerialDuelsSetPiecesType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPieces.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPiecesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrossesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CrossesType.sql" dialect="TSQL" />
   </component>
 </project>

@@ -12,5 +12,8 @@
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPieces.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPiecesProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/SecondPhaseShotsfromSetPiecesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrossesProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/ShotsfromCrossesType.sql" dialect="TSQL" />
   </component>
 </project>

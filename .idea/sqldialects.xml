@@ -3,6 +3,8 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/AerialDuelsSetPiecesType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPieces.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrossesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrosses.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrossesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CrossesType.sql" dialect="TSQL" />
@@ -10,10 +12,10 @@
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/CreateSecondPhaseSetPiecesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/SecondPhaseSetPiecesType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPieces.sql" dialect="TSQL" />
-    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPiecesProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPiecesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/SecondPhaseShotsfromSetPiecesType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrosses.sql" dialect="TSQL" />
-    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrossesProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrossesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/ShotsfromCrossesType.sql" dialect="TSQL" />
   </component>
 </project>

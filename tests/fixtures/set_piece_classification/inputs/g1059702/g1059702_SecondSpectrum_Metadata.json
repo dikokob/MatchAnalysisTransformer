@@ -1,0 +1,324 @@
+{
+  "description": "LIV - NOR : 2019-8-9",
+  "startTime": 1565377212410,
+  "year": 2019,
+  "month": 8,
+  "day": 9,
+  "pitchLength": 102.4128,
+  "pitchWidth": 67.9704,
+  "fps": 25.0,
+  "periods": [
+    {
+      "number": 1,
+      "startFrameClock": 1565377212410,
+      "endFrameClock": 1565380103530
+    },
+    {
+      "number": 2,
+      "startFrameClock": 1565381325570,
+      "endFrameClock": 1565384154730
+    }
+  ],
+  "homePlayers": [
+    {
+      "name": "Naby Keita",
+      "number": 8,
+      "position": "SUB",
+      "ssiId": "05e6c42f-1f75-43b9-912a-39d8f1216a11",
+      "optaId": "175592",
+      "optaUuid": "6onkmsi77t7bvk9tpha472vv9"
+    },
+    {
+      "name": "Virgil Van Dijk",
+      "number": 4,
+      "position": "DF",
+      "ssiId": "1edf1ed9-68ba-4ebb-ba40-4472ca2dfba2",
+      "optaId": "97032",
+      "optaUuid": "dxze3b3fsfl814bjcs7q6wcet"
+    },
+    {
+      "name": "Alisson Ramses Becker",
+      "number": 1,
+      "position": "GK",
+      "ssiId": "3adbe63a-c616-4e6d-b715-457b51903de8",
+      "optaId": "116535",
+      "optaUuid": "53d0pvr7ylvfhp6p749iniqc5"
+    },
+    {
+      "name": "Fabio Henrique Tavares",
+      "number": 3,
+      "position": "MF",
+      "ssiId": "5ce84d81-7402-49f7-83db-7dcf63a4475b",
+      "optaId": "116643",
+      "optaUuid": "7mms3tmwizhtvzakotl4hv0et"
+    },
+    {
+      "name": "Roberto Firmino Barbosa de Oliveira",
+      "number": 9,
+      "position": "FW",
+      "ssiId": "6e1cb437-a4ad-408f-9c73-be5dc158d6b0",
+      "optaId": "92217",
+      "optaUuid": "6b9erfx1rf9nff83300tntadx"
+    },
+    {
+      "name": "Adrian San Miguel del Castillo",
+      "number": 13,
+      "position": "SUB",
+      "ssiId": "728fae78-9cfb-4a02-9ff8-ac3a338fd75e",
+      "optaId": "60706",
+      "optaUuid": "2r4ox2h5r7doo3ys9ynm2nbo5"
+    },
+    {
+      "name": "Alex Oxlade-Chamberlain",
+      "number": 15,
+      "position": "SUB",
+      "ssiId": "87acb896-c100-4021-9533-40fa6b1d39c0",
+      "optaId": "81880",
+      "optaUuid": "9twvo5p1ge4zfgy5hcu0nsvdh"
+    },
+    {
+      "name": "Mohamed Salah",
+      "number": 11,
+      "position": "FW",
+      "ssiId": "896ac3b4-7474-4a22-830f-6cb0b172b669",
+      "optaId": "118748",
+      "optaUuid": "5ilkkfbsss0bxd6ttdlqg0uz9"
+    },
+    {
+      "name": "Job Joel Matip",
+      "number": 32,
+      "position": "SUB",
+      "ssiId": "8eacc4ff-0df0-4df2-9629-fe72dc19afc5",
+      "optaId": "60914",
+      "optaUuid": "kvchpptoxgvcyiv358w9gtzp"
+    },
+    {
+      "name": "Xherdan Shaqiri",
+      "number": 23,
+      "position": "SUB",
+      "ssiId": "9509af9a-1abe-47e8-acf6-db07b7880c86",
+      "optaId": "68312",
+      "optaUuid": "7s1q4rd90gi1gwbko34fuvhlh"
+    },
+    {
+      "name": "Georginio Wijnaldum",
+      "number": 5,
+      "position": "MF",
+      "ssiId": "9856791e-93a4-46cb-8f40-4845648526be",
+      "optaId": "41733",
+      "optaUuid": "2lyib1m8bhrkcc3ukk12fbefp"
+    },
+    {
+      "name": "Trent Alexander-Arnold",
+      "number": 66,
+      "position": "DF",
+      "ssiId": "bab0a970-c0ae-4fe0-b7e2-a99a5e82648b",
+      "optaId": "169187",
+      "optaUuid": "19z8jmren3eytg7fbuzqv73kl"
+    },
+    {
+      "name": "Sadio Mane",
+      "number": 10,
+      "position": "SUB",
+      "ssiId": "da2077f8-fe03-416b-93a8-e3354c923d52",
+      "optaId": "110979",
+      "optaUuid": "cotiiu6mjkfx5xa63nhfbdf4l"
+    },
+    {
+      "name": "Joseph Gomez",
+      "number": 12,
+      "position": "DF",
+      "ssiId": "e25ce4ed-2e2a-4fb2-b8d6-dd35bf796a8c",
+      "optaId": "171287",
+      "optaUuid": "29dp5gmu5xbd04mozwxq5tjh1"
+    },
+    {
+      "name": "Divock Okoth Origi",
+      "number": 27,
+      "position": "FW",
+      "ssiId": "e771f665-9e95-4dd6-a8d6-5befd70b95d7",
+      "optaId": "152760",
+      "optaUuid": "1dwwsz1i6v8zwh802ujwf7emt"
+    },
+    {
+      "name": "Jordan Henderson",
+      "number": 14,
+      "position": "MF",
+      "ssiId": "f2259424-246c-4958-a0f2-dd02b1dfc8d0",
+      "optaId": "56979",
+      "optaUuid": "25yu90pekqr1lhs098f3uxy39"
+    },
+    {
+      "name": "Andrew Robertson",
+      "number": 26,
+      "position": "DF",
+      "ssiId": "f48891b3-dd10-4b5f-9ddb-995b50d15941",
+      "optaId": "122798",
+      "optaUuid": "eziqega9e25bg939pfh4vjp3p"
+    },
+    {
+      "name": "James Milner",
+      "number": 7,
+      "position": "SUB",
+      "ssiId": "faf74d5f-7017-4476-a6b0-be89172e4267",
+      "optaId": "15157",
+      "optaUuid": "3xqbru6q5dvtrhv6coe7retp1"
+    }
+  ],
+  "awayPlayers": [
+    {
+      "name": "Mario Vrancic",
+      "number": 8,
+      "position": "SUB",
+      "ssiId": "051955dc-1d8c-42bc-80c3-c78817a262be",
+      "optaId": "37614",
+      "optaUuid": "74siybux7l86ugy4z5eq2nob9"
+    },
+    {
+      "name": "Max Aarons",
+      "number": 2,
+      "position": "DF",
+      "ssiId": "08d90b7c-844c-47fe-a9a1-86877b805b5e",
+      "optaId": "232980",
+      "optaUuid": "70ursnnskhuf7zkltyrudquax"
+    },
+    {
+      "name": "Tom Trybull",
+      "number": 19,
+      "position": "MF",
+      "ssiId": "0b40bab9-77e3-45d3-9ed8-ec320999a17a",
+      "optaId": "90440",
+      "optaUuid": "wha77a8wm7jyn32743y0w79x"
+    },
+    {
+      "name": "Teemu Pukki",
+      "number": 22,
+      "position": "FW",
+      "ssiId": "0efe875b-09b1-4a4c-b838-6086dc863e8a",
+      "optaId": "57127",
+      "optaUuid": "8jb026oewf17pg61vdstcgj4l"
+    },
+    {
+      "name": "Grant Hanley",
+      "number": 5,
+      "position": "DF",
+      "ssiId": "2249378c-e6f9-4501-8f6e-f6625eeea129",
+      "optaId": "83428",
+      "optaUuid": "2zjxatr9s9esind5qke4wd3v9"
+    },
+    {
+      "name": "Moritz Leitner",
+      "number": 10,
+      "position": "SUB",
+      "ssiId": "27a553fc-6d09-42d8-980b-e5827f5f590d",
+      "optaId": "87396",
+      "optaUuid": "7opxs0v256yglpdb05ssfq0np"
+    },
+    {
+      "name": "Ben Godfrey",
+      "number": 4,
+      "position": "DF",
+      "ssiId": "29d82084-f394-4094-a199-6bcf8c4eb1d5",
+      "optaId": "198826",
+      "optaUuid": "8ro3lpzufz8ea9pa2j1jivqad"
+    },
+    {
+      "name": "Timothy Krul",
+      "number": 1,
+      "position": "GK",
+      "ssiId": "2d6ea452-8778-4f9f-8522-1387a1921959",
+      "optaId": "20480",
+      "optaUuid": "8wp415u3d2culxpmg7vzk33kl"
+    },
+    {
+      "name": "Patrick Roberts",
+      "number": 7,
+      "position": "SUB",
+      "ssiId": "31708670-3ead-463d-b770-9b472339b20c",
+      "optaId": "124165",
+      "optaUuid": "dua66xdc42wx57vmgh5t4ttxx"
+    },
+    {
+      "name": "Emiliano Buend\u00eda",
+      "number": 17,
+      "position": "FW",
+      "ssiId": "6f961e1c-9722-4fba-9fdf-b83fd0fe5d4e",
+      "optaId": "195546",
+      "optaUuid": "l0qqn9tlgov91p5d1zzdupcl"
+    },
+    {
+      "name": "Ralf Fahrmann",
+      "number": 21,
+      "position": "SUB",
+      "ssiId": "972f11ab-8e13-44fb-bde9-658e94e77ade",
+      "optaId": "28082",
+      "optaUuid": "8td0ccul6gf7r5benk1pxqrx1"
+    },
+    {
+      "name": "Onel Hern\u00e1ndez",
+      "number": 11,
+      "position": "SUB",
+      "ssiId": "a2cb13a3-c3e9-4659-b919-d923db1eccb1",
+      "optaId": "89470",
+      "optaUuid": "4ca71ufcoyg21mmzwq4i9tfit"
+    },
+    {
+      "name": "Jamal Lewis",
+      "number": 12,
+      "position": "DF",
+      "ssiId": "b26f0a71-b5d7-416b-b182-af7635748bbb",
+      "optaId": "194799",
+      "optaUuid": "96yg5g3b9o4gqbo2p299h4gdl"
+    },
+    {
+      "name": "Kenny McLean",
+      "number": 23,
+      "position": "MF",
+      "ssiId": "b3103cf3-0006-4f47-b9d0-9a567a061291",
+      "optaId": "78607",
+      "optaUuid": "6eeqjr5cqfksw9mgx1b3vvnpx"
+    },
+    {
+      "name": "Todd Cantwell",
+      "number": 14,
+      "position": "FW",
+      "ssiId": "bc8a2d20-cc14-4a7f-b2a7-bde7408af36b",
+      "optaId": "193111",
+      "optaUuid": "bzvr1umoce37zyxq8hvwu1lgp"
+    },
+    {
+      "name": "Josip Drmic",
+      "number": 20,
+      "position": "SUB",
+      "ssiId": "e75b379f-089f-46a3-a814-4ff1845dc6ef",
+      "optaId": "81048",
+      "optaUuid": "7mxwp86ylr1rvounew1auzwet"
+    },
+    {
+      "name": "Sam Byram",
+      "number": 3,
+      "position": "SUB",
+      "ssiId": "eec2a03b-830b-4dbe-9373-febbd6c525a3",
+      "optaId": "113564",
+      "optaUuid": "9kvp5ddeay1cmfwoao8eo1vbp"
+    },
+    {
+      "name": "Marco Stiepermann",
+      "number": 18,
+      "position": "MF",
+      "ssiId": "fcfe04e2-8ec4-4fb5-8ccb-095217448ed2",
+      "optaId": "71738",
+      "optaUuid": "6mxanrvxx6d6p8jaugvztiod1"
+    }
+  ],
+  "ssiId": "2f06ac56-e260-4d9a-b499-2fa8623ba7df",
+  "optaId": "1059702",
+  "optaUuid": "6hy62na4oiugr5shiyxsztkyy",
+  "homeSsiId": "453096cc-cf99-4a37-b229-f0ac121846da",
+  "homeOptaId": "14",
+  "homeOptaUuid": "c8h9bw1l82s06h77xxrelzhur",
+  "awaySsiId": "b18694b5-86c0-46d7-a1cf-be0b41d87858",
+  "awayOptaId": "45",
+  "awayOptaUuid": "suz80crpy3anixyzccmu6jzp",
+  "venueId": null
+}

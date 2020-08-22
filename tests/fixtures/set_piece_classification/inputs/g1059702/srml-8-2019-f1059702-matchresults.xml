@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2001-2019 Opta Sportsdata Ltd. All rights reserved. -->
+
+<!-- PRODUCTION HEADER
+     produced on:        valde-jobq-a06.nexus.opta.net
+     production time:    20190811T094402,155Z
+     production module:  Opta::Feed::XML::Soccer::F7
+-->
+<SoccerFeed TimeStamp="20190811T104400+0100">
+  <SoccerDocument Type="Result" detail_id="1" uID="f1059702">
+    <Competition uID="c8">
+      <Country>England</Country>
+      <Name>English Premier League</Name>
+      <Stat Type="season_id">2019</Stat>
+      <Stat Type="season_name">Season 2019/2020</Stat>
+      <Stat Type="symid">EN_PR</Stat>
+      <Stat Type="matchday">1</Stat>
+    </Competition>
+    <MatchData>
+      <MatchInfo MatchType="Regular" Period="FullTime" TimeStamp="20190809T215557+0100" Weather="Clear">
+        <Attendance>53333</Attendance>
+        <Date>20190809T200000+0100</Date>
+        <Result Type="NormalResult" Winner="t14" />
+      </MatchInfo>
+      <MatchOfficial uID="o40962">
+        <OfficialData>
+          <OfficialRef Type="Main" />
+        </OfficialData>
+        <OfficialName>
+          <First>Michael</First>
+          <Last>Oliver</Last>
+        </OfficialName>
+      </MatchOfficial>
+      <AssistantOfficials>
+        <AssistantOfficial FirstName="Stuart" LastName="Burt" Type="Lineman 1" uID="o43257" />
+        <AssistantOfficial FirstName="Simon" LastName="Bennett" Type="Lineman 2" uID="o43280" />
+        <AssistantOfficial FirstName="Graham" LastName="Scott" Type="Fourth official" uID="o41049" />
+        <AssistantOfficial FirstName="Andre" LastName="Marriner" Type="Video Assistant Referee" uID="o19485" />
+      </AssistantOfficials>
+      <Stat Type="match_time">93</Stat>
+      <Stat Type="first_half_start">20190809T200017+0100</Stat>
+      <Stat Type="first_half_time">49</Stat>
+      <Stat Type="first_half_stop">20190809T204828+0100</Stat>
+      <Stat Type="second_half_start">20190809T210850+0100</Stat>
+      <Stat Type="second_half_time">48</Stat>
+      <Stat Type="second_half_stop">20190809T215557+0100</Stat>
+      <TeamData Formation="433" Score="4" Side="Home" TeamRef="t14">
+        <Goal EventID="366631036" EventNumber="171" Min="6" Period="FirstHalf" PlayerRef="p83428" Sec="50" Time="7" TimeStamp="20190809T200708+0100" Type="Own" uID="g14-1" />
+        <Goal EventID="1599399819" EventNumber="1193" Min="18" Period="FirstHalf" PlayerRef="p118748" Sec="37" Time="19" TimeStamp="20190809T201855+0100" Type="Goal" uID="g14-2">
+          <Assist PlayerRef="p92217">p92217</Assist>
+        </Goal>
+        <Goal EventID="1233988922" EventNumber="1284" Min="27" Period="FirstHalf" PlayerRef="p97032" Sec="51" Time="28" TimeStamp="20190809T202809+0100" Type="Goal" uID="g14-3">
+          <Assist PlayerRef="p118748">p118748</Assist>
+        </Goal>
+        <Goal EventID="591319682" EventNumber="1425" Min="41" Period="FirstHalf" PlayerRef="p152760" Sec="15" Time="42" TimeStamp="20190809T204133+0100" Type="Goal" uID="g14-4">
+          <Assist PlayerRef="p169187">p169187</Assist>
+        </Goal>
+        <PlayerLineUp>
+          <MatchPlayer Formation_Place="1" PlayerRef="p116535" Position="Goalkeeper" ShirtNumber="1" Status="Start" />
+          <MatchPlayer Formation_Place="2" PlayerRef="p169187" Position="Defender" ShirtNumber="66" Status="Start" />
+          <MatchPlayer Formation_Place="6" PlayerRef="p97032" Position="Defender" ShirtNumber="4" Status="Start" />
+          <MatchPlayer Formation_Place="5" PlayerRef="p171287" Position="Defender" ShirtNumber="12" Status="Start" />
+          <MatchPlayer Formation_Place="3" PlayerRef="p122798" Position="Defender" ShirtNumber="26" Status="Start" />
+          <MatchPlayer Formation_Place="8" PlayerRef="p41733" Position="Midfielder" ShirtNumber="5" Status="Start" />
+          <MatchPlayer Captain="1" Formation_Place="7" PlayerRef="p56979" Position="Midfielder" ShirtNumber="14" Status="Start" />
+          <MatchPlayer Formation_Place="4" PlayerRef="p116643" Position="Midfielder" ShirtNumber="3" Status="Start" />
+          <MatchPlayer Formation_Place="11" PlayerRef="p152760" Position="Striker" ShirtNumber="27" Status="Start" />
+          <MatchPlayer Formation_Place="10" PlayerRef="p118748" Position="Striker" ShirtNumber="11" Status="Start" />
+          <MatchPlayer Formation_Place="9" PlayerRef="p92217" Position="Striker" ShirtNumber="9" Status="Start" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p15157" Position="Substitute" ShirtNumber="7" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p60706" Position="Substitute" ShirtNumber="13" Status="Sub" SubPosition="Goalkeeper" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p81880" Position="Substitute" ShirtNumber="15" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p60914" Position="Substitute" ShirtNumber="32" Status="Sub" SubPosition="Defender" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p175592" Position="Substitute" ShirtNumber="8" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p110979" Position="Substitute" ShirtNumber="10" Status="Sub" SubPosition="Forward" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p68312" Position="Substitute" ShirtNumber="23" Status="Sub" SubPosition="Midfielder" />
+        </PlayerLineUp>
+        <Substitution EventID="1519006112" EventNumber="1396" Min="38" Period="1" Reason="Injury" Sec="31" SubOff="p116535" SubOn="p60706" SubstitutePosition="1" Time="39" TimeStamp="20190809T203849+0100" uID="s14-1" />
+        <Substitution EventID="658678249" EventNumber="2747" Min="73" Period="2" Reason="Tactical" Sec="39" SubOff="p152760" SubOn="p110979" SubstitutePosition="4" Time="74" TimeStamp="20190809T213730+0100" uID="s14-2" />
+        <Substitution EventID="1808975257" EventNumber="2868" Min="85" Period="2" Reason="Tactical" Sec="5" SubOff="p92217" SubOn="p15157" SubstitutePosition="3" Time="86" TimeStamp="20190809T214856+0100" uID="s14-3" />
+      </TeamData>
+      <TeamData Formation="4231" Score="1" Side="Away" TeamRef="t45">
+        <Booking Card="Yellow" CardType="Yellow" EventID="1139781876" EventNumber="2609" Min="59" Period="SecondHalf" PlayerRef="p87396" Reason="Foul" Sec="25" Time="60" TimeStamp="20190809T212316+0100" uID="b45-1" />
+        <Booking Card="Yellow" CardType="Yellow" EventID="270670181" EventNumber="26510" Min="64" Period="SecondHalf" PlayerRef="p195546" Reason="Foul" Sec="10" Time="65" TimeStamp="20190809T212801+0100" uID="b45-2" />
+        <Goal EventID="1506168313" EventNumber="26415" Min="63" Period="SecondHalf" PlayerRef="p57127" Sec="2" Time="64" TimeStamp="20190809T212652+0100" Type="Goal" uID="g45-1">
+          <Assist PlayerRef="p195546">p195546</Assist>
+        </Goal>
+        <PlayerLineUp>
+          <MatchPlayer Formation_Place="1" PlayerRef="p20480" Position="Goalkeeper" ShirtNumber="1" Status="Start" />
+          <MatchPlayer Formation_Place="2" PlayerRef="p232980" Position="Defender" ShirtNumber="2" Status="Start" />
+          <MatchPlayer Formation_Place="3" PlayerRef="p194799" Position="Defender" ShirtNumber="12" Status="Start" />
+          <MatchPlayer Captain="1" Formation_Place="5" PlayerRef="p83428" Position="Defender" ShirtNumber="5" Status="Start" />
+          <MatchPlayer Formation_Place="6" PlayerRef="p198826" Position="Defender" ShirtNumber="4" Status="Start" />
+          <MatchPlayer Formation_Place="11" PlayerRef="p193111" Position="Midfielder" ShirtNumber="14" Status="Start" />
+          <MatchPlayer Formation_Place="4" PlayerRef="p90440" Position="Midfielder" ShirtNumber="19" Status="Start" />
+          <MatchPlayer Formation_Place="10" PlayerRef="p71738" Position="Midfielder" ShirtNumber="18" Status="Start" />
+          <MatchPlayer Formation_Place="8" PlayerRef="p78607" Position="Midfielder" ShirtNumber="23" Status="Start" />
+          <MatchPlayer Formation_Place="7" PlayerRef="p195546" Position="Midfielder" ShirtNumber="17" Status="Start" />
+          <MatchPlayer Formation_Place="9" PlayerRef="p57127" Position="Striker" ShirtNumber="22" Status="Start" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p81048" Position="Substitute" ShirtNumber="20" Status="Sub" SubPosition="Forward" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p28082" Position="Substitute" ShirtNumber="21" Status="Sub" SubPosition="Goalkeeper" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p113564" Position="Substitute" ShirtNumber="3" Status="Sub" SubPosition="Defender" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p89470" Position="Substitute" ShirtNumber="11" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p37614" Position="Substitute" ShirtNumber="8" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p124165" Position="Substitute" ShirtNumber="7" Status="Sub" SubPosition="Midfielder" />
+          <MatchPlayer Formation_Place="0" PlayerRef="p87396" Position="Substitute" ShirtNumber="10" Status="Sub" SubPosition="Midfielder" />
+        </PlayerLineUp>
+        <Substitution EventID="1597545230" EventNumber="25816" Min="57" Period="2" Reason="Tactical" Sec="55" SubOff="p71738" SubOn="p87396" SubstitutePosition="3" Time="58" TimeStamp="20190809T212146+0100" uID="s45-1" />
+        <Substitution EventID="819439278" EventNumber="27017" Min="69" Period="2" Reason="Tactical" Sec="20" SubOff="p90440" SubOn="p89470" SubstitutePosition="3" Time="70" TimeStamp="20190809T213311+0100" uID="s45-2" />
+        <Substitution EventID="1762428465" EventNumber="28318" Min="82" Period="2" Reason="Tactical" Sec="23" SubOff="p57127" SubOn="p81048" SubstitutePosition="4" Time="83" TimeStamp="20190809T214613+0100" uID="s45-3" />
+      </TeamData>
+    </MatchData>
+    <Team uID="t14">
+      <Country>England</Country>
+      <Kit id="4975" colour1="#FF0000" type="home" />
+      <Name>Liverpool</Name>
+      <Player Position="Goalkeeper" uID="p116535">
+        <PersonName>
+          <First>Alisson</First>
+          <Known>Alisson</Known>
+          <Last>Ramses Becker</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p169187">
+        <PersonName>
+          <First>Trent</First>
+          <Last>Alexander-Arnold</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p97032">
+        <PersonName>
+          <First>Virgil</First>
+          <Last>van Dijk</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p171287">
+        <PersonName>
+          <First>Joseph</First>
+          <Last>Gomez</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p122798">
+        <PersonName>
+          <First>Andrew</First>
+          <Last>Robertson</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p41733">
+        <PersonName>
+          <First>Georginio</First>
+          <Last>Wijnaldum</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p56979">
+        <PersonName>
+          <First>Jordan</First>
+          <Last>Henderson</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p116643">
+        <PersonName>
+          <First>Fabio Henrique</First>
+          <Known>Fabinho</Known>
+          <Last>Tavares</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Striker" uID="p152760">
+        <PersonName>
+          <First>Divock</First>
+          <Last>Origi</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Striker" uID="p118748">
+        <PersonName>
+          <First>Mohamed</First>
+          <Known>Mohamed Salah</Known>
+          <Last>Salah Ghaly</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Striker" uID="p92217">
+        <PersonName>
+          <First>Roberto Firmino</First>
+          <Known>Roberto Firmino</Known>
+          <Last>Barbosa de Oliveira</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p15157">
+        <PersonName>
+          <First>James</First>
+          <Last>Milner</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p60706">
+        <PersonName>
+          <First>Adrián</First>
+          <Known>Adrián</Known>
+          <Last>San Miguel del Castillo</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p81880">
+        <PersonName>
+          <First>Alex</First>
+          <Last>Oxlade-Chamberlain</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p60914">
+        <PersonName>
+          <First>Joel</First>
+          <Last>Matip</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p175592">
+        <PersonName>
+          <First>Naby</First>
+          <Last>Keita</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p110979">
+        <PersonName>
+          <First>Sadio</First>
+          <Last>Mané</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p68312">
+        <PersonName>
+          <First>Xherdan</First>
+          <Last>Shaqiri</Last>
+        </PersonName>
+      </Player>
+      <TeamOfficial Type="Manager" uID="man279">
+        <PersonName>
+          <First>Jürgen</First>
+          <Last>Klopp</Last>
+        </PersonName>
+      </TeamOfficial>
+    </Team>
+    <Team uID="t45">
+      <Country>England</Country>
+      <Kit id="423" colour1="#FFFF00" colour2="#00CC00" type="home" />
+      <Name>Norwich City</Name>
+      <Player Position="Goalkeeper" uID="p20480">
+        <PersonName>
+          <First>Tim</First>
+          <Last>Krul</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p232980">
+        <PersonName>
+          <First>Maximillian</First>
+          <Known>Max Aarons</Known>
+          <Last>Aarons</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p194799">
+        <PersonName>
+          <First>Jamal</First>
+          <Last>Lewis</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p83428">
+        <PersonName>
+          <First>Grant</First>
+          <Last>Hanley</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Defender" uID="p198826">
+        <PersonName>
+          <First>Ben</First>
+          <Last>Godfrey</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p193111">
+        <PersonName>
+          <First>Todd</First>
+          <Last>Cantwell</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p90440">
+        <PersonName>
+          <First>Tom</First>
+          <Last>Trybull</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p71738">
+        <PersonName>
+          <First>Marco</First>
+          <Last>Stiepermann</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p78607">
+        <PersonName>
+          <First>Kenneth</First>
+          <Known>Kenny McLean</Known>
+          <Last>McLean</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Midfielder" uID="p195546">
+        <PersonName>
+          <First>Emiliano</First>
+          <Last>Buendía</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Striker" uID="p57127">
+        <PersonName>
+          <First>Teemu</First>
+          <Last>Pukki</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p81048">
+        <PersonName>
+          <First>Josip</First>
+          <Last>Drmic</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p28082">
+        <PersonName>
+          <First>Ralf</First>
+          <Last>Fährmann</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p113564">
+        <PersonName>
+          <First>Sam</First>
+          <Last>Byram</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p89470">
+        <PersonName>
+          <First>Onel</First>
+          <Last>Hernández</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p37614">
+        <PersonName>
+          <First>Mario</First>
+          <Last>Vrancic</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p124165">
+        <PersonName>
+          <First>Patrick</First>
+          <Last>Roberts</Last>
+        </PersonName>
+      </Player>
+      <Player Position="Substitute" uID="p87396">
+        <PersonName>
+          <First>Moritz</First>
+          <Last>Leitner</Last>
+        </PersonName>
+      </Player>
+      <TeamOfficial Type="Manager" uID="man42856">
+        <PersonName>
+          <First>Daniel</First>
+          <Last>Farke</Last>
+        </PersonName>
+      </TeamOfficial>
+    </Team>
+    <Venue uID="v39">
+      <Country>England</Country>
+      <Name>Anfield</Name>
+    </Venue>
+  </SoccerDocument>
+</SoccerFeed>

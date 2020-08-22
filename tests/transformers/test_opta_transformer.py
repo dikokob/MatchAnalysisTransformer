@@ -12,9 +12,9 @@ from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_m
 class TestOptaTransformer:
     """Test the opta transformer
     """
-    path_match_results = 'tests/fixtures/inputs/g1059702/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/inputs/g1059702/f24-8-2019-1059702-eventdetails.xml'
-    metadata_path='tests/fixtures/inputs/g1059702/g1059702_SecondSpectrum_Metadata.json'
+    path_match_results = 'tests/fixtures/crosses_loop_in_tracking/inputs/g1059702/srml-8-2019-f1059702-matchresults.xml'
+    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/g1059702/f24-8-2019-1059702-eventdetails.xml'
+    metadata_path='tests/fixtures/crosses_loop_in_tracking/inputs/g1059702/g1059702_SecondSpectrum_Metadata.json'
 
     spectrumTransformer = SpectrumMatchAnalysisTransformer('SpectrumMatchAnalysis')
 
@@ -74,7 +74,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_opta_shots.csv", index_col=None)
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
         df_player_names_raw, _, _ = self.spectrumTransformer.get_player_match_data(
@@ -101,7 +101,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_opta_shots.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_opta_shots.csv", index_col=None)
 
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
@@ -153,7 +153,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_crosses_classification.csv", index_col=None)
 
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
@@ -167,7 +167,7 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_crosses_classification.csv", index_col=None)
 
         opta_transformer = self.get_opta_transformers()
         opta_event_data_df, _ = self.spectrumTransformer.get_opta_events(event_path=self.path_events)
@@ -213,14 +213,17 @@ class TestOptaTransformer:
     def test_opta_only_open_play_crosses_output_columns_as_expected(self):
         """test output is as expected
         """
-        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
         verification_df = verification_df.where(pd.notnull(verification_df), None)
         data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
 
         output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
 
-        assert all(verification_df.columns == output.columns), (
+        # assert all(verification_df.columns == output.columns), (
+        #     "Failed: did not return required output dataframe"
+        # )
+        assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )
 
@@ -228,13 +231,16 @@ class TestOptaTransformer:
         """test output is as expected
         """
 
-        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
         verification_df = verification_df.where(pd.notnull(verification_df), None)
         data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
 
         output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
         print("{}\n\n\n\n{}".format(verification_df.head().values, output.head().values))
-        assert (verification_df.values == output.values).all(), (
+        # assert (verification_df.values == output.values).all(), (
+        #     "Failed: did not return required output dataframe"
+        # )
+        assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )

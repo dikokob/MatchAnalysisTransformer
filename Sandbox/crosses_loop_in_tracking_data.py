@@ -5,7 +5,6 @@ from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_m
 
 def only_open_play_crosses(data: pd.DataFrame) -> pd.DataFrame:
 
-    print("Only Open play crosses\nColumns = ", data.columns.tolist())
     if (data.type_id.unique()[0]==1) | (data.type_id.unique()[0]==2):
         # if an pass or offside pass occured
         if len(set([5,6]).intersection(set(data.qualifier_id.tolist()))) == 0:
@@ -40,7 +39,6 @@ def only_open_play_crosses(data: pd.DataFrame) -> pd.DataFrame:
                 else:
                     data['open_play_cross'] = 0
 
-    print(data[data.open_play_cross.isin([1,2,3])].filter(['unique_event_id', 'open_play_cross','qualifier_id'],axis=1))
     return data
 
 def cross_label (data_output):

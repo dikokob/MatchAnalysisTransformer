@@ -6,8 +6,9 @@
         How to query a xml node on condition: https://stackoverflow.com/questions/1457638/get-nodes-where-child-node-contains-an-attribute
 """
 
-
+# xml
 import xml.etree.ElementTree as ET
+
 
 if __name__ == '__main__':
 
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     # for child in root.findall("Game/Event/[@event_id = '838']"):
     #     print("\n\nGet all events on a condition \n",child.tag, child.attrib)
 
-    for event in root.findall("Game/Event/[@type_id = '2']/Q[@qualifier_id = '5']"):
+    for event in root.findall("Game/Event/[@type_id = '1']/Q[@qualifier_id = '44']"):
         print("\n\nGet all events on a condition \n",event.tag, event.attrib)
         # for inner_event in event.findall("Event/[@type_id = '5']"):
         #     print("Inner\n", inner_event.tag)

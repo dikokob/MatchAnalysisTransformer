@@ -607,6 +607,18 @@ def corners_classification(path_events, path_match_results, path_track_meta, sea
 
         #is_ball_delivered = int(distance_x_percent_relevant_pass > -999)
 
+        print(opta_event_data_df[
+            (
+                opta_event_data_df.period_id==period_id
+            ) & (
+                    opta_event_data_df.type_id.isin([6])
+            ) & (
+                opta_event_data_df.team_id==attacking_team_id
+                ) & (
+                    opta_event_data_df.time_in_seconds <= freekick_time_seconds
+                )
+        ]['time_in_seconds'].tail(1).values)
+
         data_corner_time = opta_event_data_df[
             (
                 opta_event_data_df.period_id==period_id
@@ -617,7 +629,14 @@ def corners_classification(path_events, path_match_results, path_track_meta, sea
                 ) & (
                     opta_event_data_df.time_in_seconds <= freekick_time_seconds
                 )
-        ]['time_in_seconds'].iloc[-1] #we take most recent event before freekick
+        ]['time_in_seconds'].tail(1).values #we take most recent event before freekick
+
+        try:
+            print("HERE line 635 in set_pieces_classification.py")
+            data_corner_time = data_corner_time[0]
+        except IndexError as exception:
+            data_corner_time = 0
+        
         time_between_stop_and_corner = np.round(freekick_time_seconds - data_corner_time, 2)
         data_corner = opta_event_data_df[(opta_event_data_df.period_id==period_id) & (opta_event_data_df.time_in_seconds > data_corner_time) & (opta_event_data_df.time_in_seconds < freekick_time_seconds)].reset_index(drop=True)
         if len(data_corner.unique_event_id.unique()) == 0:

@@ -25,9 +25,12 @@ CREATE TABLE [dbo].[OptaCoreStats](
 	[Team Formation ID] [int] NULL,
 	[Team ID] [nchar](10) NULL,
 	[Team Name] [nvarchar](50) NULL,
+    [Sent Off] [bit] NULL,
+    [Retired] [bit] NULL,
 	[Time Played] [float] NULL,
 	[Time In Possession] [float] NULL,
-	[Time Out Of Possession] [float] NULL
+	[Time Out Of Possession] [float] NULL,
+    [Time Played Calculated From Tracking Data] [nvarchar](50) NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[OptaCoreStats] ADD  CONSTRAINT [PK_OptaCoreStats] PRIMARY KEY CLUSTERED

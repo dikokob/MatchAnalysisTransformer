@@ -52,9 +52,12 @@ BEGIN
 	[Team Formation ID],
 	[Team ID],
 	[Team Name],
+    [Sent Off],
+    [Retired],
 	[Time Played],
 	[Time In Possession],
-	[Time Out Of Possession]
+	[Time Out Of Possession],
+    [Time Played Calculated From Tracking Data]
 	)
     SELECT * FROM @OptaCoreStatsData
 END

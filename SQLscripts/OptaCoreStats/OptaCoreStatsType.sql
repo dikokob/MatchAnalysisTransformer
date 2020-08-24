@@ -20,8 +20,11 @@ CREATE TYPE [dbo].[OptaCoreStatsType] AS TABLE(
 	[Team Formation ID] [int] NULL,
 	[Team ID] [nchar](10) NULL,
 	[Team Name] [nvarchar](50) NULL,
+    [Sent Off] [bit] NULL,
+    [Retired] [bit] NULL,
 	[Time Played] [float] NULL,
 	[Time In Possession] [float] NULL,
-	[Time Out Of Possession] [float] NULL
+	[Time Out Of Possession] [float] NULL,
+    [Time Played Calculated From Tracking Data] [nvarchar](50) NULL
 )
 GO

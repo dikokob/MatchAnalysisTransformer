@@ -31,9 +31,12 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Team Formation ID", typeof(int)),
             new DataTypeColumnMap("Team ID", typeof(string)),
             new DataTypeColumnMap("Team Name", typeof(string)),
+            new DataTypeColumnMap("Sent Off", typeof(bool)),
+            new DataTypeColumnMap("Retired", typeof(bool)),
             new DataTypeColumnMap("Time Played", typeof(decimal)),
             new DataTypeColumnMap("Time In Possession", typeof(decimal)),
-            new DataTypeColumnMap("Time Out Of Possession", typeof(decimal))
+            new DataTypeColumnMap("Time Out Of Possession", typeof(decimal)),
+            new DataTypeColumnMap("Time Played Calculated From Tracking Data", typeof(string))
             };
 
 

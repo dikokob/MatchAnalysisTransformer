@@ -8,6 +8,9 @@
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrosses.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrossesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CrossesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/CreateOptaCoreStats.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/CreateOptaCoreStatsStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/OptaCoreStatsType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/CreateSecondPhaseSetPieces.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/CreateSecondPhaseSetPiecesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/SecondPhaseSetPiecesType.sql" dialect="TSQL" />

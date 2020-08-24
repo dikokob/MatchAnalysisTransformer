@@ -54,7 +54,6 @@ CREATE TABLE [dbo].[Crosses](
     [Defending Goalkeeper ID] [nvarchar](50) NULL,
     [Defending Goalkeeper Name] [nvarchar](50) NULL
 
-
  CONSTRAINT [PK_Crosses] PRIMARY KEY CLUSTERED
 (
 	[ID] ASC

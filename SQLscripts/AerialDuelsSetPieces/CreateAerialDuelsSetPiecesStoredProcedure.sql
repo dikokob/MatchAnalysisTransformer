@@ -41,7 +41,7 @@ BEGIN
 	[Aerial Duel Team ID],
 	[Aerial Duel Team Name],
     [Successful/Unsuccessful],
-	[Other Aerial Duel Payer ID],
+	[Other Aerial Duel Player ID],
 	[Other Aerial Duel Player Name],
 	[Other Aerial Duel Team ID],
 	[Other Aerial Duel Team Name],

@@ -3,6 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/AerialDuelsSetPiecesType.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPieces.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPiecesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrosses.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrossesStoredProcedure.sql" dialect="TSQL" />
     <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrosses.sql" dialect="TSQL" />

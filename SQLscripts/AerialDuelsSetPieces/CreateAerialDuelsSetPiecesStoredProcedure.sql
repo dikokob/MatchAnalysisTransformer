@@ -45,7 +45,7 @@ BEGIN
 	[Other Aerial Duel Player Name],
 	[Other Aerial Duel Team ID],
 	[Other Aerial Duel Team Name],
-	[Aerial Duel Is Shot],
+	[Aerial Duel Is Shot]
 	)
     SELECT * FROM @AerialDuelsSetPiecesData
 END

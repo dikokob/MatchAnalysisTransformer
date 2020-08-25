@@ -9,22 +9,22 @@ GO
 CREATE PROCEDURE [dbo].[spRemoveExistingCrosses] @CrossesData [dbo].[CrossesType] READONLY
 AS
 BEGIN
-	DECLARE @GameID as nvarchar(500);
-	DECLARE @CompetitionID as NVARCHAR(100);
+	DECLARE @game_id as nvarchar(500);
+	DECLARE @Fixture as NVARCHAR(100);
 
 	DECLARE @Cursor as CURSOR;
 
 	SET @Cursor = CURSOR FOR
-	SELECT DISTINCT [Game ID], [Competition ID] FROM @CrossesData;
+	SELECT DISTINCT [game_id], [Fixture] FROM @CrossesData;
 
 	OPEN @Cursor;
-	FETCH NEXT FROM @Cursor INTO @GameID, @CompetitionID;
+	FETCH NEXT FROM @Cursor INTO @game_id, @Fixture;
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-	 PRINT 'Deleting Crosses for GameID: ' + @GameID + ', CompetitonID: ' + @CompetitionID;
-	 DELETE FROM [dbo].[Crosses] where Id IN (SELECT Id FROM [dbo].[Crosses] where [Game ID] = @GameID AND [Competition ID] = @CompetitionID)
-	 FETCH NEXT FROM @Cursor INTO @GameID, @CompetitionID;
+	 PRINT 'Deleting Crosses for GameID: ' + @game_id + ', Fixture: ' + @Fixture;
+	 DELETE FROM [dbo].[Crosses] where Id IN (SELECT Id FROM [dbo].[Crosses] where [game_id] = @game_id AND [Fixture] = @Fixture)
+	 FETCH NEXT FROM @Cursor INTO @game_id, @Fixture;
 	END
 
 	CLOSE @Cursor;
@@ -60,12 +60,12 @@ BEGIN
 	[Keypass/Assist],
 	[Blocked Pass],
 	[Cutback],
-	[OPTA Pull Back Qulifier],
+	[OPTA Pull Back Qualifier],
 	[Out Of Pitch],
 	[Ending Too Wide],
 	[Cross Type],
 	[Set Piece OPTA Event ID],
-	[OPTA Cross Qulifier],
+	[OPTA Cross Qualifier],
 	[Time Between Set Piece and Cross],
 	[Number Events Between Set Piece and Cross],
 	[Linked 2nd Phase Cross IDs],

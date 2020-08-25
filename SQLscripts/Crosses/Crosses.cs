@@ -6,20 +6,23 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
 {
 	class Crosses
     {
+        public static readonly DataTypeColumnMap game_id = new DataTypeColumnMap("game_id", typeof(string));
+        public static readonly DataTypeColumnMap Fixture = new DataTypeColumnMap("Fixture", typeof(string));
+
         public static readonly List<DataTypeColumnMap> ColumnMaps = new List<DataTypeColumnMap>{
-            new DataTypeColumnMap("game_id", typeof(string)),
-            new DataTypeColumnMap("Fixture", typeof(string)),
-            new DataTypeColumnMap("Attackng Team", typeof(string)),
+            game_id,
+            Fixture,
+            new DataTypeColumnMap("Attacking Team", typeof(string)),
             new DataTypeColumnMap("Defending Team", typeof(string)),
-            new DataTypeColumnMap("Attackng Team ID", typeof(string)),
+            new DataTypeColumnMap("Attacking Team ID", typeof(string)),
             new DataTypeColumnMap("Defending Team ID", typeof(string)),
             new DataTypeColumnMap("Goals Scored", typeof(int)),
             new DataTypeColumnMap("Goals Conceded", typeof(int)),
             new DataTypeColumnMap("Goals Difference", typeof(int)),
             new DataTypeColumnMap("Game State", typeof(string)),
             new DataTypeColumnMap("Side", typeof(string)),
-            new DataTypeColumnMap("Early/ Lateral Deep", typeof(string)),
-            new DataTypeColumnMap("OPTA Event ID", typeof(int)),
+            new DataTypeColumnMap("Early/Lateral/Deep", typeof(string)),
+            new DataTypeColumnMap("OPTA Event ID", typeof(string)),
             new DataTypeColumnMap("perid_id", typeof(int)),
             new DataTypeColumnMap("min", typeof(int)),
             new DataTypeColumnMap("sec", typeof(int)),
@@ -40,7 +43,7 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Out Of Pitch", typeof(bool)),
             new DataTypeColumnMap("Ending Too Wide", typeof(bool)),
             new DataTypeColumnMap("Cross Type", typeof(string)),
-            new DataTypeColumnMap("Set Piece OPTA Event ID", typeof(int)),
+            new DataTypeColumnMap("Set Piece OPTA Event ID", typeof(string)),
             new DataTypeColumnMap("OPTA Cross Qualifier", typeof(bool)),
             new DataTypeColumnMap("Time Between Set Piece and Cross", typeof(float)),
             new DataTypeColumnMap("Number Events Between Set Piece and Cross", typeof(int)),

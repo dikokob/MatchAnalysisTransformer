@@ -1,3 +1,8 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Crosses]') AND type in (N'U'))
+    DROP TABLE [dbo].[Crosses]
+GO
+
+
 SET ANSI_NULLS ON
 GO
 
@@ -8,18 +13,18 @@ CREATE TABLE [dbo].[Crosses](
     [ID] [int] IDENTITY(1,1) NOT NULL,
     [game_id] [nvarchar](50) NULL,
     [Fixture] [nvarchar](50) NULL,
-    [Attackng Team] [nvarchar](50) NULL,
+    [Attacking Team] [nvarchar](50) NULL,
     [Defending Team] [nvarchar](50) NULL,
-    [Attackng Team ID] [nvarchar](50) NULL,
+    [Attacking Team ID] [nvarchar](50) NULL,
     [Defending Team ID] [nvarchar](50) NULL,
     [Goals Scored] [int] NULL,
-    [Goals Conceled] [int] NULL,
+    [Goals Conceded] [int] NULL,
     [Goals Difference] [int] NULL,
     [Game State] [nvarchar](50) NULL,
     [Side] [nvarchar](50) NULL,
-    [Early/ Lateral Deep] [nvarchar](50) NULL,
-    [OPTA Event ID] [int] NULL,
-    [perid_id] [int] NULL,
+    [Early/Lateral/Deep] [nvarchar](50) NULL,
+    [OPTA Event ID] [nvarchar](50) NULL,
+    [period_id] [int] NULL,
     [min] [int] NULL,
     [sec] [int] NULL,
     [X Coordinate] [float] NULL,
@@ -39,7 +44,7 @@ CREATE TABLE [dbo].[Crosses](
     [Out Of Pitch] [bit] NULL,
     [Ending Too Wide] [bit] NULL,
     [Cross Type] [nvarchar](50) NULL,
-    [Set Piece OPTA Event ID] [int] NULL,
+    [Set Piece OPTA Event ID] [nvarchar](50) NULL,
     [OPTA Cross Qualifier] [bit] NULL,
     [Time Between Set Piece and Cross] [float] NULL,
     [Number Events Between Set Piece and Cross] [int] NULL,

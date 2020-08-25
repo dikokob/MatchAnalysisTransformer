@@ -10,28 +10,30 @@ GO
 CREATE PROCEDURE [dbo].[spRemoveExistingAerialDuelsSetPieces] @AerialDuelsSetPiecesData [dbo].[AerialDuelsSetPiecesType] READONLY
 AS
 BEGIN
-	DECLARE @GameID as nvarchar(500);
-	DECLARE @CompetitionID as NVARCHAR(100);
+	DECLARE @game_id as nvarchar(50);
+	DECLARE @Fixture as NVARCHAR(50);
 
 	DECLARE @Cursor as CURSOR;
 
 	SET @Cursor = CURSOR FOR
-	SELECT DISTINCT [Game ID], [Competition ID] FROM @AerialDuelsSetPiecesData;
+	SELECT DISTINCT [game_id], [Fixture] FROM @AerialDuelsSetPiecesData;
 
 	OPEN @Cursor;
-	FETCH NEXT FROM @Cursor INTO @GameID, @CompetitionID;
+	FETCH NEXT FROM @Cursor INTO @game_id, @Fixture;
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-	 PRINT 'Deleting AerialDuelsSetPieces for GameID: ' + @GameID + ', CompetitonID: ' + @CompetitionID;
-	 DELETE FROM [dbo].[AerialDuelsSetPieces] where Id IN (SELECT Id FROM [dbo].[AerialDuelsSetPieces] where [Game ID] = @GameID AND [Competition ID] = @CompetitionID)
-	 FETCH NEXT FROM @Cursor INTO @GameID, @CompetitionID;
+	 PRINT 'Deleting AerialDuelsSetPieces for game_id: ' + @game_id + ', CompetitonID: ' + @CompetitionID;
+	 DELETE FROM [dbo].[AerialDuelsSetPieces] where Id IN (SELECT Id FROM [dbo].[AerialDuelsSetPieces] where [game_id] = @game_id AND [Fixture] = @Fixture)
+	 FETCH NEXT FROM @Cursor INTO @game_id, @Fixture;
 	END
 
 	CLOSE @Cursor;
 	DEALLOCATE @Cursor;
 
     INSERT [dbo].[AerialDuelsSetPieces](
+    [game_id],
+    [Fixture],
 	[Set Piece OPTA Event ID],
     [Aerial Duel OPTA ID],
 	[Aerial Duel Player ID],

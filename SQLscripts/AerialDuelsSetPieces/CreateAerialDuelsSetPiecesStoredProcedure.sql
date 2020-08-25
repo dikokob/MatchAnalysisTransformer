@@ -23,7 +23,7 @@ BEGIN
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
-	 PRINT 'Deleting AerialDuelsSetPieces for game_id: ' + @game_id + ', CompetitonID: ' + @CompetitionID;
+	 PRINT 'Deleting AerialDuelsSetPieces for game_id: ' + @game_id + ', Fixture: ' + @Fixture;
 	 DELETE FROM [dbo].[AerialDuelsSetPieces] where Id IN (SELECT Id FROM [dbo].[AerialDuelsSetPieces] where [game_id] = @game_id AND [Fixture] = @Fixture)
 	 FETCH NEXT FROM @Cursor INTO @game_id, @Fixture;
 	END

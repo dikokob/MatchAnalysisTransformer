@@ -14,7 +14,7 @@ CREATE TABLE [dbo].[AerialDuelsSetPieces](
 	[Aerial Duel Player Name] [nvarchar] (50) Null,
 	[Aerial Duel Team ID] [nvarchar] (50) Null,
 	[Aerial Duel Team Name] [nvarchar] (50) NULL,
-	[Successfull/Unsuccessful] [nvarchar] (50) NULL,
+	[Successful/Unsuccessful] [nvarchar] (50) NULL,
 	[Other Aerial Duel Player ID] [nvarchar] (50) NULL,
 	[Other Aerial Duel Player Name] [nvarchar] (50) NULL,
 	[Other Aerial Duel Team ID] [nvarchar] (50) NULL,

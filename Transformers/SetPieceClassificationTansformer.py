@@ -2725,7 +2725,16 @@ class SetPieceClassificationTansformer:
 
         shots_full = shots_full.sort_values(['Shot OPTA ID']).reset_index(drop=True)
 
+        # Add fixtures and game_id Todo Check with Fed at some point
 
+        shots_full['game_id'] = opta_match_info['match_id']
+        shots_full['Fixture'] = opta_match_info['fixture']
+
+        summary_df_all_shots['game_id'] = opta_match_info['match_id']
+        summary_df_all_shots['Fixture'] = opta_match_info['fixture']
+
+        summary_df_aerial_duels['game_id'] = opta_match_info['match_id']
+        summary_df_aerial_duels['Fixture'] = opta_match_info['fixture']
 
 
         return data_crosses, set_pieces_full, shots_full, summary_df_all_shots, summary_df_aerial_duels

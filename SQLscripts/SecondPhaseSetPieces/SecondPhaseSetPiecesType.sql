@@ -1,4 +1,5 @@
-
+DROP TYPE [dbo].[SecondPhaseSetPiecesType]
+GO
 
 CREATE TYPE [dbo].[SecondPhaseSetPiecesType] AS TABLE(
 	[game_id] [nvarchar](50) NULL,
@@ -14,7 +15,7 @@ CREATE TYPE [dbo].[SecondPhaseSetPiecesType] AS TABLE(
 	[Side] [nvarchar](50) NULL,
 	[Number Events In Window] [int] NULL,
 	[Direct] [nvarchar](50) NULL,
-	[OPTA Event ID] [int] NULL,
+	[OPTA Event ID] [nvarchar](50)NULL,
 	[period_id] [int] NULL,
 	[min] [int] NULL,
 	[sec] [int] NULL,
@@ -26,7 +27,7 @@ CREATE TYPE [dbo].[SecondPhaseSetPiecesType] AS TABLE(
 	[Player Name] [nvarchar](50) NULL,
 	[% Distance Along X] [float] NULL,
 	[Length Pass] [float] NULL,
-	[Relevant OPTA Event ID] [int] NULL,
+	[Relevant OPTA Event ID] [nvarchar](50) NULL,
 	[Relevant min] [int] NULL,
 	[Relevant sec] [int] NULL,
 	[Relevant X Coordinate] [float] NULL,

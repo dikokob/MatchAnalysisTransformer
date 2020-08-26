@@ -4,6 +4,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+DROP TABLE [dbo].[SecondPhaseSetPieces]
+GO
+
 CREATE TABLE [dbo].[SecondPhaseSetPieces](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
     [game_id] [nvarchar](50) NULL,
@@ -19,7 +22,7 @@ CREATE TABLE [dbo].[SecondPhaseSetPieces](
 	[Side] [nvarchar](50) NULL,
 	[Number Events In Window] [int] NULL,
 	[Direct] [nvarchar](50) NULL,
-	[OPTA Event ID] [int] NULL,
+	[OPTA Event ID] [nvarchar](50) NULL,
 	[period_id] [int] NULL,
 	[min] [int] NULL,
 	[sec] [int] NULL,
@@ -31,7 +34,7 @@ CREATE TABLE [dbo].[SecondPhaseSetPieces](
 	[Player Name] [nvarchar](50) NULL,
 	[% Distance Along X] [float] NULL,
 	[Length Pass] [float] NULL,
-	[Relevant OPTA Event ID] [int] NULL,
+	[Relevant OPTA Event ID] [nvarchar](50) NULL,
 	[Relevant min] [int] NULL,
 	[Relevant sec] [int] NULL,
 	[Relevant X Coordinate] [float] NULL,

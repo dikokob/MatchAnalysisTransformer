@@ -1343,8 +1343,6 @@ class SetPieceClassificationTansformer:
             freekick_type_id = int(
                 freekicks_taken.type_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0])
 
-            # freekick_player_id = 'p' + str(
-            #     int(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
             freekick_player_id = freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]
             freekick_player_name = \
             player_names_raw.full_name.loc[player_names_raw['player_id'] == int(freekick_player_id[1:])].iloc[0]

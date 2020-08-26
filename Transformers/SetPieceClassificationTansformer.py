@@ -60,7 +60,8 @@ class SetPieceClassificationTansformer:
                                      df_opta_output_aerial_duels_freekicks: pd.DataFrame,
                                      df_opta_output_final_corners: pd.DataFrame,
                                      df_opta_output_shots_corners: pd.DataFrame,
-                                     df_opta_output_aerial_duels_corners: pd.DataFrame) -> \
+                                     df_opta_output_aerial_duels_corners: pd.DataFrame,
+                                     opta_match_info: dict) -> \
             (pd.DataFrame, pd.DataFrame, pd.DataFrame):
         """[summary]
 
@@ -127,6 +128,9 @@ class SetPieceClassificationTansformer:
                                                   right_on = ['team_id', '@uID']).drop(['@uID', 'team_id', 'Name'], axis = 1).reset_index(drop=True)
             final_df_shots = final_df_shots.rename(columns = {'preferred_foot': 'Preferred Foot'})
 
+            # Add fixtures and game_id Todo Check with Fed
+            final_df_aerial_duels['game_id'] = opta_match_info['match_id']
+            final_df_aerial_duels['Fixture'] = opta_match_info['fixture']
 
             return final_df_set_pieces, final_df_shots, final_df_aerial_duels
 
@@ -2721,7 +2725,16 @@ class SetPieceClassificationTansformer:
 
         shots_full = shots_full.sort_values(['Shot OPTA ID']).reset_index(drop=True)
 
+        # Add fixtures and game_id Todo Check with Fed at some point
 
+        shots_full['game_id'] = opta_match_info['match_id']
+        shots_full['Fixture'] = opta_match_info['fixture']
+
+        summary_df_all_shots['game_id'] = opta_match_info['match_id']
+        summary_df_all_shots['Fixture'] = opta_match_info['fixture']
+
+        summary_df_aerial_duels['game_id'] = opta_match_info['match_id']
+        summary_df_aerial_duels['Fixture'] = opta_match_info['fixture']
 
 
         return data_crosses, set_pieces_full, shots_full, summary_df_all_shots, summary_df_aerial_duels

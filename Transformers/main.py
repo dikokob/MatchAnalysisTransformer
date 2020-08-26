@@ -162,7 +162,8 @@ if __name__ == "__main__":
             df_set_pieces, df_shots_from_set_pieces, df_aerial_duels_from_set_pieces = setPieceTransformer.\
                 extract_set_piece_statistics(df_opta_output_final_freekicks, df_opta_output_shots_freekicks,
                                              df_opta_output_aerial_duels_freekicks, df_opta_output_final_corners,
-                                             df_opta_output_shots_corners, df_opta_output_aerial_duels_corners)
+                                             df_opta_output_shots_corners, df_opta_output_aerial_duels_corners,
+                                             opta_match_info)
 
             df_crosses_output, df_second_phase_set_pieces, df_second_phase_set_pieces_shots, \
             df_shots_from_crosses, df_aerial_duels_from_crosses = \

@@ -19,7 +19,7 @@ class SetPieceClassificationTansformer:
 
 
     @staticmethod
-    def get_opta_squad_data() -> pd.DataFrame:
+    def get_opta_squad_data(path_squads: str = None, num_of_squads=20) -> pd.DataFrame:
         """
 
         Returns:
@@ -28,7 +28,8 @@ class SetPieceClassificationTansformer:
         """
 
         # always assume to run from root
-        path_squads = os.path.join("scripts_from_fed", "srml-8-2019-squads.xml")
+        if path_squads is None:
+            path_squads = os.path.join("scripts_from_fed", "srml-8-2019-squads.xml")
 
         try:
             with open(path_squads, encoding = 'utf-8') as fd:
@@ -39,7 +40,12 @@ class SetPieceClassificationTansformer:
 
         list_squads = []
 
-        for i in range(20):
+        if num_of_squads is None:
+            num_of_squads = len(opta_squads['SoccerFeed']['SoccerDocument']['Team'])
+
+        for i in range(num_of_squads):
+            # potentially, change from for loop to generator built the above load functionality
+            # 
             data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
             if '@loan' in data_players_in.columns:
                 data_players_in = data_players_in.drop(['@loan'], axis = 1)
@@ -51,7 +57,10 @@ class SetPieceClassificationTansformer:
             list_squads.append(data_players)
 
         data_squads = pd.concat(list_squads).reset_index(drop=True)
-        data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+        data_squads['preferred_foot'] = [
+            pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type'] == 'preferred_foot'].iloc[0] \
+            if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat
+        ]
         data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
         return data_squads
 
@@ -216,7 +225,7 @@ class SetPieceClassificationTansformer:
             #freekick_event_id = 2170928251
             #freekick_event_id = 554521953
     
-            #check for the freekick event taken 
+            #check for the freekick event taken
             attacking_team_id = np.where(freekicks_taken[(freekicks_taken.unique_event_id==freekick_event_id)]['team_id'].iloc[0]==home_team_id, home_team_id, away_team_id).tolist()
             defending_team_id = np.where(freekicks_taken[(freekicks_taken.unique_event_id==freekick_event_id)]['team_id'].iloc[0]==home_team_id, away_team_id, home_team_id).tolist()
             attacking_team = np.where(freekicks_taken[(freekicks_taken.unique_event_id==freekick_event_id)]['team_id'].iloc[0]==home_team_id, home_team_name, away_team_name).tolist()
@@ -1236,15 +1245,17 @@ class SetPieceClassificationTansformer:
 
         opta_event_data_df['time_in_seconds'] = opta_event_data_df['min'] * 60.0 + opta_event_data_df['sec']
         fixture = opta_event_data_df['fixture'].iloc[0]
-        freekicks_taken = opta_event_data_df.loc[(((opta_event_data_df.unique_event_id.isin(
-            opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id == 6].unique().tolist()))) & (
-                                                              opta_event_data_df.type_id == 1)) | (((
-            opta_event_data_df.unique_event_id.isin(
-                opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id == 263].unique().tolist()))) & (
-                                                                                                       opta_event_data_df.type_id.isin(
-                                                                                                           [13, 14, 15,
-                                                                                                            16])))].reset_index(
-            drop=True)  # we include all free kicks instances
+        # freekicks_taken = opta_event_data_df.loc[(((opta_event_data_df.unique_event_id.isin(
+        #     opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id == 6].unique().tolist()))) & (
+        #                                                       opta_event_data_df.type_id == 1)) | (((
+        #     opta_event_data_df.unique_event_id.isin(
+        #         opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id == 263].unique().tolist()))) & (
+        #                                                                                                opta_event_data_df.type_id.isin(
+        #                                                                                                    [13, 14, 15,
+        #                                                                                                     16])))].reset_index(
+        #     drop=True)  # we include all free kicks instances
+        freekicks_taken = opta_event_data_df.loc[(((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==6].unique().tolist()))) & (opta_event_data_df.type_id==1)) | (((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==263].unique().tolist()))) & (opta_event_data_df.type_id.isin([13,14,15,16])))].reset_index(drop = True) #we include all free kicks instances
+        print("(line 1258) freekicks taken = {}\n\n\n".format(freekicks_taken))
         freekicks_taken['time_in_seconds'] = freekicks_taken['min'] * 60.0 + freekicks_taken['sec']
         freekicks_taken['time_in_seconds'] = freekicks_taken['time_in_seconds'].astype(float)
 
@@ -1265,6 +1276,7 @@ class SetPieceClassificationTansformer:
             # freekick_event_id = 1893310504
             # freekick_event_id = 1418929501
             # freekick_event_id = 116705383
+            print("(line 1277) freekick_event_id = {}".format(freekick_event_id))
 
             # check for the freekick event taken
             attacking_team_id = np.where(
@@ -1332,8 +1344,13 @@ class SetPieceClassificationTansformer:
                 freekicks_taken.event_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0])
             freekick_type_id = int(
                 freekicks_taken.type_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0])
-            freekick_player_id = 'p' + str(
-                int(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
+            print("(line 1347) freekick_event_id = {}\n\n".format(freekick_event_id))
+            print("(line 1347) freekick_taken unique_event_id = {}\n\n".format(freekicks_taken.unique_event_id))
+            print("(line 1347) freekick_player_id = {}\n\n".format(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
+
+            # freekick_player_id = 'p' + str(
+            #     int(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
+            freekick_player_id = freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]
             freekick_player_name = \
             player_names_raw.full_name.loc[player_names_raw['player_id'] == int(freekick_player_id[1:])].iloc[0]
             freekick_qualifier_ids = ', '.join([str(int(x)) for x in freekicks_taken.qualifier_id.loc[
@@ -1893,11 +1910,14 @@ class SetPieceClassificationTansformer:
                                     event_type_id[event_type_id.type_id == events_after_relevant_pass.type_id.iloc[0]][
                                         'name'].iloc[0]
                             first_contact_type = events_after_relevant_pass.type_id.iloc[0]
-                            if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
+                            print("(line 1923) Is nan = {}".format(type(events_after_relevant_pass.player_id.iloc[0])))
+                            print("(line 1923) Is nan = {}".format(events_after_relevant_pass.player_id.iloc[0]))
+                            # if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
+                            if events_after_relevant_pass.player_id.iloc[0] is None:
                                 first_contact_player_id = None
                                 first_contact_player_name = None
                             else:
-                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass.player_id.iloc[0]))
+                                first_contact_player_id = events_after_relevant_pass.player_id.iloc[0]
                                 first_contact_player_name = \
                                 player_names_raw[player_names_raw['player_id'] == int(first_contact_player_id[1:])][
                                     'full_name'].iloc[0]

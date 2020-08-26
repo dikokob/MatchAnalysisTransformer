@@ -34,5 +34,5 @@ lint:
 
 test:
 	pip install pytest mock pytest-mock coverage;
-	coverage run -m pytest;
+	coverage run -m pytest tests/transformers/test_set_piece_classification_transformer.py;
 	coverage report --fail-under=${COVERAGE_THRESHOLD}

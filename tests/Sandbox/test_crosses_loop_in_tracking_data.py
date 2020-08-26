@@ -8,7 +8,7 @@ from sandbox.crosses_loop_in_tracking_data import crosses_classification, only_o
 class TestCrossesClassification:
     """Test the get shots functionality from set_pieces_classification
     """
-    path_match_results = 'tests/fixtures/crosses_loop_in_tracking/inputs/srml-8-2019-f1059702-matchresults.xml'
+    path_match_results = 'tests/fixtures/srml-8-2019-f1059702-matchresults.xml'
     path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
 
     def test_cross_classification_output_is_dataframe(self):
@@ -112,14 +112,9 @@ class TestCrossesClassification:
         verification_df = verification_df.where(pd.notnull(verification_df), None)
         data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
 
-
-        # data.to_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses2.csv", index=False)
-
         output = data.groupby(['unique_event_id']).apply(only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
-        # assert (verification_df.values == output.values).all(), (
-        #     "Failed: did not return required output dataframe"
-        # )
+
         assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )

@@ -16,14 +16,15 @@ def pprint_dataframe(df):
     """
     print(tabulate(df))
 
-class TestGetShots:
+class TestSetPieceClassification:
     """Test the get shots functionality from set_pieces_classification
     """
-    path_match_results = 'tests/fixtures/crosses_loop_in_tracking/inputs/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
-    path_metadata = 'tests/fixtures/crosses_loop_in_tracking/inputs/g1059702_SecondSpectrum_Metadata.json'
+    path_match_results = 'tests/fixtures/srml-8-2019-f1059702-matchresults.xml'
+    path_metadata = 'tests/fixtures/g1059702_SecondSpectrum_Metadata.json'
     season = '2019-20'
     competition ='FA Cup'
+
+    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
 
     def test_output_is_dataframe(self):
         """test that output is a pd.Dataframe
@@ -81,7 +82,6 @@ class TestGetShots:
             _,
             _
         ) = corners_classification(
-            # path_events='data/raw_data/g1059702/f24-8-2019-1059702-eventdetails.xml',
             path_events='tests/fixtures/set_piece_classification/inputs/test_corners_final_corners.xml',
             path_match_results=self.path_match_results,
             path_track_meta=self.path_metadata,
@@ -118,7 +118,6 @@ class TestGetShots:
         opta_output_final_corners = opta_output_final_corners.replace([' ', '', np.nan, None], 'nan')
         
         base_path = 'tests/fixtures/set_piece_classification/outputs'
-        # opta_output_final_corners.to_csv(os.path.join(base_path, 'df_final_corners.csv'), index=False)
         verified_df = pd.read_csv(os.path.join(base_path, 'df_final_corners.csv'), index_col=None)
         verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
         print("final corners=\t{}\nverified_df=\t{}".format(
@@ -145,7 +144,6 @@ class TestGetShots:
         )
 
         base_path = 'tests/fixtures/set_piece_classification/outputs'
-        # opta_output_shots_corners.to_csv(os.path.join(base_path, 'df_shots_corners.csv'), index=False)
         verified_df = pd.read_csv(os.path.join(base_path, 'df_shots_corners.csv'), index_col=None)
         print("final corners=\t{}\nverified_df=\t{}".format(
             opta_output_shots_corners,
@@ -163,7 +161,6 @@ class TestGetShots:
             _,
             opta_output_aerial_duels_corners
         ) = corners_classification(
-            # path_events='data/raw_data/g1059702/f24-8-2019-1059702-eventdetails.xml',
             path_events='tests/fixtures/set_piece_classification/inputs/test_corners_aerial_duel.xml',
             path_match_results=self.path_match_results,
             path_track_meta=self.path_metadata,
@@ -172,7 +169,6 @@ class TestGetShots:
         )
         opta_output_aerial_duels_corners = opta_output_aerial_duels_corners.replace([' ', '', np.nan, None], 'nan')
         base_path = 'tests/fixtures/set_piece_classification/outputs'
-        # opta_output_aerial_duels_corners.to_csv(os.path.join(base_path, 'df_aerial_duels_corners.csv'), index=False)
         verified_df = pd.read_csv(os.path.join(base_path, 'df_aerial_duels_corners.csv'), index_col=None)
         verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
         print("aerial duels corners=\t{}\nverfification=\t{}".format(

@@ -12,10 +12,10 @@ from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_m
 class TestOptaTransformer:
     """Test the opta transformer
     """
-    path_match_results = 'tests/fixtures/crosses_loop_in_tracking/inputs/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
-    metadata_path='tests/fixtures/crosses_loop_in_tracking/inputs/g1059702_SecondSpectrum_Metadata.json'
+    path_match_results = 'tests/fixtures/srml-8-2019-f1059702-matchresults.xml'
+    metadata_path='tests/fixtures/g1059702_SecondSpectrum_Metadata.json'
 
+    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
     spectrumTransformer = SpectrumMatchAnalysisTransformer('SpectrumMatchAnalysis')
 
     @staticmethod
@@ -220,9 +220,6 @@ class TestOptaTransformer:
         output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
 
-        # assert all(verification_df.columns == output.columns), (
-        #     "Failed: did not return required output dataframe"
-        # )
         assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )
@@ -237,10 +234,7 @@ class TestOptaTransformer:
 
         output = data.groupby(['unique_event_id']).apply(OPTATransformer.only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
-        print("{}\n\n\n\n{}".format(verification_df.head().values, output.head().values))
-        # assert (verification_df.values == output.values).all(), (
-        #     "Failed: did not return required output dataframe"
-        # )
+
         assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )

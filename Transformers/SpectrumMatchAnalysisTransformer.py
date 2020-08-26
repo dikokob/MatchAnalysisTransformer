@@ -484,6 +484,7 @@ class SpectrumMatchAnalysisTransformer:
         opta_match_info['home_score'] = home_score
         opta_match_info['home_team_id'] = home_team_id
         opta_match_info['home_team_name'] = home_team_name
+        opta_match_info['fixture'] = fixture
 
         return opta_event_data_df, opta_match_info
 

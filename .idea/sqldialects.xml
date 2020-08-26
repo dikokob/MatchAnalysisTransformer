@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/AerialDuelsSetPiecesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPieces.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsSetPieces/CreateAerialDuelsSetPiecesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/AerialDuelsfromCrosses/CreateAerialDuelsfromCrossesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CreateCrossesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/Crosses/CrossesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/CreateOptaCoreStats.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/CreateOptaCoreStatsStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/OptaCoreStats/OptaCoreStatsType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/CreateSecondPhaseSetPieces.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/CreateSecondPhaseSetPiecesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseSetPieces/SecondPhaseSetPiecesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPieces.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/CreateSecondPhaseShotsfromSetPiecesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/SecondPhaseShotsfromSetPieces/SecondPhaseShotsfromSetPiecesType.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrosses.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/CreateShotsfromCrossesStoredProcedure.sql" dialect="TSQL" />
+    <file url="file://$PROJECT_DIR$/SQLscripts/ShotsfromCrosses/ShotsfromCrossesType.sql" dialect="TSQL" />
+  </component>
+</project>

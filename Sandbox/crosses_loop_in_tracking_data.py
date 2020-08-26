@@ -3,36 +3,24 @@ import pandas as pd
 import numpy as np
 from scripts_from_fed.opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
 
-def only_open_play_crosses(data):
-    #if we have a pass
-    if (data.type_id.unique()[0]==1) | (data.type_id.unique()[0]==2): 
-        #if we have a cross
-    #    if 2 in data.qualifier_id.tolist():
-            #if the cross does not involve set pieces/corners
+def only_open_play_crosses(data: pd.DataFrame) -> pd.DataFrame:
+
+    if (data.type_id.unique()[0]==1) | (data.type_id.unique()[0]==2):
+        # if an pass or offside pass occured
         if len(set([5,6]).intersection(set(data.qualifier_id.tolist()))) == 0:
+            # if ball goes out or corner is awarded
+            # then flag as open play cross as category = 1
             data['open_play_cross'] = 1
-        #if the cross involves set pieces/corners
         else:
-            #if the cross involves a corner
+            # else cross involves set pieces/corners
             if (len(set([6]).intersection(set(data.qualifier_id.tolist()))) > 0) & (len(set([5]).intersection(set(data.qualifier_id.tolist()))) == 0):
+                #if the cross involves a corner
+                # then open play cross category = 3
                 data['open_play_cross'] = 3
-            #if the cross involves a set piece
             else:
+                # else cross involves a set piece
+                # cross category = 2
                 data['open_play_cross'] = 2
-        #if the pass is not qualified as a cross
-    #    else:
-            #if the pass does not involve set pieces
-            # if len(set([5,6,24,25,26,97]).intersection(set(data.qualifier_id.tolist()))) == 0:
-            #     data['open_play_cross'] = 1
-            # #if the pass involves set pieces/corners
-            # else:
-            #     #if the pass involves corners
-            #     if (len(set([6,25]).intersection(set(data.qualifier_id.tolist()))) > 0) & (len(set([5,24,26,97]).intersection(set(data.qualifier_id.tolist()))) == 0):
-            #         data['open_play_cross'] = 3
-            #     #if the pass involves set pieces
-            #     else:
-            #         data['open_play_cross'] = 2
-    #if the event is not a pass
     else:
         #if the event involves set corners
         if ((6 in data.type_id.tolist()) | (len(set([6]).intersection(set(data.qualifier_id.tolist()))) > 0)) & (len(set([5]).intersection(set(data.qualifier_id.tolist()))) == 0):
@@ -50,6 +38,7 @@ def only_open_play_crosses(data):
                 #if the event is not related to a set piece
                 else:
                     data['open_play_cross'] = 0
+
     return data
 
 def cross_label (data_output):

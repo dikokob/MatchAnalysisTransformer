@@ -1,0 +1,77 @@
+@uID,Name,Position,team_id,preferred_foot
+p80201,Bernd Leno,Goalkeeper,t3,Right
+p98980,Emiliano Martínez,Goalkeeper,t3,Right
+p113534,Matt Macey,Goalkeeper,t3,Right
+p98745,Héctor Bellerín,Defender,t3,Right
+p192895,Kieran Tierney,Defender,t3,Left
+p39476,Sokratis,Defender,t3,Right
+p156074,Rob Holding,Defender,t3,Right
+p58822,Cédric Soares,Defender,t3,Right
+p69140,Shkodran Mustafi,Defender,t3,Right
+p101184,Calum Chambers,Defender,t3,Right
+p92371,Pablo Marí,Defender,t3,Left
+p41270,David Luiz,Defender,t3,Right
+p111457,Sead Kolasinac,Defender,t3,Left
+p183654,Tolaji Bola,Defender,t3,Not Available
+p209037,Zech Medley,Defender,t3,Left
+p182539,Dani Ceballos,Midfielder,t3,Right
+p37605,Mesut Özil,Midfielder,t3,Left
+p198849,Lucas Torreira,Midfielder,t3,Right
+p154043,Ainsley Maitland-Niles,Midfielder,t3,Right
+p200089,Joseph Willock,Midfielder,t3,Right
+p242166,Matteo Guendouzi,Midfielder,t3,Right
+p84450,Granit Xhaka,Midfielder,t3,Left
+p199601,Robbie Burton,Midfielder,t3,Right
+p59966,Alexandre Lacazette,Forward,t3,Right
+p54694,Pierre-Emerick Aubameyang,Forward,t3,Right
+p195735,Nicolas Pépé,Forward,t3,Left
+p200641,Reiss Nelson,Forward,t3,Right
+p205533,Eddie Nketiah,Forward,t3,Right
+p444145,Gabriel Martinelli,Forward,t3,Right
+p232223,Folarin Balogun,Forward,t3,Not Available
+p223340,Bukayo Saka,Forward,t3,Left
+p232234,James Olayinka,Midfielder,t3,Right
+p233963,Konstantinos Mavropanos,Defender,t3,Right
+p232233,Tyreece John-Jules,Forward,t3,Right
+p209289,Emile Smith Rowe,Midfielder,t3,Right
+p57249,Henrikh Mkhitaryan,Midfielder,t3,Right
+p153256,Mohamed Elneny,Midfielder,t3,Right
+p38411,Nacho Monreal,Defender,t3,Left
+p109745,Kepa Arrizabalaga,Goalkeeper,t8,Right
+p20310,Willy Caballero,Goalkeeper,t8,Right
+p209706,Jamie Cumming,Goalkeeper,t8,Right
+p102380,Antonio Rüdiger,Defender,t8,Right
+p82263,Marcos Alonso,Defender,t8,Left
+p135363,Andreas Christensen,Defender,t8,Right
+p103192,Kurt Zouma,Defender,t8,Right
+p225796,Reece James,Defender,t8,Right
+p41328,César Azpilicueta,Defender,t8,Right
+p194794,Fikayo Tomori,Defender,t8,Right
+p109533,Emerson,Defender,t8,Left
+p441302,Ian Maatsen,Defender,t8,Left
+p85955,Jorginho,Midfielder,t8,Right
+p116594,N'Golo Kanté,Midfielder,t8,Right
+p88894,Ross Barkley,Midfielder,t8,Right
+p126187,Ruben Loftus-Cheek,Midfielder,t8,Right
+p91651,Mateo Kovacic,Midfielder,t8,Right
+p184341,Mason Mount,Midfielder,t8,Right
+p176413,Christian Pulisic,Midfielder,t8,Right
+p126186,Lewis Baker,Midfielder,t8,Right
+p243568,Billy Gilmour,Midfielder,t8,Right
+p223332,Faustino Anjorin,Midfielder,t8,Not Available
+p173879,Tammy Abraham,Forward,t8,Right
+p47431,Willian,Forward,t8,Right
+p49579,Pedro,Forward,t8,Right
+p44346,Olivier Giroud,Forward,t8,Left
+p209046,Callum Hudson-Odoi,Forward,t8,Right
+p94245,Michy Batshuayi,Forward,t8,Right
+p440323,Armando Broja,Forward,t8,Not Available
+p232792,Tariq Lamptey,Defender,t8,Not Available
+p49013,Victor Moses,Defender,t8,Right
+p232787,Conor Gallagher,Midfielder,t8,Right
+p209036,Marc Guehi,Defender,t8,Right
+p167767,Kenedy,Midfielder,t8,Left
+p118335,Abdul Rahman Baba,Defender,t8,Left
+p111565,Lucas Piazon,Midfielder,t8,Right
+p169102,Tiemoué Bakayoko,Midfielder,t8,Right
+p105700,Davide Zappacosta,Defender,t8,Right

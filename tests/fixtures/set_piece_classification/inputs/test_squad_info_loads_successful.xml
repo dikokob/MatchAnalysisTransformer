@@ -1,0 +1,1406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2001-2020 Opta Sportsdata Ltd. All rights reserved. -->
+
+<!-- PRODUCTION HEADER
+     produced on:        valde-jobq-a03.nexus.opta.net
+     production time:    20200308T125525,221Z
+     production module:  Opta::Feed::XML::Soccer::F40
+-->
+<SoccerFeed timestamp="20200308T125525+0000">
+  <SoccerDocument Type="SQUADS Latest" competition_code="EN_PR" competition_id="8" competition_name="English Premier League" season_id="2019" season_name="Season 2019/2020">
+    <Team city="London" country="England" country_id="1" country_iso="EN" official_club_name="Arsenal" postal_code="N5 1BU" region_id="17" region_name="Europe" short_club_name="Arsenal" street="75 Drayton Park" uID="t3" web_address="http://www.arsenal.com">
+      <Founded>1886</Founded>
+      <Name>Arsenal</Name>
+      <Player uID="p80201">
+        <Name>Bernd Leno</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Bernd</Stat>
+        <Stat Type="last_name">Leno</Stat>
+        <Stat Type="birth_date">1992-03-04</Stat>
+        <Stat Type="birth_place">Bietigheim-Bissingen</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">83</Stat>
+        <Stat Type="height">190</Stat>
+        <Stat Type="jersey_num">1</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2018-06-19</Stat>
+        <Stat Type="country">Germany</Stat>
+      </Player>
+      <Player uID="p98980">
+        <Name>Emiliano Martínez</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Emiliano</Stat>
+        <Stat Type="last_name">Martínez</Stat>
+        <Stat Type="birth_date">1992-09-02</Stat>
+        <Stat Type="birth_place">Mar de Plata</Stat>
+        <Stat Type="first_nationality">Argentina</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">88</Stat>
+        <Stat Type="height">195</Stat>
+        <Stat Type="jersey_num">26</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2011-07-01</Stat>
+        <Stat Type="country">Argentina</Stat>
+      </Player>
+      <Player uID="p113534">
+        <Name>Matt Macey</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Matt</Stat>
+        <Stat Type="last_name">Macey</Stat>
+        <Stat Type="middle_name">Ryan</Stat>
+        <Stat Type="birth_date">1994-09-09</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">81</Stat>
+        <Stat Type="height">198</Stat>
+        <Stat Type="jersey_num">33</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2014-07-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p98745">
+        <Name>Héctor Bellerín</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Héctor</Stat>
+        <Stat Type="last_name">Bellerín</Stat>
+        <Stat Type="birth_date">1995-03-19</Stat>
+        <Stat Type="birth_place">Badalona</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">74</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">2</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Right</Stat>
+        <Stat Type="join_date">2012-07-01</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p192895">
+        <Name>Kieran Tierney</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Kieran</Stat>
+        <Stat Type="last_name">Tierney</Stat>
+        <Stat Type="birth_date">1997-06-05</Stat>
+        <Stat Type="birth_place">Douglas</Stat>
+        <Stat Type="first_nationality">Scotland</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">70</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">3</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2019-08-08</Stat>
+        <Stat Type="country">Scotland</Stat>
+      </Player>
+      <Player uID="p39476">
+        <Name>Sokratis</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Sokratis</Stat>
+        <Stat Type="last_name">Papastathopoulos</Stat>
+        <Stat Type="known_name">Sokratis</Stat>
+        <Stat Type="birth_date">1988-06-09</Stat>
+        <Stat Type="birth_place">Kalamata</Stat>
+        <Stat Type="first_nationality">Greece</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">85</Stat>
+        <Stat Type="height">186</Stat>
+        <Stat Type="jersey_num">5</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-07-02</Stat>
+        <Stat Type="country">Greece</Stat>
+      </Player>
+      <Player uID="p156074">
+        <Name>Rob Holding</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Rob</Stat>
+        <Stat Type="last_name">Holding</Stat>
+        <Stat Type="birth_date">1995-09-20</Stat>
+        <Stat Type="birth_place">Tameside</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">75</Stat>
+        <Stat Type="height">189</Stat>
+        <Stat Type="jersey_num">16</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2016-07-22</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player loan="1" uID="p58822">
+        <Name>Cédric Soares</Name>
+        <Position>Defender</Position>
+        <Stat Type="on_loan_from">Southampton</Stat>
+        <Stat Type="first_name">Cédric Ricardo</Stat>
+        <Stat Type="last_name">Alves Soares</Stat>
+        <Stat Type="known_name">Cédric Soares</Stat>
+        <Stat Type="birth_date">1991-08-31</Stat>
+        <Stat Type="birth_place">Singen</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">67</Stat>
+        <Stat Type="height">172</Stat>
+        <Stat Type="jersey_num">17</Stat>
+        <Stat Type="real_position">Wing Back</Stat>
+        <Stat Type="real_position_side">Right</Stat>
+        <Stat Type="join_date">2020-01-31</Stat>
+        <Stat Type="country">Portugal</Stat>
+      </Player>
+      <Player uID="p69140">
+        <Name>Shkodran Mustafi</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Shkodran</Stat>
+        <Stat Type="last_name">Mustafi</Stat>
+        <Stat Type="birth_date">1992-04-17</Stat>
+        <Stat Type="birth_place">Bad Hersfeld</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">82</Stat>
+        <Stat Type="height">184</Stat>
+        <Stat Type="jersey_num">20</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre/Right</Stat>
+        <Stat Type="join_date">2016-08-30</Stat>
+        <Stat Type="country">Germany</Stat>
+      </Player>
+      <Player uID="p101184">
+        <Name>Calum Chambers</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Calum</Stat>
+        <Stat Type="last_name">Chambers</Stat>
+        <Stat Type="birth_date">1995-01-20</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">66</Stat>
+        <Stat Type="height">182</Stat>
+        <Stat Type="jersey_num">21</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre/Right</Stat>
+        <Stat Type="join_date">2014-07-28</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player loan="1" uID="p92371">
+        <Name>Pablo Marí</Name>
+        <Position>Defender</Position>
+        <Stat Type="on_loan_from">Flamengo</Stat>
+        <Stat Type="first_name">Pablo</Stat>
+        <Stat Type="last_name">Marí</Stat>
+        <Stat Type="birth_date">1993-08-31</Stat>
+        <Stat Type="birth_place">Valencia</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">87</Stat>
+        <Stat Type="height">193</Stat>
+        <Stat Type="jersey_num">22</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2020-01-29</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p41270">
+        <Name>David Luiz</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">David</Stat>
+        <Stat Type="last_name">Luiz Moreira Marinho</Stat>
+        <Stat Type="known_name">David Luiz</Stat>
+        <Stat Type="birth_date">1987-04-22</Stat>
+        <Stat Type="birth_place">Diadema</Stat>
+        <Stat Type="first_nationality">Brazil</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">84</Stat>
+        <Stat Type="height">189</Stat>
+        <Stat Type="jersey_num">23</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-08-08</Stat>
+        <Stat Type="country">Brazil</Stat>
+      </Player>
+      <Player uID="p111457">
+        <Name>Sead Kolasinac</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Sead</Stat>
+        <Stat Type="last_name">Kolasinac</Stat>
+        <Stat Type="birth_date">1993-06-20</Stat>
+        <Stat Type="birth_place">Karlsruhe</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">85</Stat>
+        <Stat Type="height">183</Stat>
+        <Stat Type="jersey_num">31</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2017-07-01</Stat>
+        <Stat Type="country">Bosnia and Herzegovina</Stat>
+      </Player>
+      <Player uID="p183654">
+        <Name>Tolaji Bola</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Tolaji</Stat>
+        <Stat Type="last_name">Bola</Stat>
+        <Stat Type="birth_date">1999-01-04</Stat>
+        <Stat Type="weight">78</Stat>
+        <Stat Type="height">188</Stat>
+        <Stat Type="jersey_num">40</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2019-09-23</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p209037">
+        <Name>Zech Medley</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Zech</Stat>
+        <Stat Type="last_name">Medley</Stat>
+        <Stat Type="birth_date">2000-07-09</Stat>
+        <Stat Type="birth_place">Greenwich</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">Unknown</Stat>
+        <Stat Type="height">195</Stat>
+        <Stat Type="jersey_num">49</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2018-10-21</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player loan="1" uID="p182539">
+        <Name>Dani Ceballos</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="on_loan_from">Real Madrid</Stat>
+        <Stat Type="first_name">Dani</Stat>
+        <Stat Type="last_name">Ceballos</Stat>
+        <Stat Type="birth_date">1996-08-07</Stat>
+        <Stat Type="birth_place">Utrera</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">70</Stat>
+        <Stat Type="height">179</Stat>
+        <Stat Type="jersey_num">8</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Left/Centre/Right</Stat>
+        <Stat Type="join_date">2019-07-25</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p37605">
+        <Name>Mesut Özil</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Mesut</Stat>
+        <Stat Type="last_name">Özil</Stat>
+        <Stat Type="birth_date">1988-10-15</Stat>
+        <Stat Type="birth_place">Gelsenkirchen</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">76</Stat>
+        <Stat Type="height">180</Stat>
+        <Stat Type="jersey_num">10</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Centre/Right</Stat>
+        <Stat Type="join_date">2013-09-02</Stat>
+        <Stat Type="country">Germany</Stat>
+      </Player>
+      <Player uID="p198849">
+        <Name>Lucas Torreira</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Lucas</Stat>
+        <Stat Type="last_name">Torreira</Stat>
+        <Stat Type="birth_date">1996-02-11</Stat>
+        <Stat Type="birth_place">Fray Bentos</Stat>
+        <Stat Type="first_nationality">Uruguay</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">64</Stat>
+        <Stat Type="height">168</Stat>
+        <Stat Type="jersey_num">11</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-07-10</Stat>
+        <Stat Type="country">Uruguay</Stat>
+      </Player>
+      <Player uID="p154043">
+        <Name>Ainsley Maitland-Niles</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Ainsley</Stat>
+        <Stat Type="last_name">Maitland-Niles</Stat>
+        <Stat Type="birth_date">1997-08-29</Stat>
+        <Stat Type="birth_place">London</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">71</Stat>
+        <Stat Type="height">177</Stat>
+        <Stat Type="jersey_num">15</Stat>
+        <Stat Type="real_position">Wing Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2014-12-05</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p200089">
+        <Name>Joseph Willock</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Joseph</Stat>
+        <Stat Type="last_name">Willock</Stat>
+        <Stat Type="birth_date">1999-08-20</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">71</Stat>
+        <Stat Type="height">179</Stat>
+        <Stat Type="jersey_num">28</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2017-07-12</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p242166">
+        <Name>Matteo Guendouzi</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Matteo</Stat>
+        <Stat Type="last_name">Guendouzi</Stat>
+        <Stat Type="birth_date">1999-04-14</Stat>
+        <Stat Type="birth_place">Poissy</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">64</Stat>
+        <Stat Type="height">185</Stat>
+        <Stat Type="jersey_num">29</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-07-11</Stat>
+        <Stat Type="country">France</Stat>
+      </Player>
+      <Player uID="p84450">
+        <Name>Granit Xhaka</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Granit</Stat>
+        <Stat Type="last_name">Xhaka</Stat>
+        <Stat Type="birth_date">1992-09-27</Stat>
+        <Stat Type="birth_place">Basel</Stat>
+        <Stat Type="first_nationality">Switzerland</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">82</Stat>
+        <Stat Type="height">185</Stat>
+        <Stat Type="jersey_num">34</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2016-07-01</Stat>
+        <Stat Type="country">Switzerland</Stat>
+      </Player>
+      <Player uID="p199601">
+        <Name>Robbie Burton</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Robbie</Stat>
+        <Stat Type="last_name">Burton</Stat>
+        <Stat Type="birth_date">1999-12-26</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">69</Stat>
+        <Stat Type="height">176</Stat>
+        <Stat Type="jersey_num">41</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-07-15</Stat>
+        <Stat Type="country">Wales</Stat>
+      </Player>
+      <Player uID="p59966">
+        <Name>Alexandre Lacazette</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Alexandre</Stat>
+        <Stat Type="last_name">Lacazette</Stat>
+        <Stat Type="birth_date">1991-05-28</Stat>
+        <Stat Type="birth_place">Lyon</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">73</Stat>
+        <Stat Type="height">175</Stat>
+        <Stat Type="jersey_num">9</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2017-07-05</Stat>
+        <Stat Type="country">France</Stat>
+      </Player>
+      <Player uID="p54694">
+        <Name>Pierre-Emerick Aubameyang</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Pierre-Emerick</Stat>
+        <Stat Type="last_name">Aubameyang</Stat>
+        <Stat Type="birth_date">1989-06-18</Stat>
+        <Stat Type="birth_place">Laval</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">80</Stat>
+        <Stat Type="height">187</Stat>
+        <Stat Type="jersey_num">14</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-01-31</Stat>
+        <Stat Type="country">Gabon</Stat>
+      </Player>
+      <Player uID="p195735">
+        <Name>Nicolas Pépé</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Nicolas</Stat>
+        <Stat Type="last_name">Pépé</Stat>
+        <Stat Type="birth_date">1995-05-29</Stat>
+        <Stat Type="birth_place">Mantes-la-Jolie</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">73</Stat>
+        <Stat Type="height">183</Stat>
+        <Stat Type="jersey_num">19</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Right</Stat>
+        <Stat Type="join_date">2019-08-01</Stat>
+        <Stat Type="country">Côte d&#39;Ivoire</Stat>
+      </Player>
+      <Player uID="p200641">
+        <Name>Reiss Nelson</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Reiss</Stat>
+        <Stat Type="last_name">Nelson</Stat>
+        <Stat Type="birth_date">1999-12-10</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">71</Stat>
+        <Stat Type="height">175</Stat>
+        <Stat Type="jersey_num">24</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Left/Centre/Right</Stat>
+        <Stat Type="join_date">2017-07-12</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p205533">
+        <Name>Eddie Nketiah</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Eddie</Stat>
+        <Stat Type="last_name">Nketiah</Stat>
+        <Stat Type="middle_name">Keddar</Stat>
+        <Stat Type="birth_date">1999-05-30</Stat>
+        <Stat Type="birth_place">Lewisham</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">72</Stat>
+        <Stat Type="height">175</Stat>
+        <Stat Type="jersey_num">30</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2017-07-12</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p444145">
+        <Name>Gabriel Martinelli</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Gabriel Teodoro</Stat>
+        <Stat Type="last_name">Martinelli Silva</Stat>
+        <Stat Type="known_name">Gabriel Martinelli</Stat>
+        <Stat Type="birth_date">2001-06-18</Stat>
+        <Stat Type="birth_place">Guarulhos</Stat>
+        <Stat Type="first_nationality">Brazil</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">75</Stat>
+        <Stat Type="height">180</Stat>
+        <Stat Type="jersey_num">35</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2019-07-15</Stat>
+        <Stat Type="country">Brazil</Stat>
+      </Player>
+      <Player uID="p232223">
+        <Name>Folarin Balogun</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Folarin</Stat>
+        <Stat Type="last_name">Balogun</Stat>
+        <Stat Type="birth_date">2001-07-03</Stat>
+        <Stat Type="weight">66</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">38</Stat>
+        <Stat Type="real_position">Unknown</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2019-09-23</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p223340">
+        <Name>Bukayo Saka</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Bukayo</Stat>
+        <Stat Type="last_name">Saka</Stat>
+        <Stat Type="birth_date">2001-09-05</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">65</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">77</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2018-11-28</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <SYMID>ARS</SYMID>
+      <Stadium uID="3250">
+        <Capacity>60272</Capacity>
+        <Name>Emirates Stadium</Name>
+      </Stadium>
+      <TeamKits>
+        <Kit id="179" colour1="#FF0000" colour2="#FFFFFF" type="home" />
+        <Kit id="6323" colour1="#FFFF00" type="away" />
+        <Kit id="6715" colour1="#000066" type="third" />
+      </TeamKits>
+      <TeamOfficial Type="Manager" country="Spain" uID="man51018">
+        <PersonName>
+          <BirthDate>1982-03-26</BirthDate>
+          <First>Mikel</First>
+          <Last>Arteta</Last>
+          <join_date>2019-12-22</join_date>
+        </PersonName>
+      </TeamOfficial>
+      <TeamOfficial Type="Assistant Manager" country="England" uID="man42456">
+        <PersonName>
+          <BirthDate>1962-11-16</BirthDate>
+          <First>Steve</First>
+          <Last>Bould</Last>
+          <join_date>2012-07-01</join_date>
+        </PersonName>
+      </TeamOfficial>
+    </Team>
+    <Team city="London" country="England" country_id="1" country_iso="EN" official_club_name="Chelsea FC" postal_code="SW6 1HS" region_id="17" region_name="Europe" short_club_name="Chelsea" street="Fulham Road" uID="t8" web_address="http://www.chelseafc.com">
+      <Founded>1905</Founded>
+      <Name>Chelsea</Name>
+      <Player uID="p109745">
+        <Name>Kepa Arrizabalaga</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Kepa</Stat>
+        <Stat Type="last_name">Arrizabalaga</Stat>
+        <Stat Type="birth_date">1994-10-03</Stat>
+        <Stat Type="birth_place">Ondarroa</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">84</Stat>
+        <Stat Type="height">189</Stat>
+        <Stat Type="jersey_num">1</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2018-08-08</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p20310">
+        <Name>Willy Caballero</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Willy</Stat>
+        <Stat Type="last_name">Caballero</Stat>
+        <Stat Type="birth_date">1981-09-28</Stat>
+        <Stat Type="birth_place">Santa Elena</Stat>
+        <Stat Type="first_nationality">Argentina</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">81</Stat>
+        <Stat Type="height">186</Stat>
+        <Stat Type="jersey_num">13</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2017-07-01</Stat>
+        <Stat Type="country">Argentina</Stat>
+      </Player>
+      <Player uID="p209706">
+        <Name>Jamie Cumming</Name>
+        <Position>Goalkeeper</Position>
+        <Stat Type="first_name">Jamie</Stat>
+        <Stat Type="last_name">Cumming</Stat>
+        <Stat Type="middle_name">Andrew</Stat>
+        <Stat Type="birth_date">1999-09-04</Stat>
+        <Stat Type="birth_place">Winchester</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">79</Stat>
+        <Stat Type="height">186</Stat>
+        <Stat Type="jersey_num">31</Stat>
+        <Stat Type="real_position">Goalkeeper</Stat>
+        <Stat Type="real_position_side">Unknown</Stat>
+        <Stat Type="join_date">2018-12-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p102380">
+        <Name>Antonio Rüdiger</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Antonio</Stat>
+        <Stat Type="last_name">Rüdiger</Stat>
+        <Stat Type="birth_date">1993-03-03</Stat>
+        <Stat Type="birth_place">Berlin</Stat>
+        <Stat Type="first_nationality">Germany</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">85</Stat>
+        <Stat Type="height">190</Stat>
+        <Stat Type="jersey_num">2</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2017-07-09</Stat>
+        <Stat Type="country">Germany</Stat>
+      </Player>
+      <Player uID="p82263">
+        <Name>Marcos Alonso</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Marcos</Stat>
+        <Stat Type="last_name">Alonso</Stat>
+        <Stat Type="birth_date">1990-12-28</Stat>
+        <Stat Type="birth_place">Madrid</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">84</Stat>
+        <Stat Type="height">188</Stat>
+        <Stat Type="jersey_num">3</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2016-08-31</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p135363">
+        <Name>Andreas Christensen</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Andreas</Stat>
+        <Stat Type="last_name">Christensen</Stat>
+        <Stat Type="birth_date">1996-04-10</Stat>
+        <Stat Type="birth_place">Lillerod</Stat>
+        <Stat Type="first_nationality">Denmark</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">78</Stat>
+        <Stat Type="height">188</Stat>
+        <Stat Type="jersey_num">4</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2012-07-01</Stat>
+        <Stat Type="country">Denmark</Stat>
+      </Player>
+      <Player uID="p103192">
+        <Name>Kurt Zouma</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Kurt</Stat>
+        <Stat Type="last_name">Zouma</Stat>
+        <Stat Type="middle_name">Happy</Stat>
+        <Stat Type="birth_date">1994-10-27</Stat>
+        <Stat Type="birth_place">Lyon</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">96</Stat>
+        <Stat Type="height">190</Stat>
+        <Stat Type="jersey_num">15</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2014-01-31</Stat>
+        <Stat Type="country">France</Stat>
+      </Player>
+      <Player uID="p225796">
+        <Name>Reece James</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Reece</Stat>
+        <Stat Type="last_name">James</Stat>
+        <Stat Type="birth_date">1999-12-08</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">82</Stat>
+        <Stat Type="height">182</Stat>
+        <Stat Type="jersey_num">24</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Right</Stat>
+        <Stat Type="join_date">2019-05-15</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p41328">
+        <Name>César Azpilicueta</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">César</Stat>
+        <Stat Type="last_name">Azpilicueta</Stat>
+        <Stat Type="birth_date">1989-08-28</Stat>
+        <Stat Type="birth_place">Pamplona</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">76</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">28</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left/Right</Stat>
+        <Stat Type="join_date">2012-08-24</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p194794">
+        <Name>Fikayo Tomori</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Fikayo</Stat>
+        <Stat Type="last_name">Tomori</Stat>
+        <Stat Type="birth_date">1997-12-19</Stat>
+        <Stat Type="birth_place">Calgary</Stat>
+        <Stat Type="first_nationality">Canada</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">75</Stat>
+        <Stat Type="height">185</Stat>
+        <Stat Type="jersey_num">29</Stat>
+        <Stat Type="real_position">Central Defender</Stat>
+        <Stat Type="real_position_side">Centre/Right</Stat>
+        <Stat Type="join_date">2016-05-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p109533">
+        <Name>Emerson</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Emerson</Stat>
+        <Stat Type="last_name">Palmieri dos Santos</Stat>
+        <Stat Type="known_name">Emerson</Stat>
+        <Stat Type="birth_date">1994-08-03</Stat>
+        <Stat Type="first_nationality">Brazil</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">63</Stat>
+        <Stat Type="height">176</Stat>
+        <Stat Type="jersey_num">33</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2018-01-30</Stat>
+        <Stat Type="country">Italy</Stat>
+      </Player>
+      <Player uID="p441302">
+        <Name>Ian Maatsen</Name>
+        <Position>Defender</Position>
+        <Stat Type="first_name">Ian</Stat>
+        <Stat Type="last_name">Maatsen</Stat>
+        <Stat Type="birth_date">2002-03-10</Stat>
+        <Stat Type="first_nationality">Netherlands</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">57</Stat>
+        <Stat Type="height">167</Stat>
+        <Stat Type="jersey_num">63</Stat>
+        <Stat Type="real_position">Full Back</Stat>
+        <Stat Type="real_position_side">Left</Stat>
+        <Stat Type="join_date">2019-07-01</Stat>
+        <Stat Type="country">Netherlands</Stat>
+      </Player>
+      <Player uID="p85955">
+        <Name>Jorginho</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Jorge Luiz</Stat>
+        <Stat Type="last_name">Frello Filho</Stat>
+        <Stat Type="known_name">Jorginho</Stat>
+        <Stat Type="birth_date">1991-12-20</Stat>
+        <Stat Type="birth_place">Imbituba</Stat>
+        <Stat Type="first_nationality">Brazil</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">65</Stat>
+        <Stat Type="height">180</Stat>
+        <Stat Type="jersey_num">5</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-07-14</Stat>
+        <Stat Type="country">Italy</Stat>
+      </Player>
+      <Player uID="p116594">
+        <Name>N&#39;Golo Kanté</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">N&#39;Golo</Stat>
+        <Stat Type="last_name">Kanté</Stat>
+        <Stat Type="birth_date">1991-03-29</Stat>
+        <Stat Type="birth_place">Paris</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">68</Stat>
+        <Stat Type="height">168</Stat>
+        <Stat Type="jersey_num">7</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2016-07-16</Stat>
+        <Stat Type="country">France</Stat>
+      </Player>
+      <Player uID="p88894">
+        <Name>Ross Barkley</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Ross</Stat>
+        <Stat Type="last_name">Barkley</Stat>
+        <Stat Type="birth_date">1993-12-05</Stat>
+        <Stat Type="birth_place">Liverpool</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">76</Stat>
+        <Stat Type="height">189</Stat>
+        <Stat Type="jersey_num">8</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-01-05</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p126187">
+        <Name>Ruben Loftus-Cheek</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Ruben</Stat>
+        <Stat Type="last_name">Loftus-Cheek</Stat>
+        <Stat Type="birth_date">1996-01-23</Stat>
+        <Stat Type="birth_place">London</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">88</Stat>
+        <Stat Type="height">191</Stat>
+        <Stat Type="jersey_num">12</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2012-07-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p91651">
+        <Name>Mateo Kovacic</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Mateo</Stat>
+        <Stat Type="last_name">Kovacic</Stat>
+        <Stat Type="birth_date">1994-05-06</Stat>
+        <Stat Type="birth_place">Linz</Stat>
+        <Stat Type="first_nationality">Austria</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">78</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">17</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-07-01</Stat>
+        <Stat Type="country">Croatia</Stat>
+      </Player>
+      <Player uID="p184341">
+        <Name>Mason Mount</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Mason</Stat>
+        <Stat Type="last_name">Mount</Stat>
+        <Stat Type="birth_date">1999-01-10</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">70</Stat>
+        <Stat Type="height">178</Stat>
+        <Stat Type="jersey_num">19</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-07-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p176413">
+        <Name>Christian Pulisic</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Christian</Stat>
+        <Stat Type="last_name">Pulisic</Stat>
+        <Stat Type="birth_date">1998-09-18</Stat>
+        <Stat Type="birth_place">Hershey</Stat>
+        <Stat Type="first_nationality">USA</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">69</Stat>
+        <Stat Type="height">172</Stat>
+        <Stat Type="jersey_num">22</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Left/Centre/Right</Stat>
+        <Stat Type="join_date">2019-01-02</Stat>
+        <Stat Type="country">USA</Stat>
+      </Player>
+      <Player uID="p126186">
+        <Name>Lewis Baker</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Lewis</Stat>
+        <Stat Type="last_name">Baker</Stat>
+        <Stat Type="middle_name">Renard</Stat>
+        <Stat Type="birth_date">1995-04-25</Stat>
+        <Stat Type="birth_place">Luton</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">72</Stat>
+        <Stat Type="height">182</Stat>
+        <Stat Type="jersey_num">34</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2012-07-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p243568">
+        <Name>Billy Gilmour</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Billy</Stat>
+        <Stat Type="last_name">Gilmour</Stat>
+        <Stat Type="birth_date">2001-06-11</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">60</Stat>
+        <Stat Type="height">166</Stat>
+        <Stat Type="jersey_num">47</Stat>
+        <Stat Type="real_position">Attacking Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-07-01</Stat>
+        <Stat Type="country">Scotland</Stat>
+      </Player>
+      <Player uID="p223332">
+        <Name>Faustino Anjorin</Name>
+        <Position>Midfielder</Position>
+        <Stat Type="first_name">Faustino</Stat>
+        <Stat Type="last_name">Anjorin</Stat>
+        <Stat Type="birth_date">2001-11-23</Stat>
+        <Stat Type="weight">73</Stat>
+        <Stat Type="height">185</Stat>
+        <Stat Type="jersey_num">55</Stat>
+        <Stat Type="real_position">Central Midfielder</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2019-09-24</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p173879">
+        <Name>Tammy Abraham</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Tammy</Stat>
+        <Stat Type="last_name">Abraham</Stat>
+        <Stat Type="birth_date">1997-10-02</Stat>
+        <Stat Type="birth_place">London</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">80</Stat>
+        <Stat Type="height">190</Stat>
+        <Stat Type="jersey_num">9</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2016-05-01</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p47431">
+        <Name>Willian</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Willian</Stat>
+        <Stat Type="last_name">Borges Da Silva</Stat>
+        <Stat Type="known_name">Willian</Stat>
+        <Stat Type="birth_date">1988-08-09</Stat>
+        <Stat Type="birth_place">Ribeirão Pires</Stat>
+        <Stat Type="first_nationality">Brazil</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">77</Stat>
+        <Stat Type="height">175</Stat>
+        <Stat Type="jersey_num">10</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Left/Centre/Right</Stat>
+        <Stat Type="join_date">2013-08-28</Stat>
+        <Stat Type="country">Brazil</Stat>
+      </Player>
+      <Player uID="p49579">
+        <Name>Pedro</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Pedro</Stat>
+        <Stat Type="last_name">Rodríguez Ledesma</Stat>
+        <Stat Type="known_name">Pedro</Stat>
+        <Stat Type="birth_date">1987-07-28</Stat>
+        <Stat Type="birth_place">Santa Cruz de Tenerife</Stat>
+        <Stat Type="first_nationality">Spain</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">65</Stat>
+        <Stat Type="height">169</Stat>
+        <Stat Type="jersey_num">11</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Left/Right</Stat>
+        <Stat Type="join_date">2015-08-20</Stat>
+        <Stat Type="country">Spain</Stat>
+      </Player>
+      <Player uID="p44346">
+        <Name>Olivier Giroud</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Olivier</Stat>
+        <Stat Type="last_name">Giroud</Stat>
+        <Stat Type="birth_date">1986-09-30</Stat>
+        <Stat Type="birth_place">Chambéry</Stat>
+        <Stat Type="first_nationality">France</Stat>
+        <Stat Type="preferred_foot">Left</Stat>
+        <Stat Type="weight">93</Stat>
+        <Stat Type="height">192</Stat>
+        <Stat Type="jersey_num">18</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2018-01-31</Stat>
+        <Stat Type="country">France</Stat>
+      </Player>
+      <Player uID="p209046">
+        <Name>Callum Hudson-Odoi</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Callum</Stat>
+        <Stat Type="last_name">Hudson-Odoi</Stat>
+        <Stat Type="birth_date">2000-11-07</Stat>
+        <Stat Type="birth_place">London</Stat>
+        <Stat Type="first_nationality">England</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">76</Stat>
+        <Stat Type="height">182</Stat>
+        <Stat Type="jersey_num">20</Stat>
+        <Stat Type="real_position">Winger</Stat>
+        <Stat Type="real_position_side">Left/Right</Stat>
+        <Stat Type="join_date">2017-12-19</Stat>
+        <Stat Type="country">England</Stat>
+      </Player>
+      <Player uID="p94245">
+        <Name>Michy Batshuayi</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Michy</Stat>
+        <Stat Type="last_name">Batshuayi</Stat>
+        <Stat Type="birth_date">1993-10-02</Stat>
+        <Stat Type="birth_place">Brussels</Stat>
+        <Stat Type="first_nationality">Belgium</Stat>
+        <Stat Type="preferred_foot">Right</Stat>
+        <Stat Type="weight">74</Stat>
+        <Stat Type="height">184</Stat>
+        <Stat Type="jersey_num">23</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2016-07-03</Stat>
+        <Stat Type="country">Belgium</Stat>
+      </Player>
+      <Player uID="p440323">
+        <Name>Armando Broja</Name>
+        <Position>Forward</Position>
+        <Stat Type="first_name">Armando</Stat>
+        <Stat Type="last_name">Broja</Stat>
+        <Stat Type="birth_date">2001-09-10</Stat>
+        <Stat Type="weight">Unknown</Stat>
+        <Stat Type="height">Unknown</Stat>
+        <Stat Type="jersey_num">57</Stat>
+        <Stat Type="real_position">Striker</Stat>
+        <Stat Type="real_position_side">Centre</Stat>
+        <Stat Type="join_date">2020-03-07</Stat>
+        <Stat Type="country">Albania</Stat>
+      </Player>
+      <SYMID>CHE</SYMID>
+      <Stadium uID="35">
+        <Capacity>41798</Capacity>
+        <Name>Stamford Bridge</Name>
+      </Stadium>
+      <TeamKits>
+        <Kit id="4964" colour1="#0000FF" type="home" />
+        <Kit id="4965" colour1="#FFFFFF" type="away" />
+        <Kit id="6961" colour1="#000000" type="third" />
+      </TeamKits>
+      <TeamOfficial Type="Manager" country="England" uID="man50167">
+        <PersonName>
+          <BirthDate>1978-06-20</BirthDate>
+          <First>Frank</First>
+          <Last>Lampard</Last>
+          <join_date>2019-07-04</join_date>
+        </PersonName>
+      </TeamOfficial>
+      <TeamOfficial Type="Assistant Manager" country="England" uID="man47412">
+        <PersonName>
+          <First>Jody</First>
+          <Last>Morris</Last>
+          <join_date>2019-07-04</join_date>
+        </PersonName>
+      </TeamOfficial>
+    </Team>
+    <PlayerChanges>
+<Team uID="t3">
+        <Name>Arsenal</Name>
+        <Player uID="p232234">
+          <Name>James Olayinka</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">James</Stat>
+          <Stat Type="last_name">Olayinka</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">2000-10-05</Stat>
+          <Stat Type="weight">Unknown</Stat>
+          <Stat Type="height">Unknown</Stat>
+          <Stat Type="jersey_num">52</Stat>
+          <Stat Type="real_position">Unknown</Stat>
+          <Stat Type="real_position_side">Unknown</Stat>
+          <Stat Type="join_date">2019-07-15</Stat>
+          <Stat Type="leave_date">2020-01-27</Stat>
+          <Stat Type="new_team">Northampton Town</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p233963">
+          <Name>Konstantinos Mavropanos</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Konstantinos</Stat>
+          <Stat Type="last_name">Mavropanos</Stat>
+          <Stat Type="birth_place">Athens</Stat>
+          <Stat Type="first_nationality">Greece</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">1997-12-11</Stat>
+          <Stat Type="weight">88</Stat>
+          <Stat Type="height">194</Stat>
+          <Stat Type="jersey_num">27</Stat>
+          <Stat Type="real_position">Central Defender</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2017-01-04</Stat>
+          <Stat Type="leave_date">2020-01-13</Stat>
+          <Stat Type="new_team">1. FC Nürnberg</Stat>
+          <Stat Type="country">Greece</Stat>
+        </Player>
+        <Player uID="p232233">
+          <Name>Tyreece John-Jules</Name>
+          <Position>Forward</Position>
+          <Stat Type="first_name">Tyreece</Stat>
+          <Stat Type="last_name">John-Jules</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">2001-02-14</Stat>
+          <Stat Type="weight">Unknown</Stat>
+          <Stat Type="height">183</Stat>
+          <Stat Type="jersey_num">45</Stat>
+          <Stat Type="real_position">Striker</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2018-11-28</Stat>
+          <Stat Type="leave_date">2020-01-10</Stat>
+          <Stat Type="new_team">Lincoln City</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p209289">
+          <Name>Emile Smith Rowe</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Emile</Stat>
+          <Stat Type="last_name">Smith Rowe</Stat>
+          <Stat Type="birth_place">London</Stat>
+          <Stat Type="first_nationality">England</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">2000-07-28</Stat>
+          <Stat Type="weight">79</Stat>
+          <Stat Type="height">182</Stat>
+          <Stat Type="jersey_num">32</Stat>
+          <Stat Type="real_position">Unknown</Stat>
+          <Stat Type="real_position_side">Unknown</Stat>
+          <Stat Type="join_date">2018-07-13</Stat>
+          <Stat Type="leave_date">2020-01-10</Stat>
+          <Stat Type="new_team">Huddersfield Town</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p57249">
+          <Name>Henrikh Mkhitaryan</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Henrikh</Stat>
+          <Stat Type="last_name">Mkhitaryan</Stat>
+          <Stat Type="birth_place">Yerevan</Stat>
+          <Stat Type="first_nationality">Armenia</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">1989-01-21</Stat>
+          <Stat Type="weight">75</Stat>
+          <Stat Type="height">177</Stat>
+          <Stat Type="jersey_num">7</Stat>
+          <Stat Type="real_position">Attacking Midfielder</Stat>
+          <Stat Type="real_position_side">Centre/Right</Stat>
+          <Stat Type="join_date">2018-01-22</Stat>
+          <Stat Type="leave_date">2019-09-02</Stat>
+          <Stat Type="new_team">Roma</Stat>
+          <Stat Type="country">Armenia</Stat>
+        </Player>
+        <Player uID="p153256">
+          <Name>Mohamed Elneny</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Mohamed Naser</Stat>
+          <Stat Type="last_name">El Sayed Elneny</Stat>
+          <Stat Type="birth_place">Mahalla El Kubra</Stat>
+          <Stat Type="first_nationality">Egypt</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="known_name">Mohamed Elneny</Stat>
+          <Stat Type="birth_date">1992-07-11</Stat>
+          <Stat Type="weight">73</Stat>
+          <Stat Type="height">180</Stat>
+          <Stat Type="jersey_num">4</Stat>
+          <Stat Type="real_position">Defensive Midfielder</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2016-01-14</Stat>
+          <Stat Type="leave_date">2019-08-31</Stat>
+          <Stat Type="new_team">Besiktas</Stat>
+          <Stat Type="country">Egypt</Stat>
+        </Player>
+        <Player uID="p38411">
+          <Name>Nacho Monreal</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Ignacio</Stat>
+          <Stat Type="last_name">Monreal</Stat>
+          <Stat Type="birth_place">Pamplona</Stat>
+          <Stat Type="first_nationality">Spain</Stat>
+          <Stat Type="preferred_foot">Left</Stat>
+          <Stat Type="known_name">Nacho Monreal</Stat>
+          <Stat Type="birth_date">1986-02-26</Stat>
+          <Stat Type="weight">72</Stat>
+          <Stat Type="height">179</Stat>
+          <Stat Type="jersey_num">18</Stat>
+          <Stat Type="real_position">Full Back</Stat>
+          <Stat Type="real_position_side">Left</Stat>
+          <Stat Type="join_date">2013-01-31</Stat>
+          <Stat Type="leave_date">2019-08-31</Stat>
+          <Stat Type="new_team">Real Sociedad</Stat>
+          <Stat Type="country">Spain</Stat>
+        </Player>
+        <TeamOfficial Type="Manager" country="Sweden" uID="man48076">
+          <PersonName>
+            <BirthDate>1977-04-16</BirthDate>
+            <BirthPlace>Vittsjö</BirthPlace>
+            <First>Fredrik</First>
+            <Last>Ljungberg</Last>
+            <join_date>2019-11-29</join_date>
+            <leave_date>2019-12-22</leave_date>
+          </PersonName>
+        </TeamOfficial>
+        <TeamOfficial Type="Manager" country="Spain" uID="man37569">
+          <PersonName>
+            <BirthDate>1971-11-03</BirthDate>
+            <First>Unai</First>
+            <Last>Emery</Last>
+            <join_date>2018-05-23</join_date>
+            <leave_date>2019-11-29</leave_date>
+          </PersonName>
+        </TeamOfficial>
+      </Team>
+      <Team uID="t8">
+        <Name>Chelsea</Name>
+        <Player uID="p232792">
+          <Name>Tariq Lamptey</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Tariq</Stat>
+          <Stat Type="last_name">Lamptey</Stat>
+          <Stat Type="first_nationality">England</Stat>
+          <Stat Type="birth_date">2000-09-30</Stat>
+          <Stat Type="weight">Unknown</Stat>
+          <Stat Type="height">Unknown</Stat>
+          <Stat Type="jersey_num">48</Stat>
+          <Stat Type="real_position">Full Back</Stat>
+          <Stat Type="real_position_side">Right</Stat>
+          <Stat Type="join_date">2019-10-30</Stat>
+          <Stat Type="leave_date">2020-01-31</Stat>
+          <Stat Type="new_team">Brighton and Hove Albion</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p49013">
+          <Name>Victor Moses</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Victor</Stat>
+          <Stat Type="last_name">Moses</Stat>
+          <Stat Type="birth_place">Lagos</Stat>
+          <Stat Type="first_nationality">Nigeria</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">1990-12-12</Stat>
+          <Stat Type="weight">79</Stat>
+          <Stat Type="height">177</Stat>
+          <Stat Type="jersey_num">15</Stat>
+          <Stat Type="real_position">Wing Back</Stat>
+          <Stat Type="real_position_side">Right</Stat>
+          <Stat Type="join_date">2012-08-24</Stat>
+          <Stat Type="leave_date">2020-01-23</Stat>
+          <Stat Type="new_team">Internazionale</Stat>
+          <Stat Type="country">Nigeria</Stat>
+        </Player>
+        <Player uID="p232787">
+          <Name>Conor Gallagher</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Conor</Stat>
+          <Stat Type="last_name">Gallagher</Stat>
+          <Stat Type="first_nationality">England</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">2000-02-06</Stat>
+          <Stat Type="weight">Unknown</Stat>
+          <Stat Type="height">182</Stat>
+          <Stat Type="jersey_num">Unknown</Stat>
+          <Stat Type="real_position">Central Midfielder</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2019-05-15</Stat>
+          <Stat Type="leave_date">2020-01-15</Stat>
+          <Stat Type="new_team">Swansea City</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p209036">
+          <Name>Marc Guehi</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Addji Keaninkin Marc-Israel</Stat>
+          <Stat Type="last_name">Guehi</Stat>
+          <Stat Type="birth_place">Abidjan</Stat>
+          <Stat Type="first_nationality">Côte d&#39;Ivoire</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="known_name">Marc Guehi</Stat>
+          <Stat Type="birth_date">2000-07-13</Stat>
+          <Stat Type="weight">82</Stat>
+          <Stat Type="height">182</Stat>
+          <Stat Type="jersey_num">44</Stat>
+          <Stat Type="real_position">Central Defender</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2019-05-11</Stat>
+          <Stat Type="leave_date">2020-01-10</Stat>
+          <Stat Type="new_team">Swansea City</Stat>
+          <Stat Type="country">England</Stat>
+        </Player>
+        <Player uID="p167767">
+          <Name>Kenedy</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Robert Kenedy</Stat>
+          <Stat Type="last_name">Nunes do Nascimento</Stat>
+          <Stat Type="birth_place">Santa Rita do Sapucaí</Stat>
+          <Stat Type="first_nationality">Brazil</Stat>
+          <Stat Type="preferred_foot">Left</Stat>
+          <Stat Type="known_name">Kenedy</Stat>
+          <Stat Type="birth_date">1996-02-08</Stat>
+          <Stat Type="weight">77</Stat>
+          <Stat Type="height">182</Stat>
+          <Stat Type="jersey_num">16</Stat>
+          <Stat Type="real_position">Wing Back</Stat>
+          <Stat Type="real_position_side">Left</Stat>
+          <Stat Type="join_date">2015-07-27</Stat>
+          <Stat Type="leave_date">2019-09-02</Stat>
+          <Stat Type="new_team">Getafe</Stat>
+          <Stat Type="country">Brazil</Stat>
+        </Player>
+        <Player uID="p118335">
+          <Name>Abdul Rahman Baba</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Abdul Rahman</Stat>
+          <Stat Type="last_name">Baba</Stat>
+          <Stat Type="birth_place">Tamale</Stat>
+          <Stat Type="first_nationality">Ghana</Stat>
+          <Stat Type="preferred_foot">Left</Stat>
+          <Stat Type="known_name">Abdul Rahman Baba</Stat>
+          <Stat Type="birth_date">1994-07-02</Stat>
+          <Stat Type="weight">72</Stat>
+          <Stat Type="height">180</Stat>
+          <Stat Type="jersey_num">Unknown</Stat>
+          <Stat Type="real_position">Full Back</Stat>
+          <Stat Type="real_position_side">Left</Stat>
+          <Stat Type="join_date">2015-08-16</Stat>
+          <Stat Type="leave_date">2019-09-02</Stat>
+          <Stat Type="new_team">Mallorca</Stat>
+          <Stat Type="country">Ghana</Stat>
+        </Player>
+        <Player uID="p111565">
+          <Name>Lucas Piazon</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Gustavo Lucas</Stat>
+          <Stat Type="last_name">Domingues Piazon</Stat>
+          <Stat Type="birth_place">Sao Paolo</Stat>
+          <Stat Type="first_nationality">Brazil</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="known_name">Lucas Piazon</Stat>
+          <Stat Type="birth_date">1994-01-20</Stat>
+          <Stat Type="weight">73</Stat>
+          <Stat Type="height">182</Stat>
+          <Stat Type="jersey_num">34</Stat>
+          <Stat Type="real_position">Attacking Midfielder</Stat>
+          <Stat Type="real_position_side">Left/Centre/Right</Stat>
+          <Stat Type="join_date">2011-07-01</Stat>
+          <Stat Type="leave_date">2019-09-02</Stat>
+          <Stat Type="new_team">Rio Ave</Stat>
+          <Stat Type="country">Brazil</Stat>
+        </Player>
+        <Player uID="p169102">
+          <Name>Tiemoué Bakayoko</Name>
+          <Position>Midfielder</Position>
+          <Stat Type="first_name">Tiemoué</Stat>
+          <Stat Type="last_name">Bakayoko</Stat>
+          <Stat Type="first_nationality">France</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">1994-08-17</Stat>
+          <Stat Type="weight">77</Stat>
+          <Stat Type="height">185</Stat>
+          <Stat Type="jersey_num">14</Stat>
+          <Stat Type="real_position">Defensive Midfielder</Stat>
+          <Stat Type="real_position_side">Centre</Stat>
+          <Stat Type="join_date">2017-07-15</Stat>
+          <Stat Type="leave_date">2019-08-31</Stat>
+          <Stat Type="new_team">Monaco</Stat>
+          <Stat Type="country">France</Stat>
+        </Player>
+        <Player uID="p105700">
+          <Name>Davide Zappacosta</Name>
+          <Position>Defender</Position>
+          <Stat Type="first_name">Davide</Stat>
+          <Stat Type="last_name">Zappacosta</Stat>
+          <Stat Type="birth_place">Sora</Stat>
+          <Stat Type="first_nationality">Italy</Stat>
+          <Stat Type="preferred_foot">Right</Stat>
+          <Stat Type="birth_date">1992-06-11</Stat>
+          <Stat Type="weight">70</Stat>
+          <Stat Type="height">185</Stat>
+          <Stat Type="jersey_num">21</Stat>
+          <Stat Type="real_position">Full Back</Stat>
+          <Stat Type="real_position_side">Right</Stat>
+          <Stat Type="join_date">2017-08-31</Stat>
+          <Stat Type="leave_date">2019-08-21</Stat>
+          <Stat Type="new_team">Roma</Stat>
+          <Stat Type="country">Italy</Stat>
+        </Player>
+      </Team>
+    </PlayerChanges>
+  </SoccerDocument>
+</SoccerFeed>

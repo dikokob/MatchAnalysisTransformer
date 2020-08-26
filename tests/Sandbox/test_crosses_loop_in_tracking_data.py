@@ -8,8 +8,8 @@ from sandbox.crosses_loop_in_tracking_data import crosses_classification, only_o
 class TestCrossesClassification:
     """Test the get shots functionality from set_pieces_classification
     """
-    path_match_results = 'tests/fixtures/inputs/g1059702/srml-8-2019-f1059702-matchresults.xml'
-    path_events = 'tests/fixtures/inputs/g1059702/f24-8-2019-1059702-eventdetails.xml'
+    path_match_results = 'tests/fixtures/srml-8-2019-f1059702-matchresults.xml'
+    path_events = 'tests/fixtures/crosses_loop_in_tracking/inputs/f24-8-2019-1059702-eventdetails.xml'
 
     def test_cross_classification_output_is_dataframe(self):
         """test that output is a pd.Dataframe
@@ -39,7 +39,7 @@ class TestCrossesClassification:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/df_crosses_classification.csv", index_col=None)
 
         output = crosses_classification(self.path_events)
 
@@ -51,7 +51,7 @@ class TestCrossesClassification:
         """test output is as expected
         """
 
-        verification_result = pd.read_csv("tests/fixtures/outputs/g1059702/df_crosses_classification.csv", index_col=None)
+        verification_result = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/df_crosses_classification.csv", index_col=None)
 
         output = crosses_classification(self.path_events)
 
@@ -85,8 +85,6 @@ class TestCrossesClassification:
 
         output = data.groupby(['unique_event_id']).apply(only_open_play_crosses)
 
-        print(output)
-        print(output.columns)
         for field in validation_fields:
             assert (field in output.columns),(
                 "Failed: Output did not contain = {}".format(field)
@@ -95,7 +93,7 @@ class TestCrossesClassification:
     def test_only_open_play_crosses_output_columns_as_expected(self):
         """test output is as expected
         """
-        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/df_only_open_play_crosses.csv", index_col=None)
         verification_df = verification_df.where(pd.notnull(verification_df), None)
         data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
 
@@ -110,14 +108,14 @@ class TestCrossesClassification:
         """test output is as expected
         """
 
-        verification_df = pd.read_csv("tests/fixtures/outputs/g1059702/df_only_open_play_crosses.csv", index_col=None)
+        verification_df = pd.read_csv("tests/fixtures/crosses_loop_in_tracking/outputs/df_only_open_play_crosses.csv", index_col=None)
         verification_df = verification_df.where(pd.notnull(verification_df), None)
         data, _, _, _, _, _, _, _, _ = opta_event_file_manipulation(self.path_events)
 
         output = data.groupby(['unique_event_id']).apply(only_open_play_crosses)
         output = output.where(pd.notnull(output), None)
-        print("{}\n\n\n\n{}".format(verification_df.head().values, output.head().values))
-        assert (verification_df.values == output.values).all(), (
+
+        assert (verification_df.equals(output)), (
             "Failed: did not return required output dataframe"
         )
 

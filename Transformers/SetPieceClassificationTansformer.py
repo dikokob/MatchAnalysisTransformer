@@ -1255,7 +1255,6 @@ class SetPieceClassificationTansformer:
         #                                                                                                     16])))].reset_index(
         #     drop=True)  # we include all free kicks instances
         freekicks_taken = opta_event_data_df.loc[(((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==6].unique().tolist()))) & (opta_event_data_df.type_id==1)) | (((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==263].unique().tolist()))) & (opta_event_data_df.type_id.isin([13,14,15,16])))].reset_index(drop = True) #we include all free kicks instances
-        print("(line 1258) freekicks taken = {}\n\n\n".format(freekicks_taken))
         freekicks_taken['time_in_seconds'] = freekicks_taken['min'] * 60.0 + freekicks_taken['sec']
         freekicks_taken['time_in_seconds'] = freekicks_taken['time_in_seconds'].astype(float)
 
@@ -1276,7 +1275,6 @@ class SetPieceClassificationTansformer:
             # freekick_event_id = 1893310504
             # freekick_event_id = 1418929501
             # freekick_event_id = 116705383
-            print("(line 1277) freekick_event_id = {}".format(freekick_event_id))
 
             # check for the freekick event taken
             attacking_team_id = np.where(
@@ -1344,9 +1342,6 @@ class SetPieceClassificationTansformer:
                 freekicks_taken.event_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0])
             freekick_type_id = int(
                 freekicks_taken.type_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0])
-            print("(line 1347) freekick_event_id = {}\n\n".format(freekick_event_id))
-            print("(line 1347) freekick_taken unique_event_id = {}\n\n".format(freekicks_taken.unique_event_id))
-            print("(line 1347) freekick_player_id = {}\n\n".format(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
 
             # freekick_player_id = 'p' + str(
             #     int(freekicks_taken.player_id.loc[freekicks_taken.unique_event_id == freekick_event_id].unique()[0]))
@@ -1909,8 +1904,6 @@ class SetPieceClassificationTansformer:
                                     event_type_id[event_type_id.type_id == events_after_relevant_pass.type_id.iloc[0]][
                                         'name'].iloc[0]
                             first_contact_type = events_after_relevant_pass.type_id.iloc[0]
-                            print("(line 1923) Is nan = {}".format(type(events_after_relevant_pass.player_id.iloc[0])))
-                            print("(line 1923) Is nan = {}".format(events_after_relevant_pass.player_id.iloc[0]))
                             # if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
                             if events_after_relevant_pass.player_id.iloc[0] is None:
                                 first_contact_player_id = None

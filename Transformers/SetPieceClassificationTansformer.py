@@ -358,7 +358,7 @@ class SetPieceClassificationTansformer:
                     cross_relevant = passes_in_window[index_longest_pass,11]
                     overhit_cross_relevant = passes_in_window[index_longest_pass,12]
                     switch_of_play_relevant = passes_in_window[index_longest_pass,13]
-                    freekick_player_id_relevant = 'p' + str(int(time_window_passes.player_id.loc[time_window_passes.unique_event_id==passes_in_window[index_longest_pass,9]].unique()[0]))
+                    freekick_player_id_relevant = time_window_passes.player_id.loc[time_window_passes.unique_event_id==passes_in_window[index_longest_pass,9]].unique()[0]
                     freekick_player_name_relevant = player_names_raw.full_name.loc[player_names_raw['player_id'] == int(freekick_player_id_relevant[1:])].iloc[0]
                     # else:
                     #     chipped_or_launch_relevant = None
@@ -1595,10 +1595,9 @@ class SetPieceClassificationTansformer:
                     cross_relevant = passes_in_window[index_longest_pass, 11]
                     overhit_cross_relevant = passes_in_window[index_longest_pass, 12]
                     switch_of_play_relevant = passes_in_window[index_longest_pass, 13]
-                    freekick_player_id_relevant = 'p' + str(int(time_window_passes.player_id.loc[
-                                                                    time_window_passes.unique_event_id ==
-                                                                    passes_in_window[index_longest_pass, 9]].unique()[
-                                                                    0]))
+                    freekick_player_id_relevant = time_window_passes.player_id.loc[
+                        time_window_passes.unique_event_id ==passes_in_window[index_longest_pass, 9]
+                    ].unique()[0]
                     freekick_player_name_relevant = \
                     player_names_raw.full_name.loc[player_names_raw['player_id'] == int(freekick_player_id_relevant[1:])].iloc[0]
                     event_id_relevant = time_window_passes.unique_event_id.loc[
@@ -1930,9 +1929,9 @@ class SetPieceClassificationTansformer:
                                 first_contact_aerial = 1
                                 description = 'Aerial Duel Won'
                                 first_contact_type = events_after_relevant_pass.type_id.iloc[0]
-                                first_contact_player_id = 'p' + str(int(
-                                    events_after_relevant_pass[events_after_relevant_pass.outcome == 1][
-                                        'player_id'].iloc[0]))
+                                first_contact_player_id = events_after_relevant_pass[
+                                    events_after_relevant_pass.outcome == 1
+                                ]['player_id'].iloc[0]
                                 first_contact_team_id = 't' + str(int(
                                     events_after_relevant_pass[events_after_relevant_pass.outcome == 1]['team_id'].iloc[
                                         0]))
@@ -2079,9 +2078,9 @@ class SetPieceClassificationTansformer:
                                                   events_after_relevant_pass.type_id == 44].drop_duplicates(
                                 ['unique_event_id']).unique_event_id.iloc[:2]:
                             # aerial_duel_ids = ', '.join([str(int(x)) for x in events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[:2].tolist()])
-                            successful_player_id_duel = 'p' + str(int(
-                                events_after_relevant_pass.player_id.loc[events_after_relevant_pass.outcome == 1].iloc[
-                                    0]))
+                            successful_player_id_duel = events_after_relevant_pass.player_id.loc[
+                                events_after_relevant_pass.outcome == 1
+                            ].iloc[0]
                             successful_player_name_duel = \
                             player_names_raw[player_names_raw['player_id'] == int(successful_player_id_duel[1:])]['full_name'].iloc[
                                 0]
@@ -2091,12 +2090,10 @@ class SetPieceClassificationTansformer:
                             successful_team_name_duel = np.where(
                                 successful_team_id_duel == 't' + str(int(attacking_team_id)),
                                 attacking_team, defending_team).tolist()
-                            unsuccessful_player_id_duel = 'p' + str(int(
-                                events_after_relevant_pass.player_id.loc[events_after_relevant_pass.outcome == 0].iloc[
-                                    0]))
+                            unsuccessful_player_id_duel = events_after_relevant_pass.player_id.loc[
+                                events_after_relevant_pass.outcome == 0].iloc[0]
                             unsuccessful_player_name_duel = \
-                            player_names_raw[player_names_raw['player_id'] == int(unsuccessful_player_id_duel[1:])][
-                                'full_name'].iloc[0]
+                            player_names_raw[player_names_raw['player_id'] == int(unsuccessful_player_id_duel[1:])]['full_name'].iloc[0]
                             unsuccessful_team_id_duel = 't' + str(int(
                                 events_after_relevant_pass.team_id.loc[events_after_relevant_pass.outcome == 0].iloc[
                                     0]))
@@ -2112,9 +2109,9 @@ class SetPieceClassificationTansformer:
                                                 shot_event_ids.split(', ')[0])].qualifier_id)):
                                     aerial_duel_is_shot = 1
 
-                            if 'p' + str(int(events_after_relevant_pass[
-                                                 events_after_relevant_pass.unique_event_id == aerial_duel_id][
-                                                 'player_id'].iloc[0])) == successful_player_id_duel:
+                            if events_after_relevant_pass[
+                                events_after_relevant_pass.unique_event_id == aerial_duel_id
+                            ]['player_id'].iloc[0] == successful_player_id_duel:
                                 list_aerial_duels.append([freekick_event_id, aerial_duel_id, successful_player_id_duel,
                                                           successful_player_name_duel, successful_team_id_duel,
                                                           successful_team_name_duel, 'Successful',

@@ -82,18 +82,6 @@ class TestSetPieceClassification:
             df_opta_crosses=df_opta_crosses,
             df_opta_shots=df_opta_shots
         )
-        
-        # (
-        #     opta_output_final_corners,
-        #     _,
-        #     _
-        # ) = corners_classification(
-        #     path_events='tests/fixtures/set_piece_classification/inputs/test_corners_final_corners.xml',
-        #     path_match_results=self.path_match_results,
-        #     path_track_meta=self.path_metadata,
-        #     season=self.season,
-        #     competition=self.competition
-        # )
 
         base_path = 'tests/fixtures/set_piece_classification/outputs'
         verified_df = pd.read_csv(os.path.join(base_path, 'df_final_corners.csv'), index_col=None)
@@ -107,80 +95,127 @@ class TestSetPieceClassification:
         )
 
 
-    # def test_corners_classification_success_building_final_corners(self):
+    def test_corners_classification_success_building_final_corners(self):
+
+        path_events = 'tests/fixtures/set_piece_classification/inputs/test_corners_final_corners.xml'
+        spc_transformer = self.get_set_piece_classification_transformer()
+        opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=path_events)
+        df_player_names_raw, players_df_lineup, match_info = self.spectrumTransformer.get_player_match_data(
+            match_results_xml=self.path_match_results,
+            path_track_meta=self.path_metadata
+        )
+        df_opta_shots = self.opta_transformer.opta_shots(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            opta_match_info=opta_match_info
+        )
+        df_opta_crosses = self.opta_transformer.opta_crosses_classification(
+            df_opta_events=opta_event_data_df
+        )
+        (
+            opta_output_final_corners,
+            _,
+            _
+        ) = spc_transformer.corners_classification(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            match_info=match_info,
+            opta_match_info=opta_match_info,
+            df_opta_crosses=df_opta_crosses,
+            df_opta_shots=df_opta_shots
+        )
+        opta_output_final_corners = opta_output_final_corners.replace([' ', '', np.nan, None], 'nan')
+        
+        base_path = 'tests/fixtures/set_piece_classification/outputs'
+        verified_df = pd.read_csv(os.path.join(base_path, 'df_final_corners.csv'), index_col=None)
+        verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
+        print("final corners=\t{}\nverified_df=\t{}".format(
+            opta_output_final_corners,
+            verified_df
+        ))
+        assert (opta_output_final_corners.equals(verified_df)),(
+            "Failed: Building opta_output_final_corners dataframe"
+        )
+
+    def test_corners_classification_success_building_shots_corners(self):
 
         
-    #     (
-    #         opta_output_final_corners,
-    #         _,
-    #         _
-    #     ) = corners_classification(
-    #         path_events='tests/fixtures/set_piece_classification/inputs/test_corners_final_corners.xml',
-    #         path_match_results=self.path_match_results,
-    #         path_track_meta=self.path_metadata,
-    #         season=self.season,
-    #         competition=self.competition
-    #     )
-    #     opta_output_final_corners = opta_output_final_corners.replace([' ', '', np.nan, None], 'nan')
-        
-    #     base_path = 'tests/fixtures/set_piece_classification/outputs'
-    #     verified_df = pd.read_csv(os.path.join(base_path, 'df_final_corners.csv'), index_col=None)
-    #     verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
-    #     print("final corners=\t{}\nverified_df=\t{}".format(
-    #         opta_output_final_corners,
-    #         verified_df
-    #     ))
-    #     assert (opta_output_final_corners.equals(verified_df)),(
-    #         "Failed: Building opta_output_final_corners dataframe"
-    #     )
+        path_events = 'tests/fixtures/set_piece_classification/inputs/test_corners_shots.xml'
+        spc_transformer = self.get_set_piece_classification_transformer()
+        opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=path_events)
+        df_player_names_raw, players_df_lineup, match_info = self.spectrumTransformer.get_player_match_data(
+            match_results_xml=self.path_match_results,
+            path_track_meta=self.path_metadata
+        )
+        df_opta_shots = self.opta_transformer.opta_shots(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            opta_match_info=opta_match_info
+        )
+        df_opta_crosses = self.opta_transformer.opta_crosses_classification(
+            df_opta_events=opta_event_data_df
+        )
+        (
+            _,
+            opta_output_shots_corners,
+            _
+        ) = spc_transformer.corners_classification(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            match_info=match_info,
+            opta_match_info=opta_match_info,
+            df_opta_crosses=df_opta_crosses,
+            df_opta_shots=df_opta_shots
+        )
 
-    # def test_corners_classification_success_building_shots_corners(self):
+        base_path = 'tests/fixtures/set_piece_classification/outputs'
+        verified_df = pd.read_csv(os.path.join(base_path, 'df_shots_corners.csv'), index_col=None)
+        print("final corners=\t{}\nverified_df=\t{}".format(
+            opta_output_shots_corners,
+            verified_df
+        ))
+        assert (opta_output_shots_corners.equals(verified_df)),(
+            "Failed: Building opta_output_shots_corners dataframe"
+        )
 
-        
-    #     (
-    #         _,
-    #         opta_output_shots_corners,
-    #         _
-    #     ) = corners_classification(
-    #         path_events='tests/fixtures/set_piece_classification/inputs/test_corners_shots.xml',
-    #         path_match_results=self.path_match_results,
-    #         path_track_meta=self.path_metadata,
-    #         season=self.season,
-    #         competition=self.competition
-    #     )
-
-    #     base_path = 'tests/fixtures/set_piece_classification/outputs'
-    #     verified_df = pd.read_csv(os.path.join(base_path, 'df_shots_corners.csv'), index_col=None)
-    #     print("final corners=\t{}\nverified_df=\t{}".format(
-    #         opta_output_shots_corners,
-    #         verified_df
-    #     ))
-    #     assert (opta_output_shots_corners.equals(verified_df)),(
-    #         "Failed: Building opta_output_shots_corners dataframe"
-    #     )
-
-    # def test_corners_classification_success_building_aerial_duel_corners_dataframe(self):
+    def test_corners_classification_success_building_aerial_duel_corners_dataframe(self):
 
         
-    #     (
-    #         _,
-    #         _,
-    #         opta_output_aerial_duels_corners
-    #     ) = corners_classification(
-    #         path_events='tests/fixtures/set_piece_classification/inputs/test_corners_aerial_duel.xml',
-    #         path_match_results=self.path_match_results,
-    #         path_track_meta=self.path_metadata,
-    #         season=self.season,
-    #         competition=self.competition
-    #     )
-    #     opta_output_aerial_duels_corners = opta_output_aerial_duels_corners.replace([' ', '', np.nan, None], 'nan')
-    #     base_path = 'tests/fixtures/set_piece_classification/outputs'
-    #     verified_df = pd.read_csv(os.path.join(base_path, 'df_aerial_duels_corners.csv'), index_col=None)
-    #     verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
-    #     print("aerial duels corners=\t{}\nverfification=\t{}".format(
-    #         opta_output_aerial_duels_corners,
-    #         verified_df
-    #     ))
-    #     assert opta_output_aerial_duels_corners.equals(verified_df),(
-    #         "Failed: Building aerial deils corners dataframe"
-    #     )
+        path_events = 'tests/fixtures/set_piece_classification/inputs/test_corners_aerial_duel.xml'
+        spc_transformer = self.get_set_piece_classification_transformer()
+        opta_event_data_df, opta_match_info = self.spectrumTransformer.get_opta_events(event_path=path_events)
+        df_player_names_raw, players_df_lineup, match_info = self.spectrumTransformer.get_player_match_data(
+            match_results_xml=self.path_match_results,
+            path_track_meta=self.path_metadata
+        )
+        df_opta_shots = self.opta_transformer.opta_shots(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            opta_match_info=opta_match_info
+        )
+        df_opta_crosses = self.opta_transformer.opta_crosses_classification(
+            df_opta_events=opta_event_data_df
+        )
+        (
+            _,
+            _,
+            opta_output_aerial_duels_corners
+        ) = spc_transformer.corners_classification(
+            df_opta_events=opta_event_data_df,
+            df_player_names_raw=df_player_names_raw,
+            match_info=match_info,
+            opta_match_info=opta_match_info,
+            df_opta_crosses=df_opta_crosses,
+            df_opta_shots=df_opta_shots
+        )
+        opta_output_aerial_duels_corners = opta_output_aerial_duels_corners.replace([' ', '', np.nan, None], 'nan')
+        base_path = 'tests/fixtures/set_piece_classification/outputs'
+        verified_df = pd.read_csv(os.path.join(base_path, 'df_aerial_duels_corners.csv'), index_col=None)
+        verified_df = verified_df.replace([' ', '', np.nan, None], 'nan')
+        print("aerial duels corners=\t{}\nverfification=\t{}".format(
+            opta_output_aerial_duels_corners,
+            verified_df
+        ))
+        assert opta_output_aerial_duels_corners.equals(verified_df),(
+            "Failed: Building aerial deils corners dataframe"
+        )

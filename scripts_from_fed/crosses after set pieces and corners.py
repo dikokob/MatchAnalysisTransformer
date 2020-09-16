@@ -409,30 +409,51 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             aerial_duel_is_shot = 0 
         
             #incorporate the shots logic for each crossing event.  
-            if (data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0] == 'Open Play') | ('2nd Phase' in data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0]):
+            if (data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0] == 'Open Play'):
                 qualifying_shots = data_shots[((data_shots.Time_in_Seconds >= 
                     data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
                     5 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
                     data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (data_shots.game_id==game) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0])) | (((data_shots.value == 
                     opta_event_data_df[opta_event_data_df.unique_event_id==cross_id]['event_id'].iloc[0])) & (data_shots.game_id==game) & (data_shots.related_event_team_id == 
-                    data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0]))].sort_values(['Time_in_Seconds']).reset_index(drop=True)
+                    data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0]) & (data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))].sort_values(['Time_in_Seconds']).reset_index(drop=True)
                 #if qualifying_shots.shape[0] > 0:
                 #    for opta_id_shot in qualifying_shots.unique_event_id.tolist():
                 #        shots_to_track.append(opta_id_shot) #we need this to make sure these do not fall within the set pieces/corner deliveries, such that each qualifying shot is assigned to only one cross
-            else:
-                qualifying_shots = data_shots[((data_shots.from_corner==1) | (data_shots.from_set_piece==1)) & (((data_shots.Time_in_Seconds >= 
+            
+            elif ('2nd Phase' in data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0]):
+                qualifying_shots = data_shots[(data_shots.game_id==game) & (((data_shots.Time_in_Seconds <= 
+                    5 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
+                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0])) | (((data_shots.Time_in_Seconds >= 
                     data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
-                    10 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
-                    data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (data_shots.game_id==game) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0])) | (((data_shots.value == 
-                    opta_event_data_df[opta_event_data_df.unique_event_id==cross_id]['event_id'].iloc[0])) & (data_shots.game_id==game) & (data_shots.related_event_team_id == 
-                    data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0])))].sort_values(['Time_in_Seconds']).reset_index(drop=True) 
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
+                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]) & ((data_shots.from_set_piece==1) | (data_shots.from_corner==1))) | (((data_shots.value == 
+                    opta_event_data_df[opta_event_data_df.unique_event_id==cross_id]['event_id'].iloc[0])) & (data_shots.related_event_team_id == 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]) & (data_shots.period_id==data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))))].sort_values(['Time_in_Seconds']).reset_index(drop=True)                
+
+            else:
+                qualifying_shots = data_shots[(data_shots.game_id==game) & (((data_shots.Time_in_Seconds <= 
+                    10 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
+                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0])) | (((data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.period_id==
+                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.related_event_team_id==data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]) & ((data_shots.from_set_piece==1) | (data_shots.from_corner==1))) | (((data_shots.value == 
+                    opta_event_data_df[opta_event_data_df.unique_event_id==cross_id]['event_id'].iloc[0])) & (data_shots.related_event_team_id == 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]) & (data_shots.period_id==data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.Time_in_Seconds >= 
+                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))))].sort_values(['Time_in_Seconds']).reset_index(drop=True)                
                 #we do that to make sure we remove shots which would be referred actually to 2nd phase crosses
-                if qualifying_shots.shape[0] > 0:
-                    for opta_id_shot in qualifying_shots.unique_event_id.tolist():
-                        if data_crosses[(data_crosses.game_id==game) & (data_crosses.period_id==
-                            data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (data_crosses.Time_in_Seconds < qualifying_shots[qualifying_shots.unique_event_id==
-                            opta_id_shot]['Time_in_Seconds'].iloc[0]) & (data_crosses.team_id==data_shots[data_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds'])['unique_event_id'].iloc[-1] != cross_id:
-                            qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)             
+            if qualifying_shots.shape[0] > 0:
+                for opta_id_shot in qualifying_shots.unique_event_id.tolist():
+                    if data_crosses[(data_crosses.game_id==game) & (data_crosses.period_id==
+                        data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (data_crosses.Time_in_Seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                        opta_id_shot]['Time_in_Seconds'].iloc[0]) & (data_crosses.team_id==data_shots[data_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds'])['unique_event_id'].iloc[-1] != cross_id:
+                        qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)             
             if qualifying_shots.shape[0] == 0:
                 shot_event_ids = None
                 shot_player_ids = None
@@ -443,6 +464,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                 shot_player_ids = ', '.join(qualifying_shots.player_id.tolist())
                 shot_player_names = ', '.join(qualifying_shots.player_name.tolist())
                 for shot_event_id in qualifying_shots.unique_event_id.unique():
+                    shot_time = qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['Time_in_Seconds'].iloc[0]
                     shot_player_id = qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['player_id'].iloc[0]
                     shot_player_name = qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['player_name'].iloc[0]
 
@@ -477,8 +499,33 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                 'Header', np.where(qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['other_body_part'].iloc[0]==1, 
                                     'Other Body Part', None)))).tolist()
 
+                    shot_x = qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['x'].iloc[0]
+                    shot_y = qualifying_shots[qualifying_shots.unique_event_id==shot_event_id]['y'].iloc[0]
+
+                    data_between_set_piece_and_shot = opta_event_data_df[(opta_event_data_df.period_id==data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds >= data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.time_in_seconds <= shot_time) & (~opta_event_data_df.unique_event_id.isin([cross_id, shot_event_id]))].reset_index(drop=True)
+                    if len(data_between_set_piece_and_shot.unique_event_id.unique()) == 0:
+                        number_events_in_between_shot = 0
+                        opta_event_id_between_shot = None
+                        opta_type_id_between_shot = None
+                        opta_descr_between_shot = None
+                    else:
+                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,27,28,43,70]))].reset_index(drop=True)
+                        if data_between_set_piece_and_shot_reduced.shape[0] == 0:
+                            number_events_in_between_shot = 0
+                            opta_event_id_between_shot = None
+                            opta_type_id_between_shot = None  
+                            opta_descr_between_shot = None 
+                        else:
+                            number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
+                            opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
+                            opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
+                            opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+
+
                     list_all_shots.append([cross_id, shot_event_id, shot_player_id, shot_player_name, shot_team_id, 
-                        shot_team_name, shot_label, shot_outcome, shot_body_part, aerial_duel_is_shot])
+                        shot_team_name, shot_label, shot_outcome, shot_body_part, aerial_duel_is_shot, shot_time - data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0], 
+                        number_events_in_between_shot, opta_event_id_between_shot, opta_descr_between_shot, 
+                        shot_x, shot_y])
 
             where_relevant_pass = np.where(opta_event_data_df.unique_event_id==cross_id)[0][-1]
             events_after_relevant_pass = opta_event_data_df[(~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.iloc[:(where_relevant_pass+1)].unique())) & (opta_event_data_df.time_in_seconds >= 
@@ -495,11 +542,17 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                             str(int(events_after_relevant_pass.event_id.iloc[0]))) & (opta_event_data_df.team_id != events_after_relevant_pass.team_id.iloc[0])])))].reset_index(drop=True)
 
             first_contact_aerial = 0
+            first_contact_shot = 0
+            first_contact_x = np.nan
+            first_contact_y = np.nan 
             description = None
+            first_contact_event_id = np.nan
             if events_after_relevant_pass.shape[0] > 0:
                 if events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,41,44,45,49,50,51,52,53,54,56,59,61,74]:
                     if (3 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                         first_contact_aerial = 1
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['type_id'].iloc[0] in [13,14,15,16]:
+                        first_contact_shot = 1
                     if events_after_relevant_pass.type_id.iloc[0] not in [4, 44]:
                         if events_after_relevant_pass.type_id.iloc[0] in event_type_id.type_id.tolist():
                             if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
@@ -509,6 +562,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                             else:
                                 description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                        first_contact_event_id = events_after_relevant_pass.unique_event_id.iloc[0]
                         if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
                             first_contact_player_id = None 
                             first_contact_player_name = None 
@@ -518,62 +572,80 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         first_contact_team_id = 't' + str(int(events_after_relevant_pass.team_id.iloc[0]))
                         first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                             home_team_name, away_team_name).tolist()
+                        first_contact_x = events_after_relevant_pass['x'].iloc[0]
+                        first_contact_y = events_after_relevant_pass['y'].iloc[0]
                     else:
                         if events_after_relevant_pass.type_id.iloc[0] == 44:
                             first_contact_aerial = 1
                             description = 'Aerial Duel Won'
                             first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                            first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==1].unique_event_id.iloc[0]
                             first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]))
                             first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['team_id'].iloc[0]))
                             first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                             first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                                 home_team_name, away_team_name).tolist()
+                            first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['x'].iloc[0]
+                            first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['y'].iloc[0]
                         if events_after_relevant_pass.type_id.iloc[0] == 4:
                             if (10 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (10 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
-                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]                             
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
                                 description = 'Handball'
                                 first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
                                 first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
                                 first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                                 first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
-                                    home_team_name, away_team_name).tolist()                        
+                                    home_team_name, away_team_name).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
                                 first_contact_type = None 
+                                first_contact_event_id = np.nan
                                 first_contact_player_id = None 
                                 first_contact_player_name = None 
                                 first_contact_team_id = None 
                                 first_contact_team_name = None 
                                 first_contact_aerial = None 
+                                first_contact_shot = None
                             elif (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
-                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]                             
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
                                 description = 'Simulation'
                                 first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
                                 first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
                                 first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                                 first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
-                                    home_team_name, away_team_name).tolist()                        
+                                    home_team_name, away_team_name).tolist()  
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]
                             else:
                                 first_contact_type = events_after_relevant_pass.type_id.iloc[0] 
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==1].unique_event_id.iloc[0]
                                 description = 'Foul Won'
-                                if np.isnan(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]):
+                                if np.isnan(events_after_relevant_pass[events_after_relevant_pass.outcome==1].player_id.iloc[0]):
                                     first_contact_player_id = None 
-                                    first_contact_player_name = None
+                                    first_contact_player_name = None 
                                 else:
-                                    first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]))
+                                    first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1].player_id.iloc[0]))
                                     first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                                 first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['team_id'].iloc[0]))         
                                 first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                                     home_team_name, away_team_name).tolist()
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['y'].iloc[0]
 
                 else:
                     first_contact_type = None 
+                    first_contact_event_id = np.nan
                     first_contact_player_id = None 
                     first_contact_player_name = None 
                     first_contact_team_id = None 
                     first_contact_team_name = None 
                     first_contact_aerial = None 
-
-              
+                    first_contact_shot = None
+                    first_contact_x = np.nan 
+                    first_contact_y = np.nan
                     if (data_crosses[data_crosses.unique_event_id==cross_id].type_id.iloc[0]==2):
                         first_contact_type = 55
                         description = 'Player Caught Offside'
@@ -582,18 +654,23 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                         first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                             home_team_name, away_team_name).tolist()
+                        first_contact_x = float(opta_event_data_df[(opta_event_data_df.unique_event_id==cross_id) & (opta_event_data_df.qualifier_id==140)]['value'].iloc[0])
+                        first_contact_y = float(opta_event_data_df[(opta_event_data_df.unique_event_id==cross_id) & (opta_event_data_df.qualifier_id==141)]['value'].iloc[0])
                     if (events_after_relevant_pass.type_id.iloc[0] in [5,6]):
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                        first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]
                         description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
                         if np.isnan(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]):
                             first_contact_player_id = None 
-                            first_contact_player_name = None
+                            first_contact_player_name = None 
                         else:
                             first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
                             first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
-                        first_contact_team_id = 't' + str(int(events_after_relevant_pass[(events_after_relevant_pass.outcome==0)]['team_id'].iloc[0]))
+                        first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))
                         first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                             home_team_name, away_team_name).tolist()
+                        first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                        first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]
 
                 if events_after_relevant_pass.type_id.iloc[0] == 44:
                     for aerial_duel_id in events_after_relevant_pass[events_after_relevant_pass.type_id==44].drop_duplicates(['unique_event_id']).unique_event_id.iloc[:2]:
@@ -606,8 +683,13 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         unsuccessful_player_id_duel = 'p' + str(int(events_after_relevant_pass.player_id.loc[events_after_relevant_pass.outcome==0].iloc[0])) 
                         unsuccessful_player_name_duel = player_names_raw[player_names_raw['@uID']==unsuccessful_player_id_duel]['player_name'].iloc[0]                                        
                         unsuccessful_team_id_duel = 't' + str(int(events_after_relevant_pass.team_id.loc[events_after_relevant_pass.outcome==0].iloc[0]))
-                        unsuccessful_team_name_duel = np.where(unsuccessful_team_id_duel == 't' + str(int(home_team_id)), 
-                            home_team_name, away_team_name).tolist()
+                        unsuccessful_team_name_duel = np.where(successful_team_id_duel == 't' + str(int(home_team_id)), 
+                            away_team_name, home_team_name).tolist()
+
+                        successful_x = events_after_relevant_pass['x'].loc[events_after_relevant_pass.outcome==1].iloc[0]
+                        successful_y = events_after_relevant_pass['y'].loc[events_after_relevant_pass.outcome==1].iloc[0]
+                        unsuccessful_x = events_after_relevant_pass['x'].loc[events_after_relevant_pass.outcome==0].iloc[0]
+                        unsuccessful_y = events_after_relevant_pass['y'].loc[events_after_relevant_pass.outcome==0].iloc[0]
 
                         if (shot_player_ids is not None) & (qualifying_shots.shape[0] > 0):
                             if (successful_player_id_duel == shot_player_ids.split(', ')[0]) & (- events_after_relevant_pass.time_in_seconds.iloc[0] + qualifying_shots.Time_in_Seconds.iloc[0] <= 1) & (15 in list(events_after_relevant_pass[events_after_relevant_pass.unique_event_id==int(shot_event_ids.split(', ')[0])].qualifier_id)):
@@ -615,23 +697,29 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
                         if 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.unique_event_id==aerial_duel_id]['player_id'].iloc[0])) == successful_player_id_duel:
                             list_aerial_duels.append([cross_id, aerial_duel_id, successful_player_id_duel, 
-                                successful_player_name_duel, successful_team_id_duel, successful_team_name_duel, 'Successful', unsuccessful_player_id_duel, 
-                                unsuccessful_player_name_duel, unsuccessful_team_id_duel, unsuccessful_team_name_duel, 
+                                successful_player_name_duel, successful_team_id_duel, successful_team_name_duel, successful_x, successful_y, 
+                                'Successful', unsuccessful_player_id_duel, 
+                                unsuccessful_player_name_duel, unsuccessful_team_id_duel, unsuccessful_team_name_duel, unsuccessful_x, unsuccessful_y,
                                 aerial_duel_is_shot])
                         else:
                             list_aerial_duels.append([cross_id, aerial_duel_id, unsuccessful_player_id_duel, 
-                                unsuccessful_player_name_duel, unsuccessful_team_id_duel, unsuccessful_team_name_duel, 'Unsuccessful', successful_player_id_duel, 
-                                successful_player_name_duel, successful_team_id_duel, successful_team_name_duel, 
+                                unsuccessful_player_name_duel, unsuccessful_team_id_duel, unsuccessful_team_name_duel, unsuccessful_x, unsuccessful_y,
+                                'Unsuccessful', successful_player_id_duel, 
+                                successful_player_name_duel, successful_team_id_duel, successful_team_name_duel, successful_x, successful_y, 
                                 aerial_duel_is_shot])
 
 
             else:
                 first_contact_type = None 
+                first_contact_event_id = np.nan
                 first_contact_player_id = None 
                 first_contact_player_name = None 
                 first_contact_team_id = None 
                 first_contact_team_name = None 
                 first_contact_aerial = None
+                first_contact_shot = None
+                first_contact_x = np.nan
+                first_contact_y = np.nan 
                 if (data_crosses[data_crosses.unique_event_id==cross_id].type_id.iloc[0]==2):
                     first_contact_type = 55
                     description = 'Player Caught Offside'
@@ -640,6 +728,8 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                     first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
                     first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
                         home_team_name, away_team_name).tolist()
+                    first_contact_x = float(opta_event_data_df[(opta_event_data_df.unique_event_id==cross_id) & (opta_event_data_df.qualifier_id==140)]['value'].iloc[0])
+                    first_contact_y = float(opta_event_data_df[(opta_event_data_df.unique_event_id==cross_id) & (opta_event_data_df.qualifier_id==141)]['value'].iloc[0])
 
 
             goalkeeper_id = 'p' + str(int(opta_event_data_df[(opta_event_data_df.type_id==34) & (opta_event_data_df.qualifier_id==30) & (opta_event_data_df.team_id==int(data_crosses[data_crosses.unique_event_id==cross_id]['Defending Team ID'].iloc[0].replace('t','')))]['value'].tolist()[0].split(',')[0]))
@@ -672,6 +762,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Player Name'] = player_names_raw[player_names_raw['@uID']==data_crosses[data_crosses.unique_event_id==cross_id].player_id.iloc[0]]['player_name'].iloc[0]
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Defending Goalkeeper ID'] = goalkeeper_id
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Defending Goalkeeper Name'] = gk_name 
+            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Event ID'] = first_contact_event_id
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Type'] = first_contact_type
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Explanation'] = description
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Player ID'] = first_contact_player_id
@@ -679,6 +770,9 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Team ID'] = first_contact_team_id
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Team Name'] = first_contact_team_name
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Aerial'] = first_contact_aerial
+            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Shot'] = first_contact_shot
+            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact X Coordinate'] = first_contact_x
+            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Y Coordinate'] = first_contact_y
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Length Pass'] = np.round(np.sqrt((data_crosses[data_crosses.unique_event_id==cross_id]['x'].iloc[0]/100.0*length_pitch - data_crosses[data_crosses.unique_event_id==cross_id]['x_end'].iloc[0]/100.0*length_pitch)**2 + (data_crosses[data_crosses.unique_event_id==cross_id]['y'].iloc[0]/100.0*width_pitch - data_crosses[data_crosses.unique_event_id==cross_id]['y_end'].iloc[0]/100.0*width_pitch)**2), 2)
             data_crosses.loc[data_crosses.unique_event_id==cross_id, '% Distance Along X'] = np.round(data_crosses[data_crosses.unique_event_id==cross_id]['x_end'].iloc[0] - data_crosses[data_crosses.unique_event_id==cross_id]['x'].iloc[0], 1)
 
@@ -707,9 +801,11 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                     shots_full.loc[shots_full['Shot OPTA ID']==int(shot_event_id), 'Aerial Duel Is Shot'] = 1
                                 if shots_full.loc[shots_full['Shot OPTA ID']==int(shot_event_id)]['Shot Occurrence'].iloc[0] != 'Related':
                                     shots_full.loc[shots_full['Shot OPTA ID']==int(shot_event_id), 'Shot Occurrence'] = '2nd Phase Cross'
+
                             #here potentially there is room to add shots that do not fall within 10 seconds from the set piece relevant pass but happen as a result of a 2nd phase cross
                             else:
                                 set_piece_id = data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]
+                                shot_time = qualifying_shots[qualifying_shots.unique_event_id==int(shot_event_id)]['Time_in_Seconds'].iloc[0]
                                 shot_player_id = shot_player_ids.split(', ')[np.where(np.array(shot_event_ids.split(', ')) == shot_event_id)[0][0]]
                                 shot_player_name = shot_player_names.split(', ')[np.where(np.array(shot_event_ids.split(', ')) == shot_event_id)[0][0]]
                                 shot_team_id = qualifying_shots[qualifying_shots.unique_event_id==int(shot_event_id)]['team_id'].iloc[0]
@@ -732,6 +828,28 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                             'Header', np.where(qualifying_shots[qualifying_shots.unique_event_id==int(shot_event_id)]['other_body_part'].iloc[0]==1, 
                                                 'Other Body Part', None))))
 
+                                shot_x = qualifying_shots[qualifying_shots.unique_event_id==int(shot_event_id)]['x'].iloc[0]
+                                shot_y = qualifying_shots[qualifying_shots.unique_event_id==int(shot_event_id)]['y'].iloc[0]
+
+                                data_between_set_piece_and_shot = opta_event_data_df[(opta_event_data_df.period_id==opta_event_data_df[opta_event_data_df.unique_event_id==set_piece_id]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds >= opta_event_data_df[opta_event_data_df.unique_event_id==set_piece_id]['time_in_seconds'].iloc[0]) & (opta_event_data_df.time_in_seconds <= shot_time) & (~opta_event_data_df.unique_event_id.isin([set_piece_id, int(shot_event_id)]))].reset_index(drop=True)
+                                if len(data_between_set_piece_and_shot.unique_event_id.unique()) == 0:
+                                    number_events_in_between_shot = 0
+                                    opta_event_id_between_shot = None
+                                    opta_type_id_between_shot = None
+                                    opta_descr_between_shot = None
+                                else:
+                                    data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,27,28,43,70]))].reset_index(drop=True)
+                                    if data_between_set_piece_and_shot_reduced.shape[0] == 0:
+                                        number_events_in_between_shot = 0
+                                        opta_event_id_between_shot = None
+                                        opta_type_id_between_shot = None  
+                                        opta_descr_between_shot = None 
+                                    else:
+                                        number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
+                                        opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
+                                        opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
+                                        opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+
                                 if shot_player_id in data_squads['@uID'].tolist():
                                     preferred_foot = data_squads[data_squads['@uID']==shot_player_id]['preferred_foot'].iloc[0]
                                 else:
@@ -742,13 +860,24 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                 else:
                                     shot_is_aerial_duel = 0
 
+                                shot_is_first_contact = 0 #by definition, a shot from a 2nd phase cross can't be the first contact after a set piece
+                                
+                                first_contact_x_set_piece = set_pieces_full[set_pieces_full['OPTA Event ID']==set_piece_id]['First Contact X Coordinate'].iloc[0]
+                                first_contact_y_set_piece = set_pieces_full[set_pieces_full['OPTA Event ID']==set_piece_id]['First Contact Y Coordinate'].iloc[0]
 
 
                                 shots_full = shots_full.append({'Set Piece OPTA Event ID': set_piece_id, 'Shot OPTA ID': int(shot_event_id), 
                                     'Shot Player ID': shot_player_id, 'Shot Player Name': shot_player_name, 
                                     'Shot Team ID': shot_team_id, 'Shot Team Name': shot_team_name, 
                                     'Shot Occurrence': shot_occurrence, 'Shot Outcome': shot_outcome, 'Shot Body Part': shot_body_part,
-                                    'Aerial Duel Is Shot': shot_is_aerial_duel, 'Preferred Foot': preferred_foot,
+                                    'Aerial Duel Is Shot': shot_is_aerial_duel, 'Time Lapsed From Set Piece And Shot': shot_time -  opta_event_data_df[opta_event_data_df.unique_event_id==set_piece_id]['time_in_seconds'].iloc[0],  
+                                    'Number Of Events Between Set Piece And Shot': number_events_in_between_shot, 
+                                    'OPTA Event IDs Between Set Piece And Shot': opta_event_id_between_shot, 
+                                    'Events Explanation Between Set Piece And Shot': opta_descr_between_shot,
+                                    'Shot X Coordinate': shot_x, 'Shot Y Coordinate': shot_y, 
+                                    'First Contact Shot': shot_is_first_contact,
+                                    'First Contact X Coordinate': first_contact_x_set_piece, 
+                                    'First Contact Y Coordinate': first_contact_y_set_piece, 'Preferred Foot': preferred_foot,
                                     '2nd Phase Cross': 'Yes', '2nd Phase Cross OPTA Event ID': cross_id}, ignore_index = True).reset_index(drop=True)
 
 
@@ -760,19 +889,40 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
     summary_df_all_shots = pd.DataFrame(list_all_shots, columns = 
         ['Cross OPTA Event ID', 'Shot OPTA ID', 'Shot Player ID', 'Shot Player Name', 
-        'Shot Team ID', 'Shot Team Name', 'Shot Occurrence', 'Shot Outcome', 'Shot Body Part', 'Aerial Duel Is Shot'])
+        'Shot Team ID', 'Shot Team Name', 'Shot Occurrence', 'Shot Outcome', 'Shot Body Part', 'Aerial Duel Is Shot', 'Time Lapsed From Cross And Shot', 
+        'Number Of Events Between Cross And Shot', 'OPTA Event IDs Between Cross And Shot',
+        'Events Explanation Between Cross And Shot', 'Shot X Coordinate', 'Shot Y Coordinate'])
 
     summary_df_aerial_duels = pd.DataFrame(list_aerial_duels, columns = 
         ['Cross OPTA Event ID', 'Aerial Duel OPTA ID', 
         'Aerial Duel Player ID', 'Aerial Duel Player Name', 
-        'Aerial Duel Team ID', 'Aerial Duel Team Name', 'Successful/Unsuccessful',
+        'Aerial Duel Team ID', 'Aerial Duel Team Name', 'X Coordinate Player', 'Y Coordinate Player', 'Successful/Unsuccessful',
         'Other Aerial Duel Player ID', 'Other Aerial Duel Player Name', 
-        'Other Aerial Duel Team ID', 'Other Aerial Duel Team Name',
+        'Other Aerial Duel Team ID', 'Other Aerial Duel Team Name', 'Other X Coordinate Player', 'Other Y Coordinate Player',
         'Aerial Duel Is Shot'])
 
     if np.any(summary_df_aerial_duels['Aerial Duel Is Shot']==1):
         for cross in summary_df_aerial_duels[summary_df_aerial_duels['Aerial Duel Is Shot']==1].drop_duplicates(['Cross OPTA Event ID'])['Cross OPTA Event ID']:
             summary_df_all_shots.loc[(summary_df_all_shots['Cross OPTA Event ID']==cross) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Cross OPTA Event ID']==cross]['Shot OPTA ID'].iloc[0]), 'Aerial Duel Is Shot'] = 1
+
+    ##here we make adjustments to add first contact shot info to main set pieces file and shots file
+    summary_df_all_shots['First Contact Shot'] = np.where(summary_df_all_shots['Aerial Duel Is Shot']==1, 1, 0)
+    if np.any(summary_df_all_shots['First Contact Shot']==1):
+        for cross_id in summary_df_all_shots[summary_df_all_shots['First Contact Shot']==1].drop_duplicates(['Cross OPTA Event ID'])['Cross OPTA Event ID']:
+            data_crosses.loc[data_crosses['unique_event_id']==cross_id, 'First Contact Shot'] = 1
+    if np.any(data_crosses['First Contact Shot']==1):
+        for cross_id in data_crosses[data_crosses['First Contact Shot']==1].drop_duplicates(['unique_event_id'])['unique_event_id']:
+            summary_df_all_shots.loc[(summary_df_all_shots['Cross OPTA Event ID']==cross_id) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Cross OPTA Event ID']==cross_id]['Shot OPTA ID'].iloc[0]), 'First Contact Shot'] = 1
+
+    
+    #here we add first contact coordinates to shots file
+    summary_df_all_shots = summary_df_all_shots.merge(data_crosses[['unique_event_id', 'First Contact X Coordinate', 
+        'First Contact Y Coordinate']], how = 'inner', left_on = ['Cross OPTA Event ID'], 
+        right_on = ['unique_event_id']).drop(['unique_event_id'], axis = 1)
+
+    summary_df_all_shots = summary_df_all_shots.merge(data_squads.drop(['Position', 'Name', 'team_id'], axis =1), how = 'left', left_on = ['Shot Player ID'], 
+        right_on = ['@uID']).drop(['@uID'], axis = 1).rename(columns = {'preferred_foot': 'Preferred Foot'}).reset_index(drop=True)#.sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+
 
     data_crosses['Side'] = np.where(data_crosses['y'] < 50, 'Right', 'Left')
     data_crosses['Early/Lateral/Deep'] = np.where(data_crosses['x'] < 83.0, 'Early', 
@@ -780,8 +930,8 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
     data_crosses = data_crosses.drop(['event_id', 'Time_in_Seconds', 
         'pass_situation', 'freekick_taken', 'corner_taken', 'throw_in_taken', 'Our Cross Qualifier'], axis = 1).reset_index(drop=True)
-    data_crosses = data_crosses.merge(data_squads.drop(['Position', 'Name'], axis =1), how = 'left', left_on = ['team_id', 'player_id'], 
-        right_on = ['team_id', '@uID']).drop(['@uID'], axis = 1).sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
+    data_crosses = data_crosses.merge(data_squads.drop(['Position', 'Name', 'team_id'], axis =1), how = 'left', left_on = ['player_id'], 
+        right_on = ['@uID']).drop(['@uID'], axis = 1).sort_values(['game_id', 'period_id', 'min', 'sec'], ascending = [True, True, True, True]).reset_index(drop=True)
 
     data_crosses['Outcome'] = np.where(data_crosses['outcome']==1, 'Successful', 'Unsuccessful')
     data_crosses['Keypass/Assist'] = np.where((data_crosses['keypass']==1) & (data_crosses['assist']==0), 
@@ -802,8 +952,8 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
     'OPTA Event ID', 'period_id', 'min', 'sec', 'X Coordinate', 'Y Coordinate', 'End X Coordinate', 'End Y Coordinate', 'Length Pass', '% Distance Along X',
     'Player ID', 'Player Name', 'Preferred Foot', 'Outcome', 'Keypass/Assist', 'Blocked Pass', 'Cutback', 'OPTA Pull Back Qualifier',
     'Out Of Pitch', 'Ending Too Wide', 'Cross Type', 'Set Piece OPTA Event ID', 'OPTA Cross Qualifier', 'Time Between Set Piece And Cross', 'Number Events Between Set Piece And Cross',
-    'Linked 2nd Phase Cross IDs', 'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name',
-    'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial',
+    'Linked 2nd Phase Cross IDs', 'First Contact Event ID', 'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name',
+    'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate',
     'Defending Goalkeeper ID', 'Defending Goalkeeper Name']]
 
     shots_full = shots_full.sort_values(['Shot OPTA ID']).reset_index(drop=True)
@@ -879,13 +1029,13 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
 
 ###loop
-seasons = ['2019-20']
-#seasons = ['2016-17', '2017-18', '2018-19']
+#seasons = ['2019-20']
+seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
     #folders_to_keep = ['Premier League']
-    folders_to_keep = ['FA Cup']
+    #folders_to_keep = ['Champions League']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
     for competition in folders_to_keep:
@@ -946,6 +1096,7 @@ for season in seasons:
         data_crosses['Defending Goalkeeper ID'] = None 
         data_crosses['Defending Goalkeeper Name'] = None 
         data_crosses['Linked 2nd Phase Cross IDs'] = None
+        data_crosses['First Contact Event ID'] = None 
         data_crosses['First Contact Type'] = None 
         data_crosses['First Contact Explanation'] = None 
         data_crosses['First Contact Player ID'] = None 
@@ -953,6 +1104,9 @@ for season in seasons:
         data_crosses['First Contact Team ID'] = None 
         data_crosses['First Contact Team Name'] = None 
         data_crosses['First Contact Aerial'] = None 
+        data_crosses['First Contact Shot'] = None 
+        data_crosses['First Contact X Coordinate'] = None 
+        data_crosses['First Contact Y Coordinate'] = None 
         data_crosses['Length Pass'] = None 
         data_crosses['% Distance Along X'] = None 
 

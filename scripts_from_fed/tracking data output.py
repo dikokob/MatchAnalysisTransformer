@@ -23,7 +23,11 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
     list_tracking_info = []
     cnt = 0
     start_time = time.process_time()
-    
+    current_game_id = 'g0'
+    parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
+    competition_folder = os.path.join(parent_folder, competition)
+    subfolders_to_keep = [x for x in os.listdir(competition_folder) if ('spectrum' not in x) & ('f73' not in x)]
+
     for cross_id in data['OPTA Event ID']:
         if 'Set Piece Type' in list(data.columns):
             if data[data['OPTA Event ID']==cross_id]['Set Piece OPTA Event ID'].iloc[0] == data[data['OPTA Event ID']==cross_id]['Relevant OPTA Event ID'].iloc[0]:
@@ -37,6 +41,10 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
         def_team_name = data[data['OPTA Event ID']==cross_id]['Defending Team'].iloc[0]
         crosser_id = data[data['OPTA Event ID']==cross_id]['Player ID'].iloc[0]
         crosser_name = data[data['OPTA Event ID']==cross_id]['Player Name'].iloc[0]
+        freekick_mins = data[data['OPTA Event ID']==cross_id]['min'].iloc[0]
+        freekick_secs = data[data['OPTA Event ID']==cross_id]['sec'].iloc[0]
+        freekick_period_id = data[data['OPTA Event ID']==cross_id]['period_id'].iloc[0]
+
         if 'Set Piece Type' in list(data.columns):
             if cross_id == data[data['OPTA Event ID']==cross_id]['Relevant OPTA Event ID'].iloc[0]:
                 crosser_id = data[data['OPTA Event ID']==cross_id]['Relevant Player ID'].iloc[0]
@@ -46,6 +54,33 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
                 crosser_name = data[data['OPTA Event ID']==cross_id]['Player Name'].iloc[0]     
 
         core_stats_reduced = core_stats[(core_stats['Game ID']==data[data['OPTA Event ID']==cross_id]['game_id'].iloc[0])].reset_index(drop = True)       
+        
+        
+        if data[data['OPTA Event ID']==cross_id]['game_id'].iloc[0] != current_game_id.replace('g','f'):
+        
+            if sum([x.startswith('g') for x in subfolders_to_keep]) > 0: #if true, we already hit the game level folders
+                game_folder_collections = [competition]
+            else:
+                game_folder_collections = subfolders_to_keep
+
+            for folder in game_folder_collections:
+                if folder == competition: #if true, it means we need to climb a level less 
+                    path_folder = competition_folder
+                else:
+                    path_folder = os.path.join(competition_folder, folder)
+                subfolders = os.listdir(path_folder)
+
+                for sub in subfolders:
+                    if sub.replace('g','f') == data[data['OPTA Event ID']==cross_id]['game_id'].iloc[0]:
+                        path_events = [os.path.join(path_folder, sub, x) for x in os.listdir(os.path.join(path_folder, sub)) if (x.endswith('.xml')) & ('f24' in x)][0]
+                        path_match_results = [os.path.join(path_folder, sub, x) for x in os.listdir(os.path.join(path_folder, sub)) if (x.endswith('.xml')) & ('srml' in x)][0] 
+                        current_game_id = sub
+                        break
+
+            opta_event_data_df, game_id, game_date, away_score, away_team_id, away_team_name, home_score, home_team_id, home_team_name = opta_event_file_manipulation(path_events)
+            referee_id, referee_name, venue, players_df_lineup, home_formation, away_formation, player_names_raw = match_results_file_manipulation(path_match_results) 
+            opta_event_data_df['time_in_seconds'] = opta_event_data_df['min']*60.0 + opta_event_data_df['sec']
+            opta_event_data_df = opta_event_data_df[opta_event_data_df.period_id <= 4].reset_index(drop=True)
 
         if cross_id in data_tracking['OPTA Event ID'].tolist():
             #number_attack_in_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Number Of Attacking Players In Box'].iloc[0]
@@ -71,12 +106,12 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box'].iloc[0]) == str:
                 attacking_player_ids_in_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box'].iloc[0].split('; ')
                 attacking_player_names_in_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names In Box'].iloc[0].split('; ')
-                attacking_players_in_box_x = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position'].iloc[0].split('; ')]
-                attacking_players_in_box_y = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position'].iloc[0].split('; ')]
-                attacking_players_in_box_x_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting X Position'].iloc[0].split('; ')]
-                attacking_players_in_box_y_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting Y Position'].iloc[0].split('; ')]
-                attacking_players_in_box_x_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending X Position'].iloc[0].split('; ')]
-                attacking_players_in_box_y_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending Y Position'].iloc[0].split('; ')]
+                attacking_players_in_box_x = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position'].iloc[0]).split('; ')]
+                attacking_players_in_box_y = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position'].iloc[0]).split('; ')]
+                attacking_players_in_box_x_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting X Position'].iloc[0]).split('; ')]
+                attacking_players_in_box_y_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting Y Position'].iloc[0]).split('; ')]
+                attacking_players_in_box_x_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending X Position'].iloc[0]).split('; ')]
+                attacking_players_in_box_y_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending Y Position'].iloc[0]).split('; ')]
 
             attacking_player_ids_in_box_first_part = [None]
             attacking_player_names_in_box_first_part = [None]
@@ -86,9 +121,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box First Part'].iloc[0]) == str:
                 attacking_player_ids_in_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box First Part'].iloc[0].split('; ')
                 attacking_player_names_in_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names In Box First Part'].iloc[0].split('; ')
-                attacking_players_in_box_x_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position First Part'].iloc[0].split('; ')]
-                attacking_players_in_box_y_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position First Part'].iloc[0].split('; ')]
-                attacking_players_in_box_first_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames First Part Downsampled'].iloc[0].split(';')]
+                attacking_players_in_box_x_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position First Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_y_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position First Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_first_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames First Part Downsampled'].iloc[0]).split(';')]
 
             attacking_player_ids_in_box_second_part = [None]
             attacking_player_names_in_box_second_part = [None]
@@ -98,9 +133,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box Second Part'].iloc[0]) == str:
                 attacking_player_ids_in_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box Second Part'].iloc[0].split('; ')
                 attacking_player_names_in_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names In Box Second Part'].iloc[0].split('; ')
-                attacking_players_in_box_x_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Second Part'].iloc[0].split('; ')]
-                attacking_players_in_box_y_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Second Part'].iloc[0].split('; ')]
-                attacking_players_in_box_second_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Second Part Downsampled'].iloc[0].split(';')]
+                attacking_players_in_box_x_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Second Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_y_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Second Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_second_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Second Part Downsampled'].iloc[0]).split(';')]
  
             attacking_player_ids_in_box_third_part = [None]
             attacking_player_names_in_box_third_part = [None]
@@ -110,9 +145,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box Third Part'].iloc[0]) == str:
                 attacking_player_ids_in_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs In Box Third Part'].iloc[0].split('; ')
                 attacking_player_names_in_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names In Box Third Part'].iloc[0].split('; ')
-                attacking_players_in_box_x_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Third Part'].iloc[0].split('; ')]
-                attacking_players_in_box_y_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Third Part'].iloc[0].split('; ')]
-                attacking_players_in_box_third_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Third Part Downsampled'].iloc[0].split(';')]
+                attacking_players_in_box_x_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Third Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_y_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Third Part'].iloc[0]).split('; ')]
+                attacking_players_in_box_third_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Third Part Downsampled'].iloc[0]).split(';')]
 
 
             defending_player_ids_in_box = [None]
@@ -126,12 +161,12 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box'].iloc[0]) == str:
                 defending_player_ids_in_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box'].iloc[0].split('; ')
                 defending_player_names_in_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names In Box'].iloc[0].split('; ')
-                defending_players_in_box_x = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position'].iloc[0].split('; ')]
-                defending_players_in_box_y = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position'].iloc[0].split('; ')]
-                defending_players_in_box_x_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting X Position'].iloc[0].split('; ')]
-                defending_players_in_box_y_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting Y Position'].iloc[0].split('; ')]
-                defending_players_in_box_x_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending X Position'].iloc[0].split('; ')]
-                defending_players_in_box_y_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending Y Position'].iloc[0].split('; ')]
+                defending_players_in_box_x = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position'].iloc[0]).split('; ')]
+                defending_players_in_box_y = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position'].iloc[0]).split('; ')]
+                defending_players_in_box_x_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting X Position'].iloc[0]).split('; ')]
+                defending_players_in_box_y_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting Y Position'].iloc[0]).split('; ')]
+                defending_players_in_box_x_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending X Position'].iloc[0]).split('; ')]
+                defending_players_in_box_y_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending Y Position'].iloc[0]).split('; ')]
 
             defending_player_ids_in_box_first_part = [None]
             defending_player_names_in_box_first_part = [None]
@@ -141,9 +176,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box First Part'].iloc[0]) == str:
                 defending_player_ids_in_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box First Part'].iloc[0].split('; ')
                 defending_player_names_in_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names In Box First Part'].iloc[0].split('; ')
-                defending_players_in_box_x_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position First Part'].iloc[0].split('; ')]
-                defending_players_in_box_y_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position First Part'].iloc[0].split('; ')]
-                defending_players_in_box_first_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames First Part Downsampled'].iloc[0].split(';')]
+                defending_players_in_box_x_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position First Part'].iloc[0]).split('; ')]
+                defending_players_in_box_y_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position First Part'].iloc[0]).split('; ')]
+                defending_players_in_box_first_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames First Part Downsampled'].iloc[0]).split(';')]
 
             defending_player_ids_in_box_second_part = [None]
             defending_player_names_in_box_second_part = [None]
@@ -153,9 +188,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box Second Part'].iloc[0]) == str:
                 defending_player_ids_in_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box Second Part'].iloc[0].split('; ')
                 defending_player_names_in_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names In Box Second Part'].iloc[0].split('; ')
-                defending_players_in_box_x_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Second Part'].iloc[0].split('; ')]
-                defending_players_in_box_y_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Second Part'].iloc[0].split('; ')]
-                defending_players_in_box_second_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Second Part Downsampled'].iloc[0].split(';')]
+                defending_players_in_box_x_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Second Part'].iloc[0]).split('; ')]
+                defending_players_in_box_y_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Second Part'].iloc[0]).split('; ')]
+                defending_players_in_box_second_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Second Part Downsampled'].iloc[0]).split(';')]
 
 
             defending_player_ids_in_box_third_part = [None]
@@ -166,9 +201,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box Third Part'].iloc[0]) == str:
                 defending_player_ids_in_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs In Box Third Part'].iloc[0].split('; ')
                 defending_player_names_in_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names In Box Third Part'].iloc[0].split('; ')
-                defending_players_in_box_x_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Third Part'].iloc[0].split('; ')]
-                defending_players_in_box_y_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Third Part'].iloc[0].split('; ')]
-                defending_players_in_box_third_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Third Part Downsampled'].iloc[0].split(';')]
+                defending_players_in_box_x_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Third Part'].iloc[0]).split('; ')]
+                defending_players_in_box_y_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Third Part'].iloc[0]).split('; ')]
+                defending_players_in_box_third_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Third Part Downsampled'].iloc[0]).split(';')]
 
 
             attacking_player_ids_out_box = [None]
@@ -182,12 +217,12 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box'].iloc[0]) == str:
                 attacking_player_ids_out_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box'].iloc[0].split('; ')
                 attacking_player_names_out_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names Outside Box'].iloc[0].split('; ')
-                attacking_players_out_box_x = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box'].iloc[0].split('; ')]
-                attacking_players_out_box_y = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box'].iloc[0].split('; ')]
-                attacking_players_out_box_x_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting X Position Outside Box'].iloc[0].split('; ')]
-                attacking_players_out_box_y_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting Y Position Outside Box'].iloc[0].split('; ')]
-                attacking_players_out_box_x_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending X Position Outside Box'].iloc[0].split('; ')]
-                attacking_players_out_box_y_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending Y Position Outside Box'].iloc[0].split('; ')]
+                attacking_players_out_box_x = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box'].iloc[0]).split('; ')]
+                attacking_players_out_box_y = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box'].iloc[0]).split('; ')]
+                attacking_players_out_box_x_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting X Position Outside Box'].iloc[0]).split('; ')]
+                attacking_players_out_box_y_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Starting Y Position Outside Box'].iloc[0]).split('; ')]
+                attacking_players_out_box_x_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending X Position Outside Box'].iloc[0]).split('; ')]
+                attacking_players_out_box_y_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Ending Y Position Outside Box'].iloc[0]).split('; ')]
 
             attacking_player_ids_out_box_first_part = [None]
             attacking_player_names_out_box_first_part = [None]
@@ -197,9 +232,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box First Part'].iloc[0]) == str:
                 attacking_player_ids_out_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box First Part'].iloc[0].split('; ')
                 attacking_player_names_out_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names Outside Box First Part'].iloc[0].split('; ')
-                attacking_players_out_box_x_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box First Part'].iloc[0].split('; ')]
-                attacking_players_out_box_y_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box First Part'].iloc[0].split('; ')]
-                attacking_players_out_box_first_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames First Part Downsampled Outside Box'].iloc[0].split(';')]
+                attacking_players_out_box_x_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box First Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_y_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box First Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_first_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames First Part Downsampled Outside Box'].iloc[0]).split(';')]
 
             attacking_player_ids_out_box_second_part = [None]
             attacking_player_names_out_box_second_part = [None]
@@ -209,9 +244,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box Second Part'].iloc[0]) == str:
                 attacking_player_ids_out_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box Second Part'].iloc[0].split('; ')
                 attacking_player_names_out_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names Outside Box Second Part'].iloc[0].split('; ')
-                attacking_players_out_box_x_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box Second Part'].iloc[0].split('; ')]
-                attacking_players_out_box_y_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box Second Part'].iloc[0].split('; ')]
-                attacking_players_out_box_second_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Second Part Downsampled Outside Box'].iloc[0].split(';')]
+                attacking_players_out_box_x_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box Second Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_y_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box Second Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_second_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Second Part Downsampled Outside Box'].iloc[0]).split(';')]
 
 
             attacking_player_ids_out_box_third_part = [None]
@@ -222,9 +257,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box Third Part'].iloc[0]) == str:
                 attacking_player_ids_out_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player IDs Outside Box Third Part'].iloc[0].split('; ')
                 attacking_player_names_out_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Player Names Outside Box Third Part'].iloc[0].split('; ')
-                attacking_players_out_box_x_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box Third Part'].iloc[0].split('; ')]
-                attacking_players_out_box_y_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box Third Part'].iloc[0].split('; ')]
-                attacking_players_out_box_third_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Third Part Downsampled Outside Box'].iloc[0].split(';')]
+                attacking_players_out_box_x_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average X Position Outside Box Third Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_y_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Players Average Y Position Outside Box Third Part'].iloc[0]).split('; ')]
+                attacking_players_out_box_third_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Attacking Frames Third Part Downsampled Outside Box'].iloc[0]).split(';')]
 
             defending_player_ids_out_box = [None]
             defending_player_names_out_box = [None]
@@ -237,12 +272,12 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box'].iloc[0]) == str:
                 defending_player_ids_out_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box'].iloc[0].split('; ')
                 defending_player_names_out_box = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names Outside Box'].iloc[0].split('; ')
-                defending_players_out_box_x = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box'].iloc[0].split('; ')]
-                defending_players_out_box_y = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box'].iloc[0].split('; ')]
-                defending_players_out_box_x_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting X Position Outside Box'].iloc[0].split('; ')]
-                defending_players_out_box_y_start = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting Y Position Outside Box'].iloc[0].split('; ')]
-                defending_players_out_box_x_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending X Position Outside Box'].iloc[0].split('; ')]
-                defending_players_out_box_y_end = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending Y Position Outside Box'].iloc[0].split('; ')]
+                defending_players_out_box_x = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box'].iloc[0]).split('; ')]
+                defending_players_out_box_y = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box'].iloc[0]).split('; ')]
+                defending_players_out_box_x_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting X Position Outside Box'].iloc[0]).split('; ')]
+                defending_players_out_box_y_start = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Starting Y Position Outside Box'].iloc[0]).split('; ')]
+                defending_players_out_box_x_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending X Position Outside Box'].iloc[0]).split('; ')]
+                defending_players_out_box_y_end = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Ending Y Position Outside Box'].iloc[0]).split('; ')]
 
             defending_player_ids_out_box_first_part = [None]
             defending_player_names_out_box_first_part = [None]
@@ -252,9 +287,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box First Part'].iloc[0]) == str:
                 defending_player_ids_out_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box First Part'].iloc[0].split('; ')
                 defending_player_names_out_box_first_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names Outside Box First Part'].iloc[0].split('; ')
-                defending_players_out_box_x_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box First Part'].iloc[0].split('; ')]
-                defending_players_out_box_y_first_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box First Part'].iloc[0].split('; ')]
-                defending_players_out_box_first_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames First Part Downsampled Outside Box'].iloc[0].split(';')]
+                defending_players_out_box_x_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box First Part'].iloc[0]).split('; ')]
+                defending_players_out_box_y_first_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box First Part'].iloc[0]).split('; ')]
+                defending_players_out_box_first_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames First Part Downsampled Outside Box'].iloc[0]).split(';')]
 
             defending_player_ids_out_box_second_part = [None]
             defending_player_names_out_box_second_part = [None]
@@ -264,9 +299,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box Second Part'].iloc[0]) == str:
                 defending_player_ids_out_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box Second Part'].iloc[0].split('; ')
                 defending_player_names_out_box_second_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names Outside Box Second Part'].iloc[0].split('; ')
-                defending_players_out_box_x_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box Second Part'].iloc[0].split('; ')]
-                defending_players_out_box_y_second_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box Second Part'].iloc[0].split('; ')]
-                defending_players_out_box_second_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Second Part Downsampled Outside Box'].iloc[0].split(';')]
+                defending_players_out_box_x_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box Second Part'].iloc[0]).split('; ')]
+                defending_players_out_box_y_second_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box Second Part'].iloc[0]).split('; ')]
+                defending_players_out_box_second_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Second Part Downsampled Outside Box'].iloc[0]).split(';')]
 
             defending_player_ids_out_box_third_part = [None]
             defending_player_names_out_box_third_part = [None]
@@ -276,9 +311,9 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             if type(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box Third Part'].iloc[0]) == str:
                 defending_player_ids_out_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player IDs Outside Box Third Part'].iloc[0].split('; ')
                 defending_player_names_out_box_third_part = data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Player Names Outside Box Third Part'].iloc[0].split('; ')
-                defending_players_out_box_x_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box Third Part'].iloc[0].split('; ')]
-                defending_players_out_box_y_third_part = [float(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box Third Part'].iloc[0].split('; ')]
-                defending_players_out_box_third_part_frame = [int(x) for x in data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Third Part Downsampled Outside Box'].iloc[0].split(';')]
+                defending_players_out_box_x_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average X Position Outside Box Third Part'].iloc[0]).split('; ')]
+                defending_players_out_box_y_third_part = [float(x) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Players Average Y Position Outside Box Third Part'].iloc[0]).split('; ')]
+                defending_players_out_box_third_part_frame = [int(float(x)) for x in str(data_tracking[data_tracking['OPTA Event ID']==cross_id]['Defending Frames Third Part Downsampled Outside Box'].iloc[0]).split(';')]
 
 
             defending_player_ids_within_2m_crosser = [None]
@@ -478,10 +513,145 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
 
 
         else:
-            player_ids = core_stats_reduced['Player ID'].tolist()
-            player_names = core_stats_reduced['Player Name'].tolist()
-            team_ids = core_stats_reduced['Team ID'].tolist()
-            team_names = core_stats_reduced['Team Name'].tolist()
+            all_player_ids = core_stats_reduced['Player ID'].tolist()
+            all_player_names = core_stats_reduced['Player Name'].tolist()
+            all_player_team_id = core_stats_reduced['Team ID'].tolist()
+            all_player_team_name = core_stats_reduced['Team Name'].tolist()
+            all_player_start = core_stats_reduced['Start'].tolist()
+            all_player_sub_on = core_stats_reduced['Substitute On'].tolist()
+            all_player_sub_off = core_stats_reduced['Substitute Off'].tolist()
+            all_player_sent_off = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[(opta_event_data_df.type_id==17) & (opta_event_data_df.qualifier_id.isin([32,33]))].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+            all_player_retired = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==20].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+            all_player_off_pitch = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==77].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+            all_player_back_on_pitch = [np.where(len(set([int(x.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==21].unique().tolist()))) == 1, 1, 0).tolist() for x in all_player_ids]
+
+            player_ids = []
+            player_names = []
+            team_ids = []
+            team_names = []
+
+            for i in range(len(all_player_ids)):
+
+                if all_player_start[i] == 1:
+                    time_player_in = 0
+                    period_player_in = 1
+                else: 
+                    time_player_in = opta_event_data_df[(opta_event_data_df.type_id==19) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                    period_player_in = opta_event_data_df[(opta_event_data_df.type_id==19) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                
+                if (all_player_sub_off[i] + all_player_sent_off[i] + all_player_retired[i] >=1):
+                    
+                    if all_player_sub_off[i] == 1:
+                        time_player_out = opta_event_data_df[(opta_event_data_df.type_id==18) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                        period_player_out = opta_event_data_df[(opta_event_data_df.type_id==18) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                    elif all_player_retired[i] == 1:
+                        time_player_out = opta_event_data_df[(opta_event_data_df.type_id==20) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                        period_player_out = opta_event_data_df[(opta_event_data_df.type_id==20) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+
+                    elif all_player_sent_off[i] == 1:
+                        time_player_out = opta_event_data_df[(opta_event_data_df.type_id==17) & (opta_event_data_df.qualifier_id.isin([32,33])) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                        period_player_out = opta_event_data_df[(opta_event_data_df.type_id==17) & (opta_event_data_df.qualifier_id.isin([32,33])) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                    else:
+                        time_player_out = None 
+                        period_player_out = None 
+
+                else:
+                    time_player_out = 10000
+                    period_player_out = opta_event_data_df.period_id.max()
+
+                if (all_player_off_pitch[i] == 1) & (all_player_back_on_pitch[i] == 1):
+                    time_player_off_temp = opta_event_data_df[(opta_event_data_df.type_id==77) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                    period_player_off_temp = opta_event_data_df[(opta_event_data_df.type_id==77) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+                    time_player_back = opta_event_data_df[(opta_event_data_df.type_id==21) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['time_in_seconds'].iloc[0]
+                    period_player_back = opta_event_data_df[(opta_event_data_df.type_id==21) & (opta_event_data_df.team_id==int(all_player_team_id[i].replace('t',''))) & (opta_event_data_df.player_id==int(all_player_ids[i].replace('p','')))]['period_id'].iloc[0]
+
+                else:
+                    time_player_off_temp = None
+                    period_player_off_temp = None
+                    time_player_back = None
+                    period_player_back = None
+
+
+                if period_player_in == period_player_out:
+                    if (freekick_mins*60 + freekick_secs > time_player_in) & (freekick_mins*60 + freekick_secs < time_player_out) & (freekick_period_id == period_player_out):
+                        if time_player_off_temp is None:
+                            player_ids.append(all_player_ids[i])
+                            player_names.append(all_player_names[i])
+                            team_ids.append(all_player_team_id[i])
+                            team_names.append(all_player_team_name[i])
+                        else:
+                            if (((freekick_mins*60 + freekick_secs <= time_player_off_temp) | (freekick_mins*60 + freekick_secs >= time_player_back)) & (freekick_period_id==period_player_off_temp)) | (freekick_period_id != period_player_off_temp):
+                                player_ids.append(all_player_ids[i])
+                                player_names.append(all_player_names[i])
+                                team_ids.append(all_player_team_id[i])
+                                team_names.append(all_player_team_name[i])  
+                else:
+                    if (freekick_period_id < period_player_out) & (freekick_period_id > period_player_in):
+                        if time_player_off_temp is None:
+                            player_ids.append(all_player_ids[i])
+                            player_names.append(all_player_names[i])
+                            team_ids.append(all_player_team_id[i])
+                            team_names.append(all_player_team_name[i])
+                        else:
+                            if period_player_off_temp == period_player_back:
+                                if (((freekick_mins*60 + freekick_secs <= time_player_off_temp) | (freekick_mins*60 + freekick_secs >= time_player_back)) & (freekick_period_id==period_player_off_temp)) | (freekick_period_id != period_player_off_temp):
+                                    player_ids.append(all_player_ids[i])
+                                    player_names.append(all_player_names[i])
+                                    team_ids.append(all_player_team_id[i])
+                                    team_names.append(all_player_team_name[i])
+                            else:
+                                if ((freekick_mins*60 + freekick_secs <= time_player_off_temp) & (freekick_period_id == period_player_off_temp)) | ((freekick_mins*60 + freekick_secs >= time_player_back) & (freekick_period_id == period_player_back)) | ((freekick_period_id != period_player_off_temp) & (freekick_period_id != period_player_back)):
+                                    player_ids.append(all_player_ids[i])
+                                    player_names.append(all_player_names[i])
+                                    team_ids.append(all_player_team_id[i])
+                                    team_names.append(all_player_team_name[i])
+                    if freekick_period_id == period_player_out:
+                        if freekick_mins*60 + freekick_secs < time_player_out:
+                            if time_player_off_temp is None:
+                                player_ids.append(all_player_ids[i])
+                                player_names.append(all_player_names[i])
+                                team_ids.append(all_player_team_id[i])
+                                team_names.append(all_player_team_name[i])    
+                            else:
+                                if period_player_off_temp == period_player_back:
+                                    if (((freekick_mins*60 + freekick_secs <= time_player_off_temp) | (freekick_mins*60 + freekick_secs >= time_player_back)) & (freekick_period_id==period_player_off_temp)) | (freekick_period_id != period_player_off_temp):                                
+                                        player_ids.append(all_player_ids[i])
+                                        player_names.append(all_player_names[i])
+                                        team_ids.append(all_player_team_id[i])
+                                        team_names.append(all_player_team_name[i])
+                                else:
+                                    if ((freekick_mins*60 + freekick_secs <= time_player_off_temp) & (freekick_period_id == period_player_off_temp)) | ((freekick_mins*60 + freekick_secs >= time_player_back) & (freekick_period_id == period_player_back)) | ((freekick_period_id != period_player_off_temp) & (freekick_period_id != period_player_back)):
+                                        player_ids.append(all_player_ids[i])
+                                        player_names.append(all_player_names[i])
+                                        team_ids.append(all_player_team_id[i])
+                                        team_names.append(all_player_team_name[i]) 
+                    if freekick_period_id == period_player_in:
+                        if freekick_mins*60 + freekick_secs > time_player_in:
+                            if time_player_off_temp is None:
+                                player_ids.append(all_player_ids[i])
+                                player_names.append(all_player_names[i])
+                                team_ids.append(all_player_team_id[i])
+                                team_names.append(all_player_team_name[i])    
+                            else:
+                                if period_player_off_temp == period_player_back:
+                                    if (((freekick_mins*60 + freekick_secs <= time_player_off_temp) | (freekick_mins*60 + freekick_secs >= time_player_back)) & (freekick_period_id==period_player_off_temp)) | (freekick_period_id != period_player_off_temp):                                
+                                        player_ids.append(all_player_ids[i])
+                                        player_names.append(all_player_names[i])
+                                        team_ids.append(all_player_team_id[i])
+                                        team_names.append(all_player_team_name[i])
+                                else:
+                                    if ((freekick_mins*60 + freekick_secs <= time_player_off_temp) & (freekick_period_id == period_player_off_temp)) | ((freekick_mins*60 + freekick_secs >= time_player_back) & (freekick_period_id == period_player_back)) | ((freekick_period_id != period_player_off_temp) & (freekick_period_id != period_player_back)):
+                                        player_ids.append(all_player_ids[i])
+                                        player_names.append(all_player_names[i])
+                                        team_ids.append(all_player_team_id[i])
+                                        team_names.append(all_player_team_name[i]) 
+
+
+
             attack_defend = ['Attacker' if x == att_team_id else 'Defender' for x in team_ids]
             present_in_box = [None]*len(player_ids)
             present_in_box_start = [None]*len(player_ids)
@@ -491,7 +661,7 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
             present_in_box_end = [None]*len(player_ids)
             within_2m_crosser = [None]*len(player_ids)
 
-            if crosser_id in list(core_stats_reduced['Player ID']):
+            if crosser_id in player_ids:
                 attack_defend[np.where(np.array(player_ids)==crosser_id)[0][0]] = 'Crosser'
                 within_2m_crosser[np.where(np.array(player_ids)==crosser_id)[0][0]] = 'Not Applicable'
                 present_in_box[np.where(np.array(player_ids)==crosser_id)[0][0]] = np.where((data[data['OPTA Event ID']==cross_id]['X Coordinate'].iloc[0] >=83.0) & 
@@ -500,7 +670,7 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
                 if 'Set Piece Type' in list(data.columns):
                     attack_defend[np.where(np.array(player_ids)==crosser_id)[0][0]] = 'Passer'
                     if cross_id == data[data['OPTA Event ID']==cross_id]['Relevant OPTA Event ID'].iloc[0]:
-                        present_in_box[0] = np.where((data[data['OPTA Event ID']==cross_id]['Relevant X Coordinate'].iloc[0] >=83.0) & 
+                        present_in_box[np.where(np.array(player_ids)==crosser_id)[0][0]] = np.where((data[data['OPTA Event ID']==cross_id]['Relevant X Coordinate'].iloc[0] >=83.0) & 
                             (data[data['OPTA Event ID']==cross_id]['Relevant Y Coordinate'].iloc[0] >=21.1) & 
                             (data[data['OPTA Event ID']==cross_id]['Relevant Y Coordinate'].iloc[0] <=78.9), 'Yes', 'No').tolist()
 
@@ -596,7 +766,7 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
         summary_df = summary_df.groupby(['Set Piece OPTA Event ID']).apply(numbers_in_box).reset_index(drop=True)
 
 
-
+    summary_df = summary_df.drop_duplicates([list(summary_df)[0], list(summary_df)[1], 'Player ID']).reset_index(drop=True)
     writer = pd.ExcelWriter('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Tracking Data Info from Crosses Output.xlsx'.format(season, competition), engine='xlsxwriter')
     if 'Set Piece Type' in list(data.columns):
         writer = pd.ExcelWriter('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Tracking Data Info from Set Pieces Output.xlsx'.format(season, competition), engine='xlsxwriter')    
@@ -620,12 +790,13 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
 
 
 ###loop
-seasons = ['2019-20']
+#seasons = ['2019-20']
+seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}'.format(season)
-    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
-    #folders_to_keep = ['Premier League']
-    folders_to_keep = ['FA Cup']
+    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    #folders_to_keep = ['Champions League']
+    #folders_to_keep = ['FA Cup']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
     for competition in folders_to_keep:
@@ -634,6 +805,7 @@ for season in seasons:
         #data_core_stats = pd.read_excel(path_core_stats).reset_index(drop=True)
 
         file_names = ['Set Pieces with 2nd Phase Output', 'Crosses Output']
+        #file_names = ['Set Pieces', 'Crosses']
         
         for file_name in file_names:         
 
@@ -642,13 +814,70 @@ for season in seasons:
             path_crosses = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\{}.xlsx'.format(file_name)) 
             data_crosses = pd.read_excel(path_crosses)
 
-            if 'crosses' in file_name.lower():
-                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data crosses')
-            if 'set pieces' in file_name.lower():
-                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data set pieces')
+            # if 'set pieces' in file_name.lower(): 
+            #     data_crosses = data_crosses[(~data_crosses['Relevant OPTA Event ID'].duplicated()) | data_crosses['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
+            #     writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
+            #     data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
+            #     for idx, col in enumerate(data_crosses):  # loop through all columns
+            #         series = data_crosses[col]
+            #         max_len = max((
+            #             series.astype(str).map(len).max(),  # len of largest item
+            #             len(str(series.name))  # len of column name/header
+            #             )) + 1  # adding a little extra space
+            #         worksheet.set_column(idx, idx, max_len)  # set column width
+            #     writer.save() 
+
+            #     data_crosses_old = pd.read_excel(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx')) 
+            #     data_crosses_old = data_crosses_old[(~data_crosses_old['Relevant OPTA Event ID'].duplicated()) | data_crosses_old['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)              
+            #     writer = pd.ExcelWriter(os.path.join(path_league_season, 'outputs', 'Set Pieces & Crosses\\Set Pieces Output.xlsx'), engine='xlsxwriter')
+            #     data_crosses_old.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
+            #     for idx, col in enumerate(data_crosses_old):  # loop through all columns
+            #         series = data_crosses_old[col]
+            #         max_len = max((
+            #             series.astype(str).map(len).max(),  # len of largest item
+            #             len(str(series.name))  # len of column name/header
+            #             )) + 1  # adding a little extra space
+            #         worksheet.set_column(idx, idx, max_len)  # set column width
+            #     writer.save()
+
+            # if 'crosses' in file_name.lower():
+            #     path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data crosses')
+            # if 'set pieces' in file_name.lower():
+            #     path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data set pieces')
             
-            data_crosses_tracking = pd.concat([pd.read_excel(os.path.join(path_crosses_tracking,x)) for x in os.listdir(path_crosses_tracking)], axis = 0).reset_index(drop=True)
+            # data_crosses_tracking = pd.concat([pd.read_excel(os.path.join(path_crosses_tracking,x)) for x in os.listdir(path_crosses_tracking)], axis = 0).reset_index(drop=True)
 
+            # if data_crosses.shape[0] > len(data_crosses['OPTA Event ID'].unique()):
+            #     data_crosses = data_crosses.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
+            #     writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
+            #     data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
+            #     for idx, col in enumerate(data_crosses):  # loop through all columns
+            #         series = data_crosses[col]
+            #         max_len = max((
+            #             series.astype(str).map(len).max(),  # len of largest item
+            #             len(str(series.name))  # len of column name/header
+            #             )) + 1  # adding a little extra space
+            #         worksheet.set_column(idx, idx, max_len)  # set column width
+            #     writer.save() 
+            #     data_crosses = pd.read_excel(path_crosses)
 
+            #tracking_data_output(data_crosses, data_crosses_tracking, data_core_stats, season, competition) 
+            
+            if 'Set Pieces' in file_name:
+                file_name = 'Set Pieces'
+            if 'Crosses' in file_name:
+                file_name = 'Crosses'
+            data_events = pd.read_excel(os.path.join(parent_folder, 
+                competition, 'Set Pieces & Crosses', 
+                'Tracking Data Info From {} Output.xlsx'.format(file_name)))
+            data_events_grouped = data_events.groupby(list(data_events)[0])['Player ID'].count().reset_index()
 
-            tracking_data_output(data_crosses, data_crosses_tracking, data_core_stats, season, competition) 
+            print ('Range of players in box is {} - {} for {} in {} {}. Number of {} is {} and number of tracking {} is {}.'.format(min(data_events_grouped['Player ID']), 
+                max(data_events_grouped['Player ID']), file_name, competition, season, file_name, data_crosses.shape[0], file_name, data_events_grouped.shape[0]))
+
+# data = data_crosses
+# data_tracking = data_crosses_tracking
+# core_stats = data_core_stats

@@ -4,6 +4,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+Drop Table [dbo].[AerialDuelsSetPieces]
+Go
+
 CREATE TABLE [dbo].[AerialDuelsSetPieces](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
     [game_id] [nvarchar](50) NULL,
@@ -19,7 +22,11 @@ CREATE TABLE [dbo].[AerialDuelsSetPieces](
 	[Other Aerial Duel Player Name] [nvarchar] (50) NULL,
 	[Other Aerial Duel Team ID] [nvarchar] (50) NULL,
 	[Other Aerial Duel Team Name][nvarchar] (50) NULL,
-	[Aerial Duel Is Shot] [bit] NULL
+	[Aerial Duel Is Shot] [bit] NULL,
+	[Other X Coordinate Player] [float] NULL,
+	[Other Y Coordinate Player] [float] NULL,
+	[X Coordinate Player] [float] NULL,
+	[Y Coordinate Player] [float] NULL
  CONSTRAINT [PK_AerialDuelsSetPieces] PRIMARY KEY CLUSTERED
 (
 	[ID] ASC

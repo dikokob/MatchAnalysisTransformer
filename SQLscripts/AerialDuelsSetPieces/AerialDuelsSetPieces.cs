@@ -23,7 +23,12 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Other Aerial Duel Player Name", typeof(string)),
             new DataTypeColumnMap("Other Aerial Duel Team ID", typeof(string)),
             new DataTypeColumnMap("Other Aerial Duel Team Name", typeof(string)),
-            new DataTypeColumnMap("Aerial Duel Is Shot", typeof(bool))
+            new DataTypeColumnMap("Aerial Duel Is Shot", typeof(bool)),
+            new DataTypeColumnMap("Other X Coordinate Player", typeof(float)),
+            new DataTypeColumnMap("Other Y Coordinate Player", typeof(float)),
+            new DataTypeColumnMap("X Coordinate Player", typeof(float)),
+            new DataTypeColumnMap("Y Coordinate Player", typeof(float))
+            
             };
 
 

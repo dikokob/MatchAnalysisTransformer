@@ -4,7 +4,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
+Drop PROCEDURE [dbo].[spRemoveExistingAerialDuelsfromCrosses] 
+Go
 
 
 CREATE PROCEDURE [dbo].[spRemoveExistingAerialDuelsfromCrosses] @AerialDuelsfromCrossesData [dbo].[AerialDuelsfromCrossesType] READONLY
@@ -45,7 +46,11 @@ BEGIN
 	[Other Aerial Duel Player Name],
 	[Other Aerial Duel Team ID],
 	[Other Aerial Duel Team Name],
-	[Other Aerial Duel Is Shot] 
+	[Other Aerial Duel Is Shot],
+	[Other X Coordinate Player],
+	[Other Y Coordinate Player],
+	[X Coordinate Player],
+	[Y Coordinate Player]
 
 	)
     SELECT * FROM @AerialDuelsfromCrossesData

@@ -74,7 +74,11 @@ CREATE TABLE [dbo].[SecondPhaseSetPieces](
 	[Relevant Preferred Foot] [nvarchar](50) NULL,
 	[Time_in_Seconds] [float] NULL,
 	[Time_in_Seconds_Relavant] [float] NULL,
-	[2nd Phase Cross OPTA Event ID] [nvarchar](50) NULL
+	[2nd Phase Cross OPTA Event ID] [nvarchar](50) NULL,
+	[First Contact Event ID] [nvarchar](50) NULL,
+	[First Contact Shot] [bit] NULL,
+	[First Contact X Coordinate] [float] NULL,
+	[First Contact Y Coordinate] [float] NULL
 
  CONSTRAINT [PK_SecondPhaseSetPieces] PRIMARY KEY CLUSTERED
 (

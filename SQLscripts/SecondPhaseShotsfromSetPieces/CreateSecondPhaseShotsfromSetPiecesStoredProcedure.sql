@@ -4,7 +4,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
+Drop PROCEDURE [dbo].[spRemoveExistingSecondPhaseShotsfromSetPieces]
+Go
 
 
 CREATE PROCEDURE [dbo].[spRemoveExistingSecondPhaseShotsfromSetPieces] @SecondPhaseShotsfromSetPiecesData [dbo].[SecondPhaseShotsfromSetPiecesType] READONLY
@@ -46,7 +47,15 @@ BEGIN
 	[Aerial Duel Is Shot],
 	[Preferred Foot],
 	[2nd Phase Cross],
-	[2nd Phase Cross OPTA Event ID]
+	[2nd Phase Cross OPTA Event ID],
+	[Events Explanation Between Set Piece and Shot],
+	[First Contact Shot],
+	[First Contact X Coordinate],
+	[First Contact Y Coordinate],
+	[Number Of Events Between Set Piece And Shot],
+	[Shot X Coordinate],
+	[Shot Y Coordinate],
+	[Time Lapsed From Set Piece And Shot]
 
 	)
     SELECT * FROM @SecondPhaseShotsfromSetPiecesData

@@ -25,7 +25,14 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Preferred Foot", typeof(string)),
             new DataTypeColumnMap("2nd Phase Cross", typeof(string)),
             new DataTypeColumnMap("2nd Phase Cross OPTA Event ID", typeof(string)),
-
+            new DataTypeColumnMap("Events Explanation Between Set Piece and Shot", typeof(string)),
+            new DataTypeColumnMap("First Contact Shot", typeof(bool)),
+            new DataTypeColumnMap("First Contact X Coordinate", typeof(float)),
+            new DataTypeColumnMap("First Contact Y Coordinate", typeof(float)),
+            new DataTypeColumnMap("Number Of Events Between Set Piece And Shot", typeof(int)),
+            new DataTypeColumnMap("Shot X Coordinate", typeof(float)),
+            new DataTypeColumnMap("Shot Y Coordinate", typeof(float)),
+            new DataTypeColumnMap("Time Lapsed From Set Piece And Shot", typeof(int))
             };
 
 

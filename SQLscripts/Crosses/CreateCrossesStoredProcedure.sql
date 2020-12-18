@@ -4,7 +4,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
+drop PROCEDURE [dbo].[spRemoveExistingCrosses] 
+go
 
 CREATE PROCEDURE [dbo].[spRemoveExistingCrosses] @CrossesData [dbo].[CrossesType] READONLY
 AS
@@ -77,7 +78,11 @@ BEGIN
 	[First Contact Team Name],
 	[First Contact Aerial],
 	[Defending Goalkeeper ID],
-	[Defending Goalkeeper Name]
+	[Defending Goalkeeper Name],
+	[First Contact Event ID],
+	[First Contact Shot],
+	[First Contact X Coordinate],
+	[First Contact Y Coordinate]
 	)
     SELECT * FROM @CrossesData
 END

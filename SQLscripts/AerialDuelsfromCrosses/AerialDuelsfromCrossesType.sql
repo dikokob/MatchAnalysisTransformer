@@ -17,7 +17,11 @@ CREATE TYPE [dbo].[AerialDuelsfromCrossesType] AS TABLE(
 	[Other Aerial Duel Player Name] [nvarchar](50) NULL,
 	[Other Aerial Duel Team ID] [nvarchar](50) NULL,
 	[Other Aerial Duel Team Name] [nvarchar](50) NULL,
-	[Other Aerial Duel Is Shot] [bit] NULL
+	[Other Aerial Duel Is Shot] [bit] NULL,
+	[Other X Coordinate Player] [float] NULL,
+	[Other Y Coordinate Player] [float] NULL,
+	[X Coordinate Player] [float] NULL,
+	[Y Coordinate Player] [float] NULL
 
 )
 GO

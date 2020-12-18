@@ -6,6 +6,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+Drop PROCEDURE [dbo].[spRemoveExistingSecondPhaseSetPieces]
+Go
 
 CREATE PROCEDURE [dbo].[spRemoveExistingSecondPhaseSetPieces] @SecondPhaseSetPiecesData [dbo].[SecondPhaseSetPiecesType] READONLY
 AS
@@ -97,7 +99,11 @@ BEGIN
 	[Relevant Preferred Foot],
 	[Time_in_Seconds],
 	[Time_in_Seconds_Relavant],
-	[2nd Phase Cross OPTA Event ID]
+	[2nd Phase Cross OPTA Event ID],
+	[First Contact Event ID],
+	[First Contact Shot],
+	[First Contact X Coordinate],
+	[First Contact Y Coordinate]
 	)
     SELECT * FROM @SecondPhaseSetPiecesData
 END

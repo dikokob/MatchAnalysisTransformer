@@ -57,6 +57,10 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("First Contact Aerial", typeof(bool)),
             new DataTypeColumnMap("Defending Goalkeeper ID", typeof(string)),
             new DataTypeColumnMap("Defending Goalkeeper Name", typeof(string)),
+            new DataTypeColumnMap("First Contact Event ID", typeof(string)),
+            new DataTypeColumnMap("First Contact Shot", typeof(bool)),
+            new DataTypeColumnMap("First Contact X Coordinate", typeof(float)),
+            new DataTypeColumnMap("First Contact Y Coordinate", typeof(float))
             };
 
 

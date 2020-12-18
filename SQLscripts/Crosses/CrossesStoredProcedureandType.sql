@@ -57,7 +57,11 @@ CREATE TYPE [dbo].[CrossesType] AS TABLE(
 	 [First Contact Team Name] [nvarchar](50) NULL,
 	 [First Contact Aerial] [bit] NULL,
 	 [Defending Goalkeeper ID] [nvarchar](50) NULL,
-	 [Defending Goalkeeper Name] [nvarchar](50) NULL
+	 [Defending Goalkeeper Name] [nvarchar](50) NULL,
+	 [First Contact Event ID] [nvarchar](50) NULL,
+	 [First Contact Shot] [bit] NULL,
+	 [First Contact X Coordinate] [float] NULL,
+	 [First Contact Y Coordinate] [float] NULL
 
 )
 GO

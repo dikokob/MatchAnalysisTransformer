@@ -22,8 +22,16 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Shot Outcome", typeof(string)),
             new DataTypeColumnMap("Shot Body Part", typeof(string)),
             new DataTypeColumnMap("Aerial Duel Is Shot", typeof(bool)),
-            v
-
+            new DataTypeColumnMap("Events Explanation Between Cross and Shot", typeof(string)),
+            new DataTypeColumnMap("First Contact Shot", typeof(bool)),
+            new DataTypeColumnMap("First Contact X Coordinate", typeof(float)),
+            new DataTypeColumnMap("First Contact Y Coordinate", typeof(float)),
+            new DataTypeColumnMap("Number Of Events Between Cross And Shot", typeof(int)),
+            new DataTypeColumnMap("OPTA Event IDs between Cross And Shot", typeof(string)),
+            new DataTypeColumnMap("Preferred Foot", typeof(string)),
+            new DataTypeColumnMap("Shot X Coordinate", typeof(float)),
+            new DataTypeColumnMap("Shot Y Coordinate", typeof(float)),
+            new DataTypeColumnMap("Time Lapsed from Cross And Shot", typeof(int))         
             };
 
 

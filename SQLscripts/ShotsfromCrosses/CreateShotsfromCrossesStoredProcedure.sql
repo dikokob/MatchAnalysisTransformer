@@ -4,7 +4,8 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
+Drop PROCEDURE [dbo].[spRemoveExistingShotsfromCrosses] 
+Go
 
 
 CREATE PROCEDURE [dbo].[spRemoveExistingShotsfromCrosses] @ShotsfromCrossesData [dbo].[ShotsfromCrossesType] READONLY
@@ -43,7 +44,17 @@ BEGIN
 	[Shot Occurrence],
 	[Shot Outcome],
 	[Shot Body Part],
-	[Aerial Duel Is Shot]
+	[Aerial Duel Is Shot],
+	[Events Explanation Between Set Piece and Shot],
+	[First Contact Shot],
+	[First Contact X Coordinate],
+	[First Contact Y Coordinate],
+	[Number Of Events Between Cross And Shot],
+	[OPTA Event IDs between Cross And Shot],
+	[Preferred Foot],
+	[Shot X Coordinate],
+	[Shot Y Coordinate],
+	[Time Lapsed from Cross And Shot]
 	)
     SELECT * FROM @ShotsfromCrossesData
 END

@@ -76,7 +76,10 @@ namespace MatchAnalysisWriteFilesToSqlServerFunction
             new DataTypeColumnMap("Time_in_Seconds", typeof(decimal)),
             new DataTypeColumnMap("Time_in_Seconds_Relavant", typeof(decimal)),
             new DataTypeColumnMap("2nd Phase Cross OPTA Event ID", typeof(string)),
-           
+            new DataTypeColumnMap("First Contact Event ID", typeof(string)),
+            new DataTypeColumnMap("First Contact Shot", typeof(bool)),
+            new DataTypeColumnMap("First Contact X Coordinate", typeof(float)),
+            new DataTypeColumnMap("First Contact Y Coordinate", typeof(float))          
 
             };
 

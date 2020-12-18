@@ -160,7 +160,7 @@ def modify_core_stats (core_stats, competition, season):
 
 
 ###loop
-seasons = ['2019-20']
+seasons = ['2020-21']
 #seasons = ['2016-17', '2017-18', '2018-19']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}'.format(season)
@@ -171,8 +171,12 @@ for season in seasons:
 
     for competition in folders_to_keep:
 
-        core_stats = pd.concat([pd.read_excel(os.path.join(parent_folder, competition, 'Opta Summaries Player Level', x)) for x in os.listdir(os.path.join(parent_folder, competition, 'Opta Summaries Player Level')) if ('core stats' in x) & ('~' not in x)]).reset_index(drop=True)
+        core_stats = pd.concat([pd.read_excel(os.path.join(parent_folder, competition, 'Opta Summaries Player Level', x)) for x in os.listdir(os.path.join(parent_folder, competition, 'Opta Summaries Player Level')) if ('core stats' in x) & ('~' not in x)], sort = False).reset_index(drop=True)
 
+        if '{} g'.format(competition) in str(os.listdir(os.path.join(parent_folder, competition, 'Opta Summaries Player Level'))):
+            for x in [os.path.join(parent_folder, competition, 'Opta Summaries Player Level', y) for y in os.listdir(os.path.join(parent_folder, competition, 'Opta Summaries Player Level')) if '{} g'.format(competition) in y]:
+                os.remove(os.path.join(parent_folder, competition, 'Opta Summaries Player Level', x))
+        
         final_df = modify_core_stats(core_stats, competition, season)
 
         writer = pd.ExcelWriter(os.path.join(parent_folder, competition, 'Opta Summaries Player Level\\{} {} core stats.xlsx'.format(competition, season)), engine='xlsxwriter')

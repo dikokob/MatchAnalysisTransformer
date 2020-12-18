@@ -4,9 +4,131 @@ import xmltodict
 import numpy as np 
 import time
 
-os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
+#os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
 
-from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
+#from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
+
+def opta_event_file_manipulation (path_events):
+    import xmltodict
+    import numpy as np
+    import pandas as pd
+
+    try:
+        with open(path_events, encoding = 'utf-8') as fd:
+            opta_event = xmltodict.parse(fd.read())
+    except UnicodeDecodeError:
+        with open(path_events, encoding = 'latin-1') as fd:
+            opta_event = xmltodict.parse(fd.read())    
+
+    if 'f73' in path_events:
+        opta_event['Games'] = opta_event.pop('SoccerFeed')    
+    
+    #start rearranging the file in a nicer format
+    opta_event_data = []
+    competition_id = int(opta_event['Games']['Game']['@competition_id'])
+    competition_name = opta_event['Games']['Game']['@competition_name']
+    season_id = int(opta_event['Games']['Game']['@season_id'])
+    season_name = opta_event['Games']['Game']['@season_name']
+    game_id = int(opta_event['Games']['Game']['@id'])
+    match_day = int(opta_event['Games']['Game']['@matchday'])
+    game_date = opta_event['Games']['Game']['@game_date']
+    period_1_start = opta_event['Games']['Game']['@period_1_start']
+    period_2_start = opta_event['Games']['Game']['@period_2_start']
+    away_score = None
+    if '@away_score' in list(opta_event['Games']['Game'].keys()):
+        away_score = int(opta_event['Games']['Game']['@away_score'])
+    away_team_id = int(opta_event['Games']['Game']['@away_team_id'])
+    away_team_name = opta_event['Games']['Game']['@away_team_name']
+    home_score = None
+    if '@home_score' in list(opta_event['Games']['Game'].keys()):
+        home_score = int(opta_event['Games']['Game']['@home_score'])
+    home_team_id = int(opta_event['Games']['Game']['@home_team_id'])
+    home_team_name = opta_event['Games']['Game']['@home_team_name']
+    fixture = home_team_name + ' v ' + away_team_name
+    result = None
+    if (home_score is not None) & (away_score is not None):
+        result = str(home_score) + ' - ' + str(away_score)
+
+    #loop over events in the opta file
+    for i in range(len(opta_event['Games']['Game']['Event'])):
+        unique_event_id = int(opta_event['Games']['Game']['Event'][i]['@id'])
+        event_id = int(opta_event['Games']['Game']['Event'][i]['@event_id'])
+        type_id = int(opta_event['Games']['Game']['Event'][i]['@type_id'])
+        period_id = int(opta_event['Games']['Game']['Event'][i]['@period_id'])
+        mins = int(opta_event['Games']['Game']['Event'][i]['@min'])
+        sec = int(opta_event['Games']['Game']['Event'][i]['@sec'])
+        team_id = int(opta_event['Games']['Game']['Event'][i]['@team_id'])
+        outcome = int(opta_event['Games']['Game']['Event'][i]['@outcome'])
+        #we need to check conditions for existence of player_id, keypass and assist
+        if len(set(list(opta_event['Games']['Game']['Event'][i].keys())).intersection(set(['@player_id']))) == 1:
+            player_id = int(opta_event['Games']['Game']['Event'][i]['@player_id'])
+        else:
+            player_id = None
+        if len(set(list(opta_event['Games']['Game']['Event'][i].keys())).intersection(set(['@keypass']))) == 1:
+            keypass = 1
+        else:
+            keypass = 0
+        if len(set(list(opta_event['Games']['Game']['Event'][i].keys())).intersection(set(['@assist']))) == 1:
+            assist = 1
+        else:
+            assist = 0
+        x = np.round(float(opta_event['Games']['Game']['Event'][i]['@x']), 1)
+        y = np.round(float(opta_event['Games']['Game']['Event'][i]['@y']), 1)
+        timestamp = opta_event['Games']['Game']['Event'][i]['@timestamp']
+
+        #inner loop over qualifiers - if there is only one qualifier then we go straight with the dict like approach
+        #we need first to check whether there are any qualifiers
+        if len(set(list(opta_event['Games']['Game']['Event'][i].keys())).intersection(set(['Q']))) == 0:
+            qualifier_id = None
+            value = None
+            opta_event_data.append([competition_id, competition_name, season_id, season_name, game_id, match_day, 
+                game_date, period_1_start, period_2_start, home_score, home_team_id, home_team_name, 
+                away_score, away_team_id, away_team_name, fixture, result, 
+                unique_event_id, event_id, period_id, mins, sec, timestamp, type_id, player_id, team_id, outcome, keypass, assist,
+                x, y, qualifier_id, value])
+        else:
+            if type(opta_event['Games']['Game']['Event'][i]['Q']) != list:
+                qualifier_id = int(opta_event['Games']['Game']['Event'][i]['Q']['@qualifier_id'])
+                if len(set(list(opta_event['Games']['Game']['Event'][i]['Q'].keys())).intersection(set(['@value']))) == 1:
+                    value = opta_event['Games']['Game']['Event'][i]['Q']['@value']
+                else:
+                    value = None
+            
+                opta_event_data.append([competition_id, competition_name, season_id, season_name, game_id, match_day, 
+                    game_date, period_1_start, period_2_start, home_score, home_team_id, home_team_name, 
+                    away_score, away_team_id, away_team_name, fixture, result, 
+                    unique_event_id, event_id, period_id, mins, sec, timestamp, type_id, player_id, team_id, outcome, keypass, assist,
+                    x, y, qualifier_id, value])
+            else:
+                for j in range(len(opta_event['Games']['Game']['Event'][i]['Q'])):
+                    qualifier_id = int(opta_event['Games']['Game']['Event'][i]['Q'][j]['@qualifier_id'])
+                    #check whether '@value' is present or not
+                    if len(set(list(opta_event['Games']['Game']['Event'][i]['Q'][j].keys())).intersection(set(['@value']))) == 1: #value present
+                        value = opta_event['Games']['Game']['Event'][i]['Q'][j]['@value']
+                    else:
+                        value = None
+
+                    #append everything
+                    opta_event_data.append([competition_id, competition_name, season_id, season_name, game_id, match_day, 
+                        game_date, period_1_start, period_2_start, home_score, home_team_id, home_team_name, 
+                        away_score, away_team_id, away_team_name, fixture, result, 
+                        unique_event_id, event_id, period_id, mins, sec, timestamp, type_id, player_id, team_id, outcome, keypass, assist,
+                        x, y, qualifier_id, value])
+
+    #convert the list to a pandas dataframe
+    opta_event_data_df = pd.DataFrame(opta_event_data, index = None, columns = ['competition_id', 'competition_name', 'season_id', 'season_name', 'game_id', 'match_day', 
+                        'game_date', 'period_1_start', 'period_2_start', 'home_score', 'home_team_id', 'home_team_name', 
+                        'away_score', 'away_team_id', 'away_team_name', 'fixture', 'result', 
+                        'unique_event_id', 'event_id', 'period_id', 'min', 'sec', 'timestamp', 'type_id', 'player_id', 'team_id', 'outcome', 'keypass', 'assist',
+                        'x', 'y', 'qualifier_id', 'value'])
+
+    return (opta_event_data_df, game_id, game_date, away_score, away_team_id, away_team_name, home_score, home_team_id, home_team_name)
+
+while sum(['dummy' in x for y in os.listdir('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21')) for x in y.split(' ')]) > 0:
+    time.sleep(5)
+    pass
+
+open('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21') + '\\' + 'integration with f73 data dummy.txt', 'w').close()
 
 #get all shot events
 def get_shots(path_events, path_match_results):
@@ -96,12 +218,12 @@ def get_shots(path_events, path_match_results):
 
     return data_shots
 
-seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
-#seasons = ['2019-20']
+#seasons = ['2016-17', '2017-18', '2018-19', '2019-20', '2020-21']
+seasons = ['2020-21']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
-    #folders_to_keep = ['Premier League']
+    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    folders_to_keep = ['Premier League']
     #folders_to_keep = ['Champions League']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
@@ -227,3 +349,6 @@ for season in seasons:
                 )) + 1  # adding a little extra space
             worksheet.set_column(idx, idx, max_len)  # set column width
         writer.save()
+
+
+os.remove('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21') + '\\' + 'integration with f73 data dummy.txt') 

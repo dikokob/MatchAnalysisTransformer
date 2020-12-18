@@ -10,7 +10,33 @@ os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory wh
 from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
 from crosses_loop_in_tracking_data import only_open_play_crosses, cross_label, crosses_classification
 
-path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
+# path_squads = '\\\ctgshares\\Drogba\\Analysts\\Shared Assets\\srml-8-2019-squads.xml'
+
+# try:
+#     with open(path_squads, encoding = 'utf-8') as fd:
+#         opta_squads = xmltodict.parse(fd.read())
+# except UnicodeDecodeError:
+#     with open(path_squads, encoding = 'latin-1') as fd:
+#         opta_squads = xmltodict.parse(fd.read())
+
+# list_squads = []
+# for i in range(19):
+#     data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
+#     if '@loan' in data_players_in.columns:
+#         data_players_in = data_players_in.drop(['@loan'], axis = 1)
+#     data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+#     if '@loan' in data_players_out.columns:
+#         data_players_out = data_players_out.drop(['@loan'], axis = 1)
+#     data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+#     data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
+#     list_squads.append(data_players)
+
+# data_squads = pd.concat(list_squads).reset_index(drop=True)
+# data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+# data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+
+#path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
+path_squads = '\\\ctgshares\\Drogba\\Analysts\\Shared Assets\\srml-8-2020-squads.xml'
 
 try:
     with open(path_squads, encoding = 'utf-8') as fd:
@@ -24,16 +50,24 @@ for i in range(20):
     data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
     if '@loan' in data_players_in.columns:
         data_players_in = data_players_in.drop(['@loan'], axis = 1)
-    data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
-    if '@loan' in data_players_out.columns:
-        data_players_out = data_players_out.drop(['@loan'], axis = 1)
-    data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+    if 'PlayerChanges' in list(opta_squads['SoccerFeed']['SoccerDocument'].keys()):
+        try:
+            data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+            if '@loan' in data_players_out.columns:
+                data_players_out = data_players_out.drop(['@loan'], axis = 1)
+            data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+        except:
+            data_players = data_players_in.reset_index(drop=True)
+    else:
+        data_players = data_players_in.reset_index(drop=True)
     data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
     list_squads.append(data_players)
 
 data_squads = pd.concat(list_squads).reset_index(drop=True)
+data_squads = data_squads[pd.Series([type(x) for x in data_squads.Stat])==list].reset_index(drop=True)
 data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
-data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates(['@uID']).reset_index(drop=True)
+
 
 #set_pieces_full = data_set_pieces
 #shots_full = data_set_piece_shots
@@ -43,6 +77,13 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
     import json
 
     data_crosses['Player Name'] = None
+    data_crosses['Cross After A Penalty Kick'] = 'No'
+    data_crosses['Penalty Kick OPTA ID'] = np.nan 
+    data_crosses['Time Between Penalty Kick And Cross'] = np.nan
+    data_crosses['Cross After A Throw-in'] = 'No'
+    data_crosses['Throw-in OPTA ID'] = np.nan 
+    data_crosses['Time Between Throw-in And Cross'] = np.nan
+    data_crosses['Time Lapsed From Cross And First Contact'] = np.nan
     event_type_id = pd.read_excel('C:\\Users\\fbettuzzi\\Desktop\\Chelsea\\OPTA\\f24 - ID definitions.xlsx')
     list_all_shots = []
     list_aerial_duels = []
@@ -91,6 +132,21 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             game_state = np.sign(goal_diff_attack_v_defense)
             game_state_word = np.where(game_state==-1, 'losing', np.where(game_state==0, 'drawing', 'winning')).tolist()
 
+            #we need to use this for 2nd phase crosses
+            # data_last_set_piece = set_pieces_full[(set_pieces_full['game_id'] == 
+            #     data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (set_pieces_full['Attacking Team'] == 
+            #     data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (set_pieces_full['period_id'] == 
+            #     data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (set_pieces_full['Time_in_Seconds'] < 
+            #     data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])].sort_values(['Time_in_Seconds']).reset_index(drop=True)
+
+
+            data_last_set_piece = opta_event_data_df[(opta_event_data_df.period_id==
+                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds < data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                int(data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0].replace('t', ''))) & (opta_event_data_df.period_id != 
+                5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds']).reset_index(drop=True)               
+            data_last_set_piece = data_last_set_piece.rename(columns = {'unique_event_id': 'OPTA Event ID'})
+
+
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Goals Scored'] = attacking_team_goals_up_to_freekick_excluded
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Goals Conceded'] = defending_team_goals_up_to_freekick_excluded
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Goal Difference'] = goal_diff_attack_v_defense
@@ -130,7 +186,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         data_shots[data_shots.from_corner==1]['Time_in_Seconds']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
                         data_shots[data_shots.from_corner==1]['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
                         data_shots[data_shots.from_corner==1]['game_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]==
-                        data_shots[data_shots.from_corner==1]['team_id']))) | (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
+                        data_shots[data_shots.from_corner==1]['related_event_team_id']))) | (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
                         data_corners['Time_in_Seconds_Relevant'] + 15.0) & (data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] >= 
                         data_corners['Time_in_Seconds_Relevant']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
                         data_corners['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
@@ -148,22 +204,29 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
 
                         #we have already ruled out crosses being the actual corner pass or being the relevant pass
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Corner Situation'
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_corners[(data_corners['game_id'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_corners['Attacking Team'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_corners['period_id'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_corners['Time_in_Seconds'] < 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+                        if data_last_set_piece.shape[0] > 0:
+                            if data_corners[(data_corners['game_id'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_corners['Attacking Team'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_corners['period_id'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_corners['Time_in_Seconds'] < 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
                         
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_corners[data_corners['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_corners[data_corners['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                            cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                            cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                            cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_corners[data_corners['OPTA Event ID']==
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([6,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Corner Situation'
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_corners[(data_corners['game_id'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_corners['Attacking Team'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_corners['period_id'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_corners['Time_in_Seconds'] < 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+                                
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_corners[data_corners['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_corners[data_corners['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_corners[data_corners['OPTA Event ID']==
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([6,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
 
-                        #continue
-                        sentinel = 1
+                                #continue
+                                sentinel = 1
 
 
 
@@ -214,7 +277,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                 data_shots[data_shots.from_set_piece==1]['Time_in_Seconds']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
                                 data_shots[data_shots.from_set_piece==1]['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
                                 data_shots[data_shots.from_set_piece==1]['game_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]==
-                                data_shots[data_shots.from_set_piece==1]['team_id'])):
+                                data_shots[data_shots.from_set_piece==1]['related_event_team_id'])):
 
                                 if (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
                                     data_fl['Time_in_Seconds_Relevant'] + 60.0) & (data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] >= 
@@ -222,23 +285,30 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                     data_fl['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
                                     data_fl['game_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]==
                                     data_fl['Attacking Team']))):
-                
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation'
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_fl[(data_fl['game_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] < 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
 
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_fl[data_fl['OPTA Event ID']==
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                    if data_last_set_piece.shape[0] > 0:
+                                        if data_fl[(data_fl['game_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] < 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
 
-                                    #continue
-                                    sentinel = 1
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation'
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_fl[(data_fl['game_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] < 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_fl[data_fl['OPTA Event ID']==
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+
+                                            #continue
+                                            sentinel = 1
 
                                 if (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
                                     data_out['Time_in_Seconds_Relevant'] + 60.0) & (data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] >= 
@@ -247,27 +317,34 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                     data_out['game_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]==
                                     data_out['Attacking Team']))):
 
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation No Target'
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_out[(data_out['game_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]     
+                                    if data_last_set_piece.shape[0] > 0:
+                                        if data_out[(data_out['game_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
 
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_out[data_out['OPTA Event ID']==
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation No Target'
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_out[(data_out['game_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]     
 
-                                    #continue  
-                                    sentinel = 1                     
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_out[data_out['OPTA Event ID']==
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+
+                                            #continue  
+                                            sentinel = 1                     
 
                     
                             else:
                                 if (np.any((((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
-                                    data_fl['Time_in_Seconds_Relevant'] + 10.0) & (data_fl['Frontal/Lateral Start']=='Start Central')) | ((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
+                                    data_fl['Time_in_Seconds_Relevant'] + 10.0) & (data_fl['Frontal/Lateral Start']=='Start Frontal')) | ((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
                                     data_fl['Time_in_Seconds_Relevant'] + 15.0) & (data_fl['Frontal/Lateral Start']=='Start Lateral'))) & (data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] >= 
                                     data_fl['Time_in_Seconds_Relevant']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
                                     data_fl['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
@@ -283,24 +360,32 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                     (data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0] == 
                                         data_crosses[data_crosses['Cross Type'] == '2nd Phase From Freekick Situation']['Attacking Team Name']))):
 
+                                    
 
                                     #we have already ruled out crosses being the actual corner pass or being the relevant pass
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation'
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_fl[(data_fl['game_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] < 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+                                    if data_last_set_piece.shape[0] > 0:
+                                        if data_fl[(data_fl['game_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] <= 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
+                                    
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation'
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_fl[(data_fl['game_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_fl['Attacking Team'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_fl['period_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_fl['Time_in_Seconds'] <= 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
 
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_fl[data_fl['OPTA Event ID']==
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_fl[data_fl['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_fl[data_fl['OPTA Event ID']==
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
 
-                                    #continue
-                                    sentinel = 1
+                                            #continue
+                                            sentinel = 1
 
 
                                 if (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
@@ -321,23 +406,30 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
 
                                     #we have already ruled out crosses being the actual corner pass or being the relevant pass
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation No Target'
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_out[(data_out['game_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+                                    if data_last_set_piece.shape[0] > 0:
+                                        if data_out[(data_out['game_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
+                                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
 
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                                        cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_out[data_out['OPTA Event ID']==
-                                        data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation No Target'
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_out[(data_out['game_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_out['Attacking Team'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_out['period_id'] == 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_out['Time_in_Seconds'] < 
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
 
-                
-                                    #continue
-                                    sentinel = 1
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_out[data_out['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                                cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_out[data_out['OPTA Event ID']==
+                                                data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+
+                        
+                                            #continue
+                                            sentinel = 1
 
 
             #check for freekick shots
@@ -384,27 +476,76 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
                 
                         #we have already ruled out crosses being the actual corner pass or being the relevant pass
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Shot Situation'
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_freekick_shots[(data_freekick_shots['game_id'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_freekick_shots['Attacking Team'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_freekick_shots['period_id'] == 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_freekick_shots['Time_in_Seconds'] < 
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
+                        if data_last_set_piece.shape[0] > 0:
+                            if data_freekick_shots[(data_freekick_shots['game_id'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_freekick_shots['Attacking Team'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_freekick_shots['period_id'] == 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_freekick_shots['Time_in_Seconds'] < 
+                                data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1] == data_last_set_piece['OPTA Event ID'].iloc[-1]:
 
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_freekick_shots[data_freekick_shots['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
-                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_freekick_shots[data_freekick_shots['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
-                            cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
-                            cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
-                            cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_freekick_shots[data_freekick_shots['OPTA Event ID']==
-                            data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,27,28,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Shot Situation'
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = data_freekick_shots[(data_freekick_shots['game_id'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]) & (data_freekick_shots['Attacking Team'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Attacking Team Name'].iloc[0]) & (data_freekick_shots['period_id'] == 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_freekick_shots['Time_in_Seconds'] < 
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0])]['OPTA Event ID'].iloc[-1]
 
-                        #continue
-                        sentinel = 1
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_freekick_shots[data_freekick_shots['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= data_freekick_shots[data_freekick_shots['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != data_freekick_shots[data_freekick_shots['OPTA Event ID']==
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+
+                                #continue
+                                sentinel = 1
 
 
             if sentinel == 0:
                 data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = 'Open Play'
                 data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = None
+
+                
+                if (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
+                    data_shots[data_shots.from_penalty==1]['Time_in_Seconds'] + 15.0) & (data_crosses[data_crosses.unique_event_id==
+                    cross_id]['Time_in_Seconds'].iloc[0] >= 
+                    data_shots[data_shots.from_penalty==1]['Time_in_Seconds']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
+                    data_shots[data_shots.from_penalty==1]['period_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0]==
+                    data_shots[data_shots.from_penalty==1]['game_id']) & (data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]==
+                    data_shots[data_shots.from_penalty==1]['team_id']))):
+
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross After A Penalty Kick'] = 'Yes'
+                    penalty_opta_id = data_shots[(data_shots.from_penalty==
+                        1) & (data_shots.game_id==data_crosses[data_crosses.unique_event_id==
+                        cross_id]['game_id'].iloc[0]) & (data_shots.period_id==data_crosses[data_crosses.unique_event_id==
+                        cross_id]['period_id'].iloc[0]) & (data_shots['Time_in_Seconds'] <= data_crosses[data_crosses.unique_event_id==
+                        cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots['Time_in_Seconds'] >= data_crosses[data_crosses.unique_event_id==
+                        cross_id]['Time_in_Seconds'].iloc[0] - 15.0) & (data_shots['team_id'] == data_crosses[data_crosses.unique_event_id==
+                        cross_id]['team_id'].iloc[0])]['unique_event_id'].iloc[-1]
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Penalty Kick OPTA ID'] = penalty_opta_id
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Penalty Kick And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - data_shots[data_shots.unique_event_id==penalty_opta_id]['Time_in_Seconds'].iloc[0]
+
+
+                if (np.any((data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] <= 
+                    opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107)]['time_in_seconds'] + 7.0) & (data_crosses[data_crosses.unique_event_id==
+                    cross_id]['Time_in_Seconds'].iloc[0] >= 
+                    opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107)]['time_in_seconds']) & (data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]==
+                    opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107)]['period_id']) & (int(data_crosses[data_crosses.unique_event_id==cross_id]['game_id'].iloc[0].replace('f', ''))==
+                    opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107)]['game_id']) & (int(data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0].replace('t', ''))==
+                    opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107)]['team_id']))):
+
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross After A Throw-in'] = 'Yes'
+                    throw_in_opta_id = opta_event_data_df[(opta_event_data_df.type_id==1) & (opta_event_data_df.qualifier_id==107) & (opta_event_data_df.game_id==
+                        int(data_crosses[data_crosses.unique_event_id==
+                        cross_id]['game_id'].iloc[0].replace('f',''))) & (opta_event_data_df.period_id==data_crosses[data_crosses.unique_event_id==
+                        cross_id]['period_id'].iloc[0]) & (opta_event_data_df['time_in_seconds'] <= data_crosses[data_crosses.unique_event_id==
+                        cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['time_in_seconds'] >= data_crosses[data_crosses.unique_event_id==
+                        cross_id]['Time_in_Seconds'].iloc[0] - 7.0) & (opta_event_data_df['team_id'] == int(data_crosses[data_crosses.unique_event_id==
+                        cross_id]['team_id'].iloc[0].replace('t', '')))]['unique_event_id'].iloc[-1]
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Throw-in OPTA ID'] = throw_in_opta_id
+                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Throw-in And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - opta_event_data_df[opta_event_data_df.unique_event_id==throw_in_opta_id]['time_in_seconds'].iloc[0]
+
+
 
             aerial_duel_is_shot = 0 
         
@@ -446,14 +587,82 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                     opta_event_data_df[opta_event_data_df.unique_event_id==cross_id]['event_id'].iloc[0])) & (data_shots.related_event_team_id == 
                     data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0]) & (data_shots.period_id==data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (data_shots.Time_in_Seconds >= 
                     data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (data_shots.Time_in_Seconds <= 
-                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))))].sort_values(['Time_in_Seconds']).reset_index(drop=True)                
+                    60 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))))].sort_values(['Time_in_Seconds']).reset_index(drop=True)      
+
+                if set_pieces_full[(set_pieces_full['OPTA Event ID']==cross_id) | (set_pieces_full['Relevant OPTA Event ID']==cross_id)]['Frontal/Lateral Start'].iloc[0] == 'Start Frontal':
+                    qualifying_shots = qualifying_shots[qualifying_shots.from_set_piece==1].reset_index(drop=True)         
                 #we do that to make sure we remove shots which would be referred actually to 2nd phase crosses
             if qualifying_shots.shape[0] > 0:
                 for opta_id_shot in qualifying_shots.unique_event_id.tolist():
-                    if data_crosses[(data_crosses.game_id==game) & (data_crosses.period_id==
+
+                    if (data_crosses[(data_crosses.game_id==game) & (data_crosses.period_id==
                         data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (data_crosses.Time_in_Seconds <= qualifying_shots[qualifying_shots.unique_event_id==
-                        opta_id_shot]['Time_in_Seconds'].iloc[0]) & (data_crosses.team_id==data_shots[data_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds'])['unique_event_id'].iloc[-1] != cross_id:
-                        qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)             
+                        opta_id_shot]['Time_in_Seconds'].iloc[0]) & (data_crosses.team_id==qualifying_shots[qualifying_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds'])['unique_event_id'].iloc[-1] != cross_id):
+
+                        qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)
+
+
+                    else:    
+                        if (set_pieces_full[(set_pieces_full.game_id==game) & (set_pieces_full.period_id==
+                            data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (set_pieces_full['Time_in_Seconds'] <= qualifying_shots[qualifying_shots.unique_event_id==
+                            opta_id_shot]['Time_in_Seconds'].iloc[0]) & (set_pieces_full['Attacking Team ID']==qualifying_shots[qualifying_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds']).shape[0] > 0):
+                        
+                            if (set_pieces_full[(set_pieces_full.game_id==game) & (set_pieces_full.period_id==
+                                data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (set_pieces_full['Time_in_Seconds'] <= qualifying_shots[qualifying_shots.unique_event_id==
+                                opta_id_shot]['Time_in_Seconds'].iloc[0]) & (set_pieces_full['Attacking Team ID']==qualifying_shots[qualifying_shots.unique_event_id==opta_id_shot].related_event_team_id.iloc[0])].sort_values(['Time_in_Seconds'])['Time_in_Seconds'].iloc[-1] > data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]):
+
+                                qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)
+
+                        if opta_id_shot in qualifying_shots.unique_event_id.tolist():
+                            if (opta_event_data_df[(opta_event_data_df.period_id==
+                                data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                                opta_id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                                int(data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0].replace('t', ''))) & (opta_event_data_df.period_id != 
+                                5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds']).shape[0] > 0):
+
+                                if (opta_event_data_df[(opta_event_data_df.period_id==
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                                    opta_id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                                    int(data_crosses[data_crosses.unique_event_id==cross_id]['team_id'].iloc[0].replace('t', ''))) & (opta_event_data_df.period_id != 
+                                    5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds'])['time_in_seconds'].iloc[-1] > data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]):    
+
+                                    qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id!=opta_id_shot].reset_index(drop=True)
+                
+                if (qualifying_shots.shape[0] > 0):
+                    if ('2nd Phase' in data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0]) & (qualifying_shots.sort_values(['Time_in_Seconds']).from_regular_play.sum() == qualifying_shots.shape[0]):
+                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = 'Open Play'
+                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = None
+                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = None
+                        data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = None
+                    
+                    if (data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0] == 'Open Play') & ((qualifying_shots.sort_values(['Time_in_Seconds']).from_set_piece + qualifying_shots.sort_values(['Time_in_Seconds']).from_corner).sum() > 0):
+                        set_piece_event_id = data_last_set_piece['OPTA Event ID'].iloc[-1]
+                        if set_piece_event_id in set_pieces_full['OPTA Event ID'].tolist():
+                            if 'Free Kick' in set_pieces_full[set_pieces_full['OPTA Event ID']==set_piece_event_id]['Set Piece Type'].iloc[0]: #qualifying_shots.sort_values(['Time_in_Seconds']).from_corner.sum() == 0:
+                                if set_piece_event_id in data_fl['OPTA Event ID'].tolist():
+                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation'
+                                if set_piece_event_id in data_out['OPTA Event ID'].tolist():
+                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Situation No Target'
+                                if set_piece_event_id in data_freekick_shots['OPTA Event ID'].tolist():
+                                    data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Freekick Shot Situation'
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = set_piece_event_id                    
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - set_pieces_full[set_pieces_full['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= set_pieces_full[set_pieces_full['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != set_pieces_full[set_pieces_full['OPTA Event ID']==
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([5,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+                            if 'Corner' in set_pieces_full[set_pieces_full['OPTA Event ID']==set_piece_event_id]['Set Piece Type'].iloc[0]: #if qualifying_shots.sort_values(['Time_in_Seconds']).from_set_piece.sum() == 0:
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Cross Type'] = '2nd Phase From Corner Situation'
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Set Piece OPTA Event ID'] = set_piece_event_id                    
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Between Relevant Pass And Cross'] = data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0] - set_pieces_full[set_pieces_full['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]
+                                data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Number Events Between Relevant Pass And Cross'] = opta_event_data_df[(opta_event_data_df.time_in_seconds >= set_pieces_full[set_pieces_full['OPTA Event ID']==data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Time_in_Seconds_Relevant'].iloc[0]) & (opta_event_data_df.time_in_seconds <= data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id == data_crosses[data_crosses.unique_event_id==
+                                    cross_id]['period_id'].iloc[0]) & (opta_event_data_df.unique_event_id != set_pieces_full[set_pieces_full['OPTA Event ID']==
+                                    data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0]]['Relevant OPTA Event ID'].iloc[0]) & (opta_event_data_df.unique_event_id != cross_id) & (~opta_event_data_df.type_id.isin([6,43,70]))].drop_duplicates(['unique_event_id']).shape[0]
+
+
             if qualifying_shots.shape[0] == 0:
                 shot_event_ids = None
                 shot_player_ids = None
@@ -509,7 +718,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         opta_type_id_between_shot = None
                         opta_descr_between_shot = None
                     else:
-                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,27,28,43,70]))].reset_index(drop=True)
+                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,43,70]))].reset_index(drop=True)
                         if data_between_set_piece_and_shot_reduced.shape[0] == 0:
                             number_events_in_between_shot = 0
                             opta_event_id_between_shot = None
@@ -519,7 +728,20 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                             number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
                             opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
                             opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
-                            opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            try:
+                                opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            except:
+                                opta_descr_between_shot = ''
+                                for x in opta_type_id_between_shot.split(', '):
+                                    if int(x) in event_type_id.type_id.tolist():
+                                        opta_descr_between_shot = opta_descr_between_shot + event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] + ', '
+                                    else:
+                                        if int(x) == 83:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Attempted Tackle (post-match only)' +', '
+                                        else:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Event not identified' + ', '
+                            if opta_descr_between_shot.endswith(', '):
+                                opta_descr_between_shot = opta_descr_between_shot[:-2]
 
 
                     list_all_shots.append([cross_id, shot_event_id, shot_player_id, shot_player_name, shot_team_id, 
@@ -531,7 +753,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             events_after_relevant_pass = opta_event_data_df[(~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.iloc[:(where_relevant_pass+1)].unique())) & (opta_event_data_df.time_in_seconds >= 
                 data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.time_in_seconds <= 
                 10 + data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df.period_id ==
-                data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (~opta_event_data_df.type_id.isin([27,28,43,55,70])) & (opta_event_data_df.unique_event_id != cross_id)].reset_index(drop=True)
+                data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) & (~opta_event_data_df.type_id.isin([21,34,35,36,38,39,40,43,53,55,58,63,69,70,71,77,79,83])) & (opta_event_data_df.unique_event_id != cross_id)].reset_index(drop=True)
 
             if events_after_relevant_pass.shape[0] > 0:  
                 if events_after_relevant_pass.type_id.iloc[0] == 5:
@@ -541,6 +763,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                             233) & (opta_event_data_df['value']==
                             str(int(events_after_relevant_pass.event_id.iloc[0]))) & (opta_event_data_df.team_id != events_after_relevant_pass.team_id.iloc[0])])))].reset_index(drop=True)
 
+            first_contact_keypass_assist = None 
             first_contact_aerial = 0
             first_contact_shot = 0
             first_contact_x = np.nan
@@ -548,19 +771,37 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             description = None
             first_contact_event_id = np.nan
             if events_after_relevant_pass.shape[0] > 0:
-                if events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,41,44,45,49,50,51,52,53,54,56,59,61,74]:
+                if (events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,27,30,41,44,45,49,50,51,52,54,56,59,60,61,67,74]) & (data_crosses[data_crosses.unique_event_id==cross_id].type_id.iloc[0]!=2):
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['keypass'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Keypass'
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['assist'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Assist'
                     if (3 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                         first_contact_aerial = 1
                     if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['type_id'].iloc[0] in [13,14,15,16]:
                         first_contact_shot = 1
-                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44]:
+                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44, 67]:
                         if events_after_relevant_pass.type_id.iloc[0] in event_type_id.type_id.tolist():
                             if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Headed Clearance'
                             elif (events_after_relevant_pass.type_id.iloc[0] == 16) & (28 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Own Goal'
+                                if 15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist():
+                                    description = 'Headed' + ' ' + description
                             else:
                                 description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
+                                if first_contact_aerial == 1:
+                                    if len(set([3, 15]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Headed' + ' ' + description
+                                    elif len(set([168]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Flick-on' + ' ' + description
+                                if events_after_relevant_pass.type_id.iloc[0] in [1, 3, 7, 61]:
+                                    description = np.where(events_after_relevant_pass.outcome.iloc[0]==1, 'Successful', 'Unsuccessful').tolist() + ' ' + description
+                                    if (238 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                                        description = description + ' ' + '(fair-play)'
+                                if events_after_relevant_pass.type_id.iloc[0] == 51:
+                                    description = description + ' ' + np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 169, 'leading to attempt', 
+                                        np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 170, 'leading to goal', '')).tolist()
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
                         first_contact_event_id = events_after_relevant_pass.unique_event_id.iloc[0]
                         if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
@@ -575,6 +816,18 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                         first_contact_x = events_after_relevant_pass['x'].iloc[0]
                         first_contact_y = events_after_relevant_pass['y'].iloc[0]
                     else:
+                        if events_after_relevant_pass.type_id.iloc[0] == 67:
+                            #first_contact_aerial = 1
+                            description = '50/50 Won'
+                            first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                            first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==1].unique_event_id.iloc[0]
+                            first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]))
+                            first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['team_id'].iloc[0]))
+                            first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                            first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
+                                home_team_name, away_team_name).tolist()
+                            first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['x'].iloc[0]
+                            first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['y'].iloc[0]
                         if events_after_relevant_pass.type_id.iloc[0] == 44:
                             first_contact_aerial = 1
                             description = 'Aerial Duel Won'
@@ -600,14 +853,27 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                 first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
                                 first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
-                                first_contact_type = None 
-                                first_contact_event_id = np.nan
-                                first_contact_player_id = None 
-                                first_contact_player_name = None 
-                                first_contact_team_id = None 
-                                first_contact_team_name = None 
-                                first_contact_aerial = None 
-                                first_contact_shot = None
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for illegal restart'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
+                                    home_team_name, away_team_name).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
+                            elif (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for shot hitting offside player'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(home_team_id)), 
+                                    home_team_name, away_team_name).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]   
                             elif (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
                                 first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
                                 first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
@@ -732,6 +998,13 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                     first_contact_y = float(opta_event_data_df[(opta_event_data_df.unique_event_id==cross_id) & (opta_event_data_df.qualifier_id==141)]['value'].iloc[0])
 
 
+            time_between_relevant_and_first_contact = np.nan
+            if events_after_relevant_pass.shape[0] > 0:
+                if (first_contact_type is not None):
+                    time_between_relevant_and_first_contact = np.round(events_after_relevant_pass.time_in_seconds.iloc[0] - (data_crosses[data_crosses.unique_event_id==cross_id]['Time_in_Seconds'].iloc[0]))
+                if first_contact_keypass_assist is not None:
+                    description = description + ' (' + first_contact_keypass_assist + ')'
+
             goalkeeper_id = 'p' + str(int(opta_event_data_df[(opta_event_data_df.type_id==34) & (opta_event_data_df.qualifier_id==30) & (opta_event_data_df.team_id==int(data_crosses[data_crosses.unique_event_id==cross_id]['Defending Team ID'].iloc[0].replace('t','')))]['value'].tolist()[0].split(',')[0]))
             gk_name = player_names_raw[player_names_raw['@uID']==goalkeeper_id]['player_name'].iloc[0]
             gk_sub_off = np.where(len(set([int(goalkeeper_id.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==18].unique().tolist()))) == 1, 1, 0).tolist()
@@ -775,6 +1048,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'First Contact Y Coordinate'] = first_contact_y
             data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Length Pass'] = np.round(np.sqrt((data_crosses[data_crosses.unique_event_id==cross_id]['x'].iloc[0]/100.0*length_pitch - data_crosses[data_crosses.unique_event_id==cross_id]['x_end'].iloc[0]/100.0*length_pitch)**2 + (data_crosses[data_crosses.unique_event_id==cross_id]['y'].iloc[0]/100.0*width_pitch - data_crosses[data_crosses.unique_event_id==cross_id]['y_end'].iloc[0]/100.0*width_pitch)**2), 2)
             data_crosses.loc[data_crosses.unique_event_id==cross_id, '% Distance Along X'] = np.round(data_crosses[data_crosses.unique_event_id==cross_id]['x_end'].iloc[0] - data_crosses[data_crosses.unique_event_id==cross_id]['x'].iloc[0], 1)
+            data_crosses.loc[data_crosses.unique_event_id==cross_id, 'Time Lapsed From Cross And First Contact'] = time_between_relevant_and_first_contact
 
             if '2nd Phase' in data_crosses[data_crosses.unique_event_id==cross_id]['Cross Type'].iloc[0]:
                 if sum(data_crosses['Set Piece OPTA Event ID']==data_crosses[data_crosses.unique_event_id==cross_id]['Set Piece OPTA Event ID'].iloc[0])==1:
@@ -838,7 +1112,7 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                     opta_type_id_between_shot = None
                                     opta_descr_between_shot = None
                                 else:
-                                    data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,27,28,43,70]))].reset_index(drop=True)
+                                    data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,6,43,70]))].reset_index(drop=True)
                                     if data_between_set_piece_and_shot_reduced.shape[0] == 0:
                                         number_events_in_between_shot = 0
                                         opta_event_id_between_shot = None
@@ -848,7 +1122,20 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
                                         number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
                                         opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
                                         opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
-                                        opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                                        try:
+                                            opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                                        except:
+                                            opta_descr_between_shot = ''
+                                            for x in opta_type_id_between_shot.split(', '):
+                                                if int(x) in event_type_id.type_id.tolist():
+                                                    opta_descr_between_shot = opta_descr_between_shot + event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] + ', '
+                                                else:
+                                                    if int(x) == 83:
+                                                        opta_descr_between_shot = opta_descr_between_shot + 'Attempted Tackle (post-match only)' +', '
+                                                    else:
+                                                        opta_descr_between_shot = opta_descr_between_shot + 'Event not identified' + ', '
+                                        if opta_descr_between_shot.endswith(', '):
+                                            opta_descr_between_shot = opta_descr_between_shot[:-2]
 
                                 if shot_player_id in data_squads['@uID'].tolist():
                                     preferred_foot = data_squads[data_squads['@uID']==shot_player_id]['preferred_foot'].iloc[0]
@@ -912,7 +1199,8 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
             data_crosses.loc[data_crosses['unique_event_id']==cross_id, 'First Contact Shot'] = 1
     if np.any(data_crosses['First Contact Shot']==1):
         for cross_id in data_crosses[data_crosses['First Contact Shot']==1].drop_duplicates(['unique_event_id'])['unique_event_id']:
-            summary_df_all_shots.loc[(summary_df_all_shots['Cross OPTA Event ID']==cross_id) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Cross OPTA Event ID']==cross_id]['Shot OPTA ID'].iloc[0]), 'First Contact Shot'] = 1
+            if summary_df_all_shots[summary_df_all_shots['Cross OPTA Event ID']==cross_id].shape[0] > 0:
+                summary_df_all_shots.loc[(summary_df_all_shots['Cross OPTA Event ID']==cross_id) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Cross OPTA Event ID']==cross_id]['Shot OPTA ID'].iloc[0]), 'First Contact Shot'] = 1
 
     
     #here we add first contact coordinates to shots file
@@ -953,8 +1241,10 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
     'Player ID', 'Player Name', 'Preferred Foot', 'Outcome', 'Keypass/Assist', 'Blocked Pass', 'Cutback', 'OPTA Pull Back Qualifier',
     'Out Of Pitch', 'Ending Too Wide', 'Cross Type', 'Set Piece OPTA Event ID', 'OPTA Cross Qualifier', 'Time Between Set Piece And Cross', 'Number Events Between Set Piece And Cross',
     'Linked 2nd Phase Cross IDs', 'First Contact Event ID', 'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name',
-    'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate',
-    'Defending Goalkeeper ID', 'Defending Goalkeeper Name']]
+    'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Time Lapsed From Cross And First Contact',
+    'Defending Goalkeeper ID', 'Defending Goalkeeper Name', 'Cross After A Penalty Kick', 'Penalty Kick OPTA ID', 
+    'Time Between Penalty Kick And Cross', 'Cross After A Throw-in', 'Throw-in OPTA ID', 
+    'Time Between Throw-in And Cross']]
 
     shots_full = shots_full.sort_values(['Shot OPTA ID']).reset_index(drop=True)
 
@@ -1029,16 +1319,19 @@ def crosses_contextualisation(set_pieces_full, shots_full, data_crosses, data_sh
 
 
 ###loop
+seasons = ['2020-21']
 #seasons = ['2019-20']
-seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
+#seasons = ['2016-17', '2017-18', '2018-19', '2019-20', '2020-21']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
     #folders_to_keep = ['Premier League']
-    #folders_to_keep = ['Champions League']
+    folders_to_keep = ['Champions League']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
     for competition in folders_to_keep:
+        #if (season == '2019-20') & (competition == 'Premier League'):
+        #    continue
 
         ###import crosses alongside set pieces and corners and start to work out 
         #path_crosses = '\\\ctgshares\\Drogba\\Analysts\\FB\\2019-20\\set pieces classification\\crosses'
@@ -1113,7 +1406,7 @@ for season in seasons:
 
 
         parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}\\{}'.format(season, competition)
-        subfolders_to_keep = [x for x in os.listdir(parent_folder) if 'spectrum' not in x]
+        subfolders_to_keep = [x for x in os.listdir(parent_folder) if ('spectrum' not in x) & ('f73' not in x)]
 
         #we need to check whether we have already reached the game level folders or we are still at a higher level
         if sum([x.startswith('g') for x in subfolders_to_keep]) > 0: #if true, we already hit the game level folders

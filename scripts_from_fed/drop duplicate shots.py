@@ -6,17 +6,23 @@ import xmltodict
 import numpy as np 
 import time
 
-os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
+# os.chdir("\\\ctgshares\\Drogba\\Analysts\\FB\\automation scripts") #directory where the function lies
 
-from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
+# from opta_files_manipulation_functions import opta_event_file_manipulation, match_results_file_manipulation
 
+while sum(['dummy' in x for y in os.listdir('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21')) for x in y.split(' ')]) > 0:
+    time.sleep(5)
+    pass
 
-seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
+open('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21') + '\\' + 'drop duplicate shots dummy.txt', 'w').close()
+
+seasons = ['2020-21']
+#seasons = ['2016-17', '2017-18', '2018-19', '2019-20', '2020-21']
 #seasons = ['2019-20']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
-    #folders_to_keep = ['Premier League']
+    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    folders_to_keep = ['Premier League']
     #folders_to_keep = ['Champions League']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
@@ -67,3 +73,6 @@ for season in seasons:
                 )) + 1  # adding a little extra space
             worksheet.set_column(idx, idx, max_len)  # set column width
         writer.save()
+
+
+os.remove('\\\ctgshares\\Drogba\\API Data Files\\{}\\Premier League'.format('2020-21') + '\\' + 'drop duplicate shots dummy.txt') 

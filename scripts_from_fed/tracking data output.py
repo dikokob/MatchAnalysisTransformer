@@ -790,13 +790,13 @@ def tracking_data_output(data, data_tracking, core_stats, season, competition):
 
 
 ###loop
-#seasons = ['2019-20']
-seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
+seasons = ['2020-21']
+#seasons = ['2016-17', '2017-18', '2018-19', '2019-20', '2020-21']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}'.format(season)
-    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
-    #folders_to_keep = ['Champions League']
-    #folders_to_keep = ['FA Cup']
+    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    #folders_to_keep = ['Premier League']
+    folders_to_keep = ['Champions League']
     #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x)) & (x != 'Premier League')]
 
     for competition in folders_to_keep:
@@ -814,57 +814,57 @@ for season in seasons:
             path_crosses = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\{}.xlsx'.format(file_name)) 
             data_crosses = pd.read_excel(path_crosses)
 
-            # if 'set pieces' in file_name.lower(): 
-            #     data_crosses = data_crosses[(~data_crosses['Relevant OPTA Event ID'].duplicated()) | data_crosses['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
-            #     writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
-            #     data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
-            #     for idx, col in enumerate(data_crosses):  # loop through all columns
-            #         series = data_crosses[col]
-            #         max_len = max((
-            #             series.astype(str).map(len).max(),  # len of largest item
-            #             len(str(series.name))  # len of column name/header
-            #             )) + 1  # adding a little extra space
-            #         worksheet.set_column(idx, idx, max_len)  # set column width
-            #     writer.save() 
+            if 'set pieces' in file_name.lower(): 
+                data_crosses = data_crosses[(~data_crosses['Relevant OPTA Event ID'].duplicated()) | data_crosses['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
+                writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
+                data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+                worksheet = writer.sheets['Sheet1']  # pull worksheet object
+                for idx, col in enumerate(data_crosses):  # loop through all columns
+                    series = data_crosses[col]
+                    max_len = max((
+                        series.astype(str).map(len).max(),  # len of largest item
+                        len(str(series.name))  # len of column name/header
+                        )) + 1  # adding a little extra space
+                    worksheet.set_column(idx, idx, max_len)  # set column width
+                writer.save() 
 
-            #     data_crosses_old = pd.read_excel(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx')) 
-            #     data_crosses_old = data_crosses_old[(~data_crosses_old['Relevant OPTA Event ID'].duplicated()) | data_crosses_old['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)              
-            #     writer = pd.ExcelWriter(os.path.join(path_league_season, 'outputs', 'Set Pieces & Crosses\\Set Pieces Output.xlsx'), engine='xlsxwriter')
-            #     data_crosses_old.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
-            #     for idx, col in enumerate(data_crosses_old):  # loop through all columns
-            #         series = data_crosses_old[col]
-            #         max_len = max((
-            #             series.astype(str).map(len).max(),  # len of largest item
-            #             len(str(series.name))  # len of column name/header
-            #             )) + 1  # adding a little extra space
-            #         worksheet.set_column(idx, idx, max_len)  # set column width
-            #     writer.save()
+                data_crosses_old = pd.read_excel(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx')) 
+                data_crosses_old = data_crosses_old[(~data_crosses_old['Relevant OPTA Event ID'].duplicated()) | data_crosses_old['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)              
+                writer = pd.ExcelWriter(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx'), engine='xlsxwriter')
+                data_crosses_old.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+                worksheet = writer.sheets['Sheet1']  # pull worksheet object
+                for idx, col in enumerate(data_crosses_old):  # loop through all columns
+                    series = data_crosses_old[col]
+                    max_len = max((
+                        series.astype(str).map(len).max(),  # len of largest item
+                        len(str(series.name))  # len of column name/header
+                        )) + 1  # adding a little extra space
+                    worksheet.set_column(idx, idx, max_len)  # set column width
+                writer.save()
 
-            # if 'crosses' in file_name.lower():
-            #     path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data crosses')
-            # if 'set pieces' in file_name.lower():
-            #     path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data set pieces')
+            if 'crosses' in file_name.lower():
+                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data crosses')
+            if 'set pieces' in file_name.lower():
+                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data set pieces')
             
-            # data_crosses_tracking = pd.concat([pd.read_excel(os.path.join(path_crosses_tracking,x)) for x in os.listdir(path_crosses_tracking)], axis = 0).reset_index(drop=True)
+            data_crosses_tracking = pd.concat([pd.read_excel(os.path.join(path_crosses_tracking,x)) for x in os.listdir(path_crosses_tracking)], axis = 0).reset_index(drop=True)
 
-            # if data_crosses.shape[0] > len(data_crosses['OPTA Event ID'].unique()):
-            #     data_crosses = data_crosses.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
-            #     writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
-            #     data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-            #     worksheet = writer.sheets['Sheet1']  # pull worksheet object
-            #     for idx, col in enumerate(data_crosses):  # loop through all columns
-            #         series = data_crosses[col]
-            #         max_len = max((
-            #             series.astype(str).map(len).max(),  # len of largest item
-            #             len(str(series.name))  # len of column name/header
-            #             )) + 1  # adding a little extra space
-            #         worksheet.set_column(idx, idx, max_len)  # set column width
-            #     writer.save() 
-            #     data_crosses = pd.read_excel(path_crosses)
+            if data_crosses.shape[0] > len(data_crosses['OPTA Event ID'].unique()):
+                data_crosses = data_crosses.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
+                writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
+                data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
+                worksheet = writer.sheets['Sheet1']  # pull worksheet object
+                for idx, col in enumerate(data_crosses):  # loop through all columns
+                    series = data_crosses[col]
+                    max_len = max((
+                        series.astype(str).map(len).max(),  # len of largest item
+                        len(str(series.name))  # len of column name/header
+                        )) + 1  # adding a little extra space
+                    worksheet.set_column(idx, idx, max_len)  # set column width
+                writer.save() 
+                data_crosses = pd.read_excel(path_crosses)
 
-            #tracking_data_output(data_crosses, data_crosses_tracking, data_core_stats, season, competition) 
+            tracking_data_output(data_crosses, data_crosses_tracking, data_core_stats, season, competition) 
             
             if 'Set Pieces' in file_name:
                 file_name = 'Set Pieces'

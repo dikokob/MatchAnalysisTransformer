@@ -13,7 +13,8 @@ from crosses_loop_in_tracking_data import only_open_play_crosses, cross_label, c
 #path_match_results = file_results
 #path_track_meta = file_meta
 
-path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
+#path_squads = '\\\ctgshares\\Drogba\\API Data Files\\2019-20\\Squads & Results\\srml-8-2019-squads.xml'
+path_squads = '\\\ctgshares\\Drogba\\Analysts\\Shared Assets\\srml-8-2020-squads.xml'
 
 try:
     with open(path_squads, encoding = 'utf-8') as fd:
@@ -27,16 +28,23 @@ for i in range(20):
     data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
     if '@loan' in data_players_in.columns:
         data_players_in = data_players_in.drop(['@loan'], axis = 1)
-    data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
-    if '@loan' in data_players_out.columns:
-        data_players_out = data_players_out.drop(['@loan'], axis = 1)
-    data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+    if 'PlayerChanges' in list(opta_squads['SoccerFeed']['SoccerDocument'].keys()):
+        try:
+            data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+            if '@loan' in data_players_out.columns:
+                data_players_out = data_players_out.drop(['@loan'], axis = 1)
+            data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+        except:
+            data_players = data_players_in.reset_index(drop=True)
+    else:
+        data_players = data_players_in.reset_index(drop=True)
     data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
     list_squads.append(data_players)
 
 data_squads = pd.concat(list_squads).reset_index(drop=True)
+data_squads = data_squads[pd.Series([type(x) for x in data_squads.Stat])==list].reset_index(drop=True)
 data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
-data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates(['@uID']).reset_index(drop=True)
 
 # writer = pd.ExcelWriter('\\\ctgshares\\Drogba\\Analysts\\FB\\2019-20\\set pieces classification\\Players Squads File.xlsx', engine='xlsxwriter')
 # data_squads.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
@@ -827,7 +835,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
             opta_event_id_between = None
             opta_type_id_between = None
         else:
-            data_foul_off_reduced = data_foul_off[(~data_foul_off.type_id.isin([55,4,2,27,28,43,70]))].reset_index(drop=True)
+            data_foul_off_reduced = data_foul_off[(~data_foul_off.type_id.isin([55,4,2,43,70]))].reset_index(drop=True)
             if data_foul_off_reduced.shape[0] == 0:
                 number_events_in_between = 0
                 opta_event_id_between = None
@@ -923,8 +931,10 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                     attacking_team_id) & (data_shots.period_id==period_id) & (data_shots.Time_in_Seconds >= 
                     passes_in_window[index_longest_pass,-2]*60 + passes_in_window[index_longest_pass,-1]) & (data_shots.Time_in_Seconds <= 
                     60 + passes_in_window[index_longest_pass,-2]*60 + passes_in_window[index_longest_pass,-1])))].sort_values(['Time_in_Seconds']).reset_index(drop=True)
+                if frontal_lateral_start == 'Start Frontal':
+                    qualifying_shots = qualifying_shots[qualifying_shots.from_set_piece==1].reset_index(drop=True)
             else:
-                qualifying_shots = data_shots[(data_shots.unique_event_id != event_id_first_shot) & (((data_shots.Time_in_Seconds <= 
+                qualifying_shots = data_shots[(data_shots.from_set_piece==1) & (data_shots.unique_event_id != event_id_first_shot) & (((data_shots.Time_in_Seconds <= 
                     10 + min_shot*60 + sec_shot) & (data_shots.Time_in_Seconds >= 
                     min_shot*60 + sec_shot) & (data_shots.period_id==
                     period_id) & (data_shots.related_event_team_id==attacking_team_id)) | ((data_shots.from_set_piece==1) & (((data_shots.Time_in_Seconds >= 
@@ -946,6 +956,23 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                         qualifying_shots[qualifying_shots.unique_event_id==id_shot]['related_event_team_id'].iloc[0])]['unique_event_id'].iloc[-1] != freekick_event_id:
 
                         qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id != id_shot].reset_index(drop=True)
+
+                    else:
+                        if opta_event_data_df[(opta_event_data_df.period_id==
+                            qualifying_shots[qualifying_shots.unique_event_id==
+                            id_shot]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                            id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                            qualifying_shots[qualifying_shots.unique_event_id==id_shot].related_event_team_id.iloc[0]) & (opta_event_data_df.period_id != 
+                            5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds']).shape[0] > 0:
+
+                            if opta_event_data_df[(opta_event_data_df.period_id==
+                                qualifying_shots[qualifying_shots.unique_event_id==
+                                id_shot]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                                id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                                qualifying_shots[qualifying_shots.unique_event_id==id_shot].related_event_team_id.iloc[0]) & (opta_event_data_df.period_id != 
+                                5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds'])['unique_event_id'].iloc[-1] != freekick_event_id:    
+
+                                qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id != id_shot].reset_index(drop=True)
 
                 shot_event_ids = ', '.join([str(int(x)) for x in qualifying_shots.unique_event_id.tolist()])
                 shot_player_ids = ', '.join(qualifying_shots.player_id.tolist())
@@ -992,7 +1019,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                         opta_type_id_between_shot = None
                         opta_descr_between_shot = None
                     else:
-                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,27,28,43,70]))].reset_index(drop=True)
+                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([5,43,70]))].reset_index(drop=True)
                         if data_between_set_piece_and_shot_reduced.shape[0] == 0:
                             number_events_in_between_shot = 0
                             opta_event_id_between_shot = None
@@ -1002,7 +1029,20 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                             number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
                             opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
                             opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
-                            opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            try:
+                                opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            except:
+                                opta_descr_between_shot = ''
+                                for x in opta_type_id_between_shot.split(', '):
+                                    if int(x) in event_type_id.type_id.tolist():
+                                        opta_descr_between_shot = opta_descr_between_shot + event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] + ', '
+                                    else:
+                                        if int(x) == 83:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Attempted Tackle (post-match only)'  + ', '
+                                        else:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Event not identified' + ', '
+                            if opta_descr_between_shot.endswith(', '):
+                                opta_descr_between_shot = opta_descr_between_shot[:-2]
 
 
                     list_all_shots.append([freekick_event_id, shot_event_id, shot_player_id, shot_player_name, shot_team_id, 
@@ -1017,16 +1057,16 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
             if frontal_lateral_end != 'End Shot':
                 where_relevant_pass = np.where(opta_event_data_df.unique_event_id==passes_in_window[index_longest_pass,9])[0][-1]
                 events_after_relevant_pass = opta_event_data_df[(~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.iloc[:(where_relevant_pass+1)].unique())) & (opta_event_data_df.time_in_seconds >= 
-                    passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.unique_event_id != 
+                    passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.time_in_seconds <= 
+                    10 + passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.unique_event_id != 
                     freekick_event_id) & (opta_event_data_df.unique_event_id != 
-                    passes_in_window[index_longest_pass,9]) & (opta_event_data_df.time_in_seconds <= 
-                    10 + passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.period_id ==
-                    period_id) & (~opta_event_data_df.type_id.isin([27,28,43,55,70]))].reset_index(drop=True)
+                    passes_in_window[index_longest_pass,9]) & (opta_event_data_df.period_id ==
+                    period_id) & (~opta_event_data_df.type_id.isin([21,34,35,36,38,39,40,43,53,55,58,63,69,70,71,77,79,83]))].reset_index(drop=True)
 
             else:
                 events_after_relevant_pass = opta_event_data_df[(opta_event_data_df.time_in_seconds >= 
                     min_shot*60 + sec_shot) & (opta_event_data_df.unique_event_id!=event_id_first_shot) & (opta_event_data_df.time_in_seconds <= 10 + min_shot*60 + sec_shot) & (opta_event_data_df.period_id ==
-                    period_id) & (~opta_event_data_df.type_id.isin([27,28,43,55,70]))].reset_index(drop=True)                
+                    period_id) & (~opta_event_data_df.type_id.isin([21,34,35,36,38,39,40,43,53,55,58,63,69,70,71,77,79,83]))].reset_index(drop=True)                
 
             # if events_after_relevant_pass.shape[0] == 0:
             #     aerial_duel_ids = None
@@ -1035,7 +1075,8 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
             #     successful_team_id_duel = None 
             #     unsuccessful_player_id_duel = None 
             #     unsuccessful_player_name_duel = None
-            #     unsuccessful_team_id_duel = None 
+            #     unsuccessful_team_id_duel = None
+            first_contact_keypass_assist = None 
             first_contact_aerial = 0
             first_contact_shot = 0
             first_contact_x = np.nan
@@ -1043,19 +1084,37 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
             description = None
             first_contact_event_id = np.nan
             if events_after_relevant_pass.shape[0] > 0:
-                if events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,41,44,45,49,50,51,52,53,54,56,59,61,74]:
-                    if (3 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                if (events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,27,30,41,44,45,49,50,51,52,54,56,59,60,61,67,74]) & (passes_in_window[index_longest_pass,5]!=2):
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['keypass'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Keypass'
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['assist'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Assist'
+                    if (3 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                         first_contact_aerial = 1
                     if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['type_id'].iloc[0] in [13,14,15,16]:
-                        first_contact_shot = 1
-                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44]:
+                        first_contact_shot = 1    
+                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44, 67]:
                         if events_after_relevant_pass.type_id.iloc[0] in event_type_id.type_id.tolist():
-                            if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                            if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Headed Clearance'
-                            elif (events_after_relevant_pass.type_id.iloc[0] == 16) & (28 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                            elif (events_after_relevant_pass.type_id.iloc[0] == 16) & (28 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Own Goal'
+                                if 15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist():
+                                    description = 'Headed' + ' ' + description
                             else:
                                 description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
+                                if first_contact_aerial == 1:
+                                    if len(set([3, 15]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Headed' + ' ' + description
+                                    elif len(set([168]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Flick-on' + ' ' + description
+                                if events_after_relevant_pass.type_id.iloc[0] in [1, 3, 7, 61]:
+                                    description = np.where(events_after_relevant_pass.outcome.iloc[0]==1, 'Successful', 'Unsuccessful').tolist() + ' ' + description
+                                    if (238 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                                        description = description + ' ' + '(fair-play)'
+                                if events_after_relevant_pass.type_id.iloc[0] == 51:
+                                    description = description + ' ' + np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 169, 'leading to attempt', 
+                                        np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 170, 'leading to goal', '')).tolist()
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
                         first_contact_event_id = events_after_relevant_pass.unique_event_id.iloc[0]
                         if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
@@ -1070,6 +1129,18 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                         first_contact_x = events_after_relevant_pass['x'].iloc[0]
                         first_contact_y = events_after_relevant_pass['y'].iloc[0]
                     else:
+                        if events_after_relevant_pass.type_id.iloc[0] == 67:
+                            #first_contact_aerial = 1
+                            description = '50/50 Won'
+                            first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                            first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==1].unique_event_id.iloc[0]
+                            first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]))
+                            first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['team_id'].iloc[0]))
+                            first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                            first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                attacking_team, defending_team).tolist()
+                            first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['x'].iloc[0]
+                            first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['y'].iloc[0]
                         if events_after_relevant_pass.type_id.iloc[0] == 44:
                             first_contact_aerial = 1
                             description = 'Aerial Duel Won'
@@ -1095,14 +1166,27 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                                 first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
                                 first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
-                                first_contact_type = None 
-                                first_contact_event_id = np.nan
-                                first_contact_player_id = None 
-                                first_contact_player_name = None 
-                                first_contact_team_id = None 
-                                first_contact_team_name = None 
-                                first_contact_aerial = None 
-                                first_contact_shot = None
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for illegal restart'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                    attacking_team, defending_team).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
+                            elif (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for shot hitting offside player'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                    attacking_team, defending_team).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
                                 first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
                                 first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
@@ -1154,7 +1238,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                     if (events_after_relevant_pass.type_id.iloc[0] in [5,6]):
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
                         first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]
-                        description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
+                        description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0] + ' Lost'
                         if np.isnan(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]):
                             first_contact_player_id = None 
                             first_contact_player_name = None 
@@ -1226,8 +1310,13 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                     first_contact_x = float(opta_event_data_df[(opta_event_data_df.unique_event_id==passes_in_window[index_longest_pass,9]) & (opta_event_data_df.qualifier_id==140)]['value'].iloc[0])
                     first_contact_y = float(opta_event_data_df[(opta_event_data_df.unique_event_id==passes_in_window[index_longest_pass,9]) & (opta_event_data_df.qualifier_id==141)]['value'].iloc[0])
 
-
-
+        
+        time_between_relevant_and_first_contact = np.nan
+        if events_after_relevant_pass.shape[0] > 0:
+            if (first_contact_type is not None):
+                time_between_relevant_and_first_contact = np.round(events_after_relevant_pass.time_in_seconds.iloc[0] - (passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]))
+            if first_contact_keypass_assist is not None:
+                description = description + ' (' + first_contact_keypass_assist + ')'
 
         goalkeeper_id = 'p' + str(int(opta_event_data_df[(opta_event_data_df.type_id==34) & (opta_event_data_df.qualifier_id==30) & (opta_event_data_df.team_id==defending_team_id)]['value'].tolist()[0].split(',')[0]))
         gk_name = player_names_raw[player_names_raw['@uID']==goalkeeper_id]['player_name'].iloc[0]
@@ -1274,7 +1363,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                 number_events_in_between, opta_event_id_between,
                 player_ids_pass_sequence, player_names_pass_sequence, rolled, first_contact_event_id,
                 first_contact_type, description, first_contact_player_id, first_contact_player_name, first_contact_team_id, 
-                first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, goalkeeper_id, gk_name])     
+                first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, time_between_relevant_and_first_contact, goalkeeper_id, gk_name])     
             #continue  
         #else:
             #continue     
@@ -1301,7 +1390,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                     number_events_in_between, opta_event_id_between,
                     player_ids_pass_sequence, player_names_pass_sequence, rolled, first_contact_event_id,
                     first_contact_type, description, first_contact_player_id, first_contact_player_name, first_contact_team_id, 
-                    first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, goalkeeper_id, gk_name])
+                    first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, time_between_relevant_and_first_contact, goalkeeper_id, gk_name])
 
             else:
                 # qualifiers_shot = [int(x) for x in first_shot_qualifier_ids.split(', ')]
@@ -1322,11 +1411,12 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
                     np.where(goal_diff_attack_v_defense > 0, 'winning', np.where(goal_diff_attack_v_defense == 0, 'drawing', 'losing')).tolist()
                     ,np.where(direct==1, 'Direct', 'Indirect').tolist(),
                     freekick_event_id, period_id, freekick_mins, 
-                    freekick_secs, freekick_x_start, freekick_y_start, passes_in_window[0,2], passes_in_window[0,3], freekick_player_id, freekick_player_name, 
+                    freekick_secs, freekick_x_start, freekick_y_start, np.where(passes_in_window[0,8] == 24, passes_in_window[0,2], -1).tolist(), 
+                    np.where(passes_in_window[0,8] == 24, passes_in_window[0,3], -1).tolist(), freekick_player_id, freekick_player_name, 
                     event_id_first_shot, min_shot, sec_shot, x_start_shot, y_start_shot, -1, -1,
                     freekick_player_id_first_shot, freekick_player_name_first_shot, rolled, first_contact_event_id,
                     first_contact_type, description, first_contact_player_id, first_contact_player_name, first_contact_team_id, 
-                    first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, goalkeeper_id, gk_name])
+                    first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, time_between_relevant_and_first_contact, goalkeeper_id, gk_name])
 
                 shot_outcome = np.where(data_shots[data_shots.unique_event_id==event_id_first_shot]['goal'].iloc[0]==1, 
                     'Goal', np.where(data_shots[data_shots.unique_event_id==event_id_first_shot]['on_target'].iloc[0]==1, 
@@ -1375,7 +1465,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
         'Number Of Events Between Stop And Start', 'OPTA Event IDs Between Stop And Start', 
         'Player IDs In Pass Sequence Up To Relevant', 'Player Names In Pass Sequence Up To Relevant', 'Rolled', 'First Contact Event ID',
         'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name', 
-        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 
+        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Time Lapsed From Relevant And First Contact', 
         'Defending Goalkeeper ID', 'Defending Goalkeeper Name'])
     summary_df_outside['Set Piece Type'] = 'Free Kick Outside Target Zone'
 
@@ -1391,7 +1481,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
         'Number Of Events Between Stop And Start', 'OPTA Event IDs Between Stop And Start', 
         'Player IDs In Pass Sequence Up To Relevant', 'Player Names In Pass Sequence Up To Relevant', 'Rolled', 'First Contact Event ID',
         'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name', 
-        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate',
+        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Time Lapsed From Relevant And First Contact',
         'Defending Goalkeeper ID', 'Defending Goalkeeper Name'])
     summary_df_frontal_lateral['Set Piece Type'] = 'Free Kick'
 
@@ -1402,7 +1492,7 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
         'Relevant End X Coordinate', 'Relevant End Y Coordinate', 'Relevant Player ID', 'Relevant Player Name', 
         'Rolled', 'First Contact Event ID',
         'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name', 
-        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 
+        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Time Lapsed From Relevant And First Contact',
         'Defending Goalkeeper ID', 'Defending Goalkeeper Name'])
     summary_df_shots['Set Piece Type'] = 'Free Kick Shot'
 
@@ -1440,7 +1530,8 @@ def set_piece_classification (path_events, path_match_results, path_track_meta, 
             summary_df.loc[summary_df['OPTA Event ID']==set_piece, 'First Contact Shot'] = 1
     if np.any(summary_df['First Contact Shot']==1):
         for set_piece in summary_df[summary_df['First Contact Shot']==1].drop_duplicates(['OPTA Event ID'])['OPTA Event ID']:
-            summary_df_all_shots.loc[(summary_df_all_shots['Set Piece OPTA Event ID']==set_piece) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Set Piece OPTA Event ID']==set_piece]['Shot OPTA ID'].iloc[0]), 'First Contact Shot'] = 1
+            if summary_df_all_shots[summary_df_all_shots['Set Piece OPTA Event ID']==set_piece].shape[0] > 0:
+                summary_df_all_shots.loc[(summary_df_all_shots['Set Piece OPTA Event ID']==set_piece) & (summary_df_all_shots['Shot OPTA ID']==summary_df_all_shots[summary_df_all_shots['Set Piece OPTA Event ID']==set_piece]['Shot OPTA ID'].iloc[0]), 'First Contact Shot'] = 1
 
     
     #here we add first contact coordinates to shots file
@@ -1647,7 +1738,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                 opta_event_id_between = None
                 opta_type_id_between = None
             else:
-                data_corner_reduced = data_corner[(~data_corner.type_id.isin([6,27,28,43,70]))].reset_index(drop=True)
+                data_corner_reduced = data_corner[(~data_corner.type_id.isin([6,43,70]))].reset_index(drop=True)
                 if data_corner_reduced.shape[0] == 0:
                     number_events_in_between = 0
                     opta_event_id_between = None
@@ -1693,7 +1784,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                 freekick_player_id, freekick_player_name,
                 None, None, outcome_shot,
                 None, None, time_between_stop_and_corner, number_events_in_between, opta_event_id_between, 
-                None, None, None, None, None, None, None, None, None, None, None, goalkeeper_id, gk_name])
+                None, None, None, None, None, None, None, None, None, None, None, np.nan, goalkeeper_id, gk_name])
 
 
             list_all_shots.append([freekick_event_id, freekick_event_id, freekick_player_id, freekick_player_name, 't' + str(int(attacking_team_id)), 
@@ -1900,6 +1991,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                 ball_delivery_relevant = ball_delivery_start
 
         if ball_delivery_start in ['Inswing', 'Outswing', 'Straight']:
+            index_longest_pass = 0
             ball_delivery_relevant = ball_delivery_start
             x_start_relevant = passes_in_window[0,0]
             y_start_relevant = passes_in_window[0,1]
@@ -1933,7 +2025,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
             opta_event_id_between = None
             opta_type_id_between = None
         else:
-            data_corner_reduced = data_corner[(~data_corner.type_id.isin([6,27,28,43,70]))].reset_index(drop=True)
+            data_corner_reduced = data_corner[(~data_corner.type_id.isin([6,43,70]))].reset_index(drop=True)
             if data_corner_reduced.shape[0] == 0:
                 number_events_in_between = 0
                 opta_event_id_between = None
@@ -1971,6 +2063,23 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                         qualifying_shots[qualifying_shots.unique_event_id==id_shot]['related_event_team_id'].iloc[0])]['unique_event_id'].iloc[-1] != freekick_event_id:
 
                         qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id != id_shot].reset_index(drop=True)
+
+                    else:
+                        if opta_event_data_df[(opta_event_data_df.period_id==
+                            qualifying_shots[qualifying_shots.unique_event_id==
+                            id_shot]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                            id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                            qualifying_shots[qualifying_shots.unique_event_id==id_shot].related_event_team_id.iloc[0]) & (opta_event_data_df.period_id != 
+                            5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds']).shape[0] > 0:
+
+                            if opta_event_data_df[(opta_event_data_df.period_id==
+                                qualifying_shots[qualifying_shots.unique_event_id==
+                                id_shot]['period_id'].iloc[0]) & (opta_event_data_df.time_in_seconds <= qualifying_shots[qualifying_shots.unique_event_id==
+                                id_shot]['Time_in_Seconds'].iloc[0]) & (opta_event_data_df['team_id']==
+                                qualifying_shots[qualifying_shots.unique_event_id==id_shot].related_event_team_id.iloc[0]) & (opta_event_data_df.period_id != 
+                                5) & (opta_event_data_df.type_id != 43) & (((opta_event_data_df.type_id.isin([1,2])) & (opta_event_data_df.qualifier_id.isin([5,6,107]))) | ((opta_event_data_df.type_id.isin([13,14,15,16])) & (opta_event_data_df.qualifier_id.isin([9, 26, 263]))))].sort_values(['time_in_seconds'])['unique_event_id'].iloc[-1] != freekick_event_id:    
+
+                                qualifying_shots = qualifying_shots[qualifying_shots.unique_event_id != id_shot].reset_index(drop=True)
 
                 shot_event_ids = ', '.join([str(int(x)) for x in qualifying_shots.unique_event_id.tolist()])
                 shot_player_ids = ', '.join(qualifying_shots.player_id.tolist())
@@ -2015,7 +2124,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                         opta_type_id_between_shot = None
                         opta_descr_between_shot = None
                     else:
-                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([6,27,28,43,70]))].reset_index(drop=True)
+                        data_between_set_piece_and_shot_reduced = data_between_set_piece_and_shot[(~data_between_set_piece_and_shot.type_id.isin([6,43,70]))].reset_index(drop=True)
                         if data_between_set_piece_and_shot_reduced.shape[0] == 0:
                             number_events_in_between_shot = 0
                             opta_event_id_between_shot = None
@@ -2025,7 +2134,20 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                             number_events_in_between_shot = len(data_between_set_piece_and_shot_reduced.unique_event_id.unique())
                             opta_event_id_between_shot = ', '.join([str(x) for x in data_between_set_piece_and_shot_reduced.unique_event_id.unique()])
                             opta_type_id_between_shot = ', '.join([str(int(x)) for x in data_between_set_piece_and_shot_reduced.drop_duplicates(['unique_event_id']).type_id])
-                            opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            try:
+                                opta_descr_between_shot = ', '.join([event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] for x in opta_type_id_between_shot.split(', ')])
+                            except:
+                                opta_descr_between_shot = ''
+                                for x in opta_type_id_between_shot.split(', '):
+                                    if int(x) in event_type_id.type_id.tolist():
+                                        opta_descr_between_shot = opta_descr_between_shot + event_type_id[event_type_id.type_id==int(x)]['name'].iloc[0] + ', '
+                                    else:
+                                        if int(x) == 83:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Attempted Tackle (post-match only)' + ', '
+                                        else:
+                                            opta_descr_between_shot = opta_descr_between_shot + 'Event not identified' + ', '
+                            if opta_descr_between_shot.endswith(', '):
+                                opta_descr_between_shot = opta_descr_between_shot[:-2]
 
 
                     list_all_shots.append([freekick_event_id, shot_event_id, shot_player_id, shot_player_name, shot_team_id, 
@@ -2039,11 +2161,12 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
 
             where_relevant_pass = np.where(opta_event_data_df.unique_event_id==passes_in_window[index_longest_pass,9])[0][-1]
             events_after_relevant_pass = opta_event_data_df[(~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.iloc[:(where_relevant_pass+1)].unique())) & (opta_event_data_df.time_in_seconds >= 
-                passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.time_in_seconds <=
+                passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.time_in_seconds <= 
                 10 + passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]) & (opta_event_data_df.period_id ==
-                period_id) & (~opta_event_data_df.type_id.isin([27,28,55,43,70])) & (opta_event_data_df.unique_event_id != 
+                period_id) & (~opta_event_data_df.type_id.isin([21,34,35,36,38,39,40,43,53,55,58,63,69,70,71,77,79,83])) & (opta_event_data_df.unique_event_id != 
                 freekick_event_id) & (opta_event_data_df.unique_event_id != passes_in_window[index_longest_pass,9])].reset_index(drop=True)
 
+            first_contact_keypass_assist = None 
             first_contact_aerial = 0
             first_contact_shot = 0
             first_contact_x = np.nan
@@ -2051,19 +2174,37 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
             description = None
             first_contact_event_id = np.nan
             if events_after_relevant_pass.shape[0] > 0:
-                if events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,41,44,45,49,50,51,52,53,54,56,59,61,74]:
-                    if (3 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                if (events_after_relevant_pass.type_id.iloc[0] in [1,2,3,4,7,10,11,13,14,15,16,8,12,27,30,41,44,45,49,50,51,52,54,56,59,60,61,67,74]) & (passes_in_window[index_longest_pass,5]!=2):                    
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['keypass'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Keypass'
+                    if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['assist'].iloc[0] == 1:
+                        first_contact_keypass_assist = 'Assist'
+                    if (3 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()) | (168 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                         first_contact_aerial = 1
                     if events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['type_id'].iloc[0] in [13,14,15,16]:
-                        first_contact_shot = 1
-                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44]:
+                        first_contact_shot = 1    
+                    if events_after_relevant_pass.type_id.iloc[0] not in [4, 44, 67]:
                         if events_after_relevant_pass.type_id.iloc[0] in event_type_id.type_id.tolist():
-                            if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                            if (events_after_relevant_pass.type_id.iloc[0] == 12) & (15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Headed Clearance'
-                            elif (events_after_relevant_pass.type_id.iloc[0] == 16) & (28 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                            elif (events_after_relevant_pass.type_id.iloc[0] == 16) & (28 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
                                 description = 'Own Goal'
+                                if 15 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist():
+                                    description = 'Headed' + ' ' + description
                             else:
                                 description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
+                                if first_contact_aerial == 1:
+                                    if len(set([3, 15]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Headed' + ' ' + description
+                                    elif len(set([168]).intersection(set(opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()))) > 0:
+                                        description = 'Flick-on' + ' ' + description
+                                if events_after_relevant_pass.type_id.iloc[0] in [1, 3, 7, 61]:
+                                    description = np.where(events_after_relevant_pass.outcome.iloc[0]==1, 'Successful', 'Unsuccessful').tolist() + ' ' + description
+                                    if (238 in opta_event_data_df[opta_event_data_df.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]].qualifier_id.tolist()):
+                                        description = description + ' ' + '(fair-play)'
+                                if events_after_relevant_pass.type_id.iloc[0] == 51:
+                                    description = description + ' ' + np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 169, 'leading to attempt', 
+                                        np.where(events_after_relevant_pass.qualifier_id.iloc[0] == 170, 'leading to goal', '')).tolist()
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
                         first_contact_event_id = events_after_relevant_pass.unique_event_id.iloc[0]
                         if np.isnan(events_after_relevant_pass.player_id.iloc[0]):
@@ -2078,6 +2219,18 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                         first_contact_x = events_after_relevant_pass['x'].iloc[0]
                         first_contact_y = events_after_relevant_pass['y'].iloc[0]
                     else:
+                        if events_after_relevant_pass.type_id.iloc[0] == 67:
+                            #first_contact_aerial = 1
+                            description = '50/50 Won'
+                            first_contact_type = events_after_relevant_pass.type_id.iloc[0]
+                            first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==1].unique_event_id.iloc[0]
+                            first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['player_id'].iloc[0]))
+                            first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==1]['team_id'].iloc[0]))
+                            first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                            first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                attacking_team, defending_team).tolist()
+                            first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['x'].iloc[0]
+                            first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==1]['y'].iloc[0]
                         if events_after_relevant_pass.type_id.iloc[0] == 44:
                             first_contact_aerial = 1
                             description = 'Aerial Duel Won'
@@ -2103,14 +2256,27 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                                 first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
                                 first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (313 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
-                                first_contact_type = None 
-                                first_contact_event_id = np.nan
-                                first_contact_player_id = None 
-                                first_contact_player_name = None 
-                                first_contact_team_id = None 
-                                first_contact_team_name = None 
-                                first_contact_aerial = None 
-                                first_contact_shot = None
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for illegal restart'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                    attacking_team, defending_team).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
+                            elif (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (314 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
+                                first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
+                                first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
+                                description = 'Foul for shot hitting offside player'
+                                first_contact_player_id = 'p' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]))
+                                first_contact_team_id = 't' + str(int(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['team_id'].iloc[0]))   
+                                first_contact_player_name = player_names_raw[player_names_raw['@uID']==first_contact_player_id]['player_name'].iloc[0]
+                                first_contact_team_name = np.where(first_contact_team_id == 't' + str(int(attacking_team_id)), 
+                                    attacking_team, defending_team).tolist() 
+                                first_contact_x = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['x'].iloc[0]
+                                first_contact_y = events_after_relevant_pass[events_after_relevant_pass.outcome==0]['y'].iloc[0]                       
                             elif (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.unique_event_id.iloc[0]]['qualifier_id'].tolist()) | (132 in events_after_relevant_pass[events_after_relevant_pass.unique_event_id==events_after_relevant_pass.drop_duplicates(['unique_event_id']).unique_event_id.iloc[1]]['qualifier_id'].tolist()):
                                 first_contact_type = events_after_relevant_pass.type_id.iloc[0]  
                                 first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]                           
@@ -2162,7 +2328,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                     if (events_after_relevant_pass.type_id.iloc[0] in [5,6]):
                         first_contact_type = events_after_relevant_pass.type_id.iloc[0]
                         first_contact_event_id = events_after_relevant_pass[events_after_relevant_pass.outcome==0].unique_event_id.iloc[0]
-                        description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0]
+                        description = event_type_id[event_type_id.type_id==events_after_relevant_pass.type_id.iloc[0]]['name'].iloc[0] + ' Lost'
                         if np.isnan(events_after_relevant_pass[events_after_relevant_pass.outcome==0]['player_id'].iloc[0]):
                             first_contact_player_id = None 
                             first_contact_player_name = None 
@@ -2235,6 +2401,13 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
                     first_contact_y = float(opta_event_data_df[(opta_event_data_df.unique_event_id==passes_in_window[index_longest_pass,9]) & (opta_event_data_df.qualifier_id==141)]['value'].iloc[0])
 
 
+        time_between_relevant_and_first_contact = np.nan
+        if events_after_relevant_pass.shape[0] > 0:
+            if (first_contact_type is not None):
+                time_between_relevant_and_first_contact = np.round(events_after_relevant_pass.time_in_seconds.iloc[0] - (passes_in_window[index_longest_pass, -2]*60 + passes_in_window[index_longest_pass,-1]))
+            if first_contact_keypass_assist is not None:
+                description = description + ' (' + first_contact_keypass_assist + ')'
+
         goalkeeper_id = 'p' + str(int(opta_event_data_df[(opta_event_data_df.type_id==34) & (opta_event_data_df.qualifier_id==30) & (opta_event_data_df.team_id==defending_team_id)]['value'].tolist()[0].split(',')[0]))
         gk_name = player_names_raw[player_names_raw['@uID']==goalkeeper_id]['player_name'].iloc[0]
         gk_sub_off = np.where(len(set([int(goalkeeper_id.replace('p', ''))]).intersection(set(opta_event_data_df.player_id.loc[opta_event_data_df.type_id==18].unique().tolist()))) == 1, 1, 0).tolist()
@@ -2274,7 +2447,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
             distance_x_percent_relevant_pass, length_relevant_pass, ball_delivery_relevant,
             passed_to_edge, played_in_behind, time_between_stop_and_corner, number_events_in_between, opta_event_id_between,
             first_contact_event_id, first_contact_type, description, first_contact_player_id, first_contact_player_name, 
-            first_contact_team_id, first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, goalkeeper_id, gk_name])
+            first_contact_team_id, first_contact_team_name, first_contact_aerial, first_contact_shot, first_contact_x, first_contact_y, time_between_relevant_and_first_contact, goalkeeper_id, gk_name])
 
     summary_df = pd.DataFrame(list_events, columns = ['game_id', 'Fixture', 'Attacking Team', 'Defending Team', 'Attacking Team ID', 'Defending Team ID', 'Goals Scored', 'Goals Conceded',
         'Goal Difference', 'Game State', 'Side',
@@ -2287,7 +2460,7 @@ def corners_classification (path_events, path_match_results, path_track_meta, se
         'Time Lapsed From Stop And Start', 'Number Of Events Between Stop And Start', 
         'OPTA Event IDs Between Stop And Start', 
         'First Contact Event ID', 'First Contact Type', 'First Contact Explanation', 'First Contact Player ID', 'First Contact Player Name', 
-        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Defending Goalkeeper ID', 'Defending Goalkeeper Name'])
+        'First Contact Team ID', 'First Contact Team Name', 'First Contact Aerial', 'First Contact Shot', 'First Contact X Coordinate', 'First Contact Y Coordinate', 'Time Lapsed From Relevant And First Contact', 'Defending Goalkeeper ID', 'Defending Goalkeeper Name'])
     summary_df['Set Piece Type'] = 'Corner'
 
     summary_df_all_shots = pd.DataFrame(list_all_shots, columns = 
@@ -2335,23 +2508,26 @@ import pandas as pd
 #parent_folder = 'K:\\TK Work\\2018-19\\DVMS\\Weekly Data'
 #parent_folder = 'Y:\\Analysts\\TK\\2018-19\\Opta'
 
-seasons = ['2017-18', '2018-19', '2019-20']
-#seasons = ['2018-19', '2019-20']
+#seasons = ['2016-17', '2017-18', '2018-19', '2019-20', '2020-21']
+seasons = ['2020-21']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
     #folders_to_keep = ['Premier League']
-    #folders_to_keep = ['Champions League']
+    folders_to_keep = ['Champions League']
 
     for competition in folders_to_keep:
-        # try:
-        #     set_pieces_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Set Pieces Output.xlsx'.format(season,competition))
-        #     aerial_duels_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Aerial Duels From Set Pieces Output.xlsx'.format(season,competition))
-        #     shots_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Shots From Set Pieces Output.xlsx'.format(season,competition))
-        #except FileNotFoundError:
-        set_pieces_file = None
-        aerial_duels_file = None 
-        shots_file = None
+
+        #if (season == '2019-20') & (competition == 'Premier League'):
+        #    continue
+        try:
+            set_pieces_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Set Pieces Output.xlsx'.format(season,competition))
+            aerial_duels_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Aerial Duels From Set Pieces Output.xlsx'.format(season,competition))
+            shots_file = pd.read_excel('\\\ctgshares\\Drogba\\Advanced Data Metrics\\{}\\{}\\Set Pieces & Crosses\\Shots From Set Pieces Output.xlsx'.format(season,competition))
+        except FileNotFoundError:
+            set_pieces_file = None
+            aerial_duels_file = None 
+            shots_file = None
         competition_folder = os.path.join(parent_folder, competition)
         subfolders_to_keep = [x for x in os.listdir(competition_folder) if ('spectrum' not in x) & ('f73' not in x)]
 
@@ -2612,12 +2788,12 @@ import time
 #parent_folder = 'K:\\TK Work\\2018-19\\DVMS\\Weekly Data'
 #parent_folder = 'Y:\\Analysts\\TK\\2018-19\\Opta'
 
-#seasons = ['2018-19', '2019-20']
-seasons = ['2019-20']
+seasons = ['2016-17', '2017-18', '2018-19', '2019-20']
+#seasons = ['2019-20']
 for season in seasons:
     parent_folder = '\\\ctgshares\\Drogba\\API Data Files\\{}'.format(season)
-    #folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
-    folders_to_keep = ['Premier League']
+    folders_to_keep = [x for x in os.listdir(parent_folder) if (('League' in x) | ('Cup' in x))]
+    #folders_to_keep = ['Premier League']
 
     for competition in folders_to_keep:
         competition_folder = os.path.join(parent_folder, competition)

@@ -46,22 +46,26 @@ class SetPieceClassificationTansformer:
         for i in range(num_of_squads):
             # potentially, change from for loop to generator built the above load functionality
             # 
-            data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
-            if '@loan' in data_players_in.columns:
-                data_players_in = data_players_in.drop(['@loan'], axis = 1)
-            data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
-            if '@loan' in data_players_out.columns:
-                data_players_out = data_players_out.drop(['@loan'], axis = 1)
-            data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
-            data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
-            list_squads.append(data_players)
+           data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
+           if '@loan' in data_players_in.columns:
+               data_players_in = data_players_in.drop(['@loan'], axis = 1)
+           if 'PlayerChanges' in list(opta_squads['SoccerFeed']['SoccerDocument'].keys()):
+               try:
+                   data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+                   if '@loan' in data_players_out.columns:
+                       data_players_out = data_players_out.drop(['@loan'], axis = 1)
+                   data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+               except:
+                   data_players = data_players_in.reset_index(drop=True)
+           else:
+               data_players = data_players_in.reset_index(drop=True)
+           data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
+           list_squads.append(data_players)
 
         data_squads = pd.concat(list_squads).reset_index(drop=True)
-        data_squads['preferred_foot'] = [
-            pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type'] == 'preferred_foot'].iloc[0] \
-            if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat
-        ]
-        data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+        data_squads = data_squads[pd.Series([type(x) for x in data_squads.Stat])==list].reset_index(drop=True)
+        data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+        data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates(['@uID']).reset_index(drop=True)
         return data_squads
 
     def extract_set_piece_statistics(self, df_opta_output_final_freekicks: pd.DataFrame,
@@ -239,8 +243,8 @@ class SetPieceClassificationTansformer:
             freekick_mins = int(freekicks_taken['min'].loc[freekicks_taken.unique_event_id==freekick_event_id].iloc[0])
             freekick_secs = int(freekicks_taken['sec'].loc[freekicks_taken.unique_event_id==freekick_event_id].iloc[0])
             freekick_time_seconds = freekick_mins*60.0 + freekick_secs
-            attacking_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | (opta_event_data_df.time_in_seconds < freekick_time_seconds))]['unique_event_id'].unique())
-            defending_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | (opta_event_data_df.time_in_seconds < freekick_time_seconds))]['unique_event_id'].unique())
+            attacking_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | ((opta_event_data_df.time_in_seconds < freekick_time_seconds) & (opta_event_data_df.period_id==period_id)))]['unique_event_id'].unique())    
+            defending_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | ((opta_event_data_df.time_in_seconds < freekick_time_seconds) & (opta_event_data_df.period_id==period_id)))]['unique_event_id'].unique())
             goal_diff_attack_v_defense = attacking_team_goals_up_to_freekick_excluded - defending_team_goals_up_to_freekick_excluded
             game_state = np.sign(goal_diff_attack_v_defense)
             freekick_event_id_event = int(freekicks_taken.event_id.loc[freekicks_taken.unique_event_id==freekick_event_id].unique()[0])
@@ -1283,8 +1287,8 @@ class SetPieceClassificationTansformer:
             freekick_mins = int(freekicks_taken['min'].loc[freekicks_taken.unique_event_id==freekick_event_id].iloc[0])
             freekick_secs = int(freekicks_taken['sec'].loc[freekicks_taken.unique_event_id==freekick_event_id].iloc[0])
             freekick_time_seconds = freekick_mins*60.0 + freekick_secs
-            attacking_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | (opta_event_data_df.time_in_seconds < freekick_time_seconds))]['unique_event_id'].unique())
-            defending_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | (opta_event_data_df.time_in_seconds < freekick_time_seconds))]['unique_event_id'].unique())
+            attacking_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | ((opta_event_data_df.time_in_seconds < freekick_time_seconds) & (opta_event_data_df.period_id==period_id)))]['unique_event_id'].unique())    
+            defending_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==defending_team_id) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==attacking_team_id) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < period_id) | ((opta_event_data_df.time_in_seconds < freekick_time_seconds) & (opta_event_data_df.period_id==period_id)))]['unique_event_id'].unique())   
             goal_diff_attack_v_defense = attacking_team_goals_up_to_freekick_excluded - defending_team_goals_up_to_freekick_excluded
             game_state = np.sign(goal_diff_attack_v_defense)
             freekick_event_id_event = int(freekicks_taken.event_id.loc[freekicks_taken.unique_event_id==freekick_event_id].unique()[0])
@@ -2009,10 +2013,10 @@ class SetPieceClassificationTansformer:
 
                 attacking_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==
                                                                                          16) & (opta_event_data_df.team_id==int(data_crosses[data_crosses.unique_event_id==
-                                                                                                                                             cross_id].team_id.iloc[0].replace('t', ''))) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id!=int(data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0].replace('t', ''))) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) | (opta_event_data_df.time_in_seconds < data_crosses[data_crosses.unique_event_id==cross_id].Time_in_Seconds.iloc[0]))]['unique_event_id'].unique())
+                                                                                                                                             cross_id].team_id.iloc[0].replace('t', ''))) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id!=int(data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0].replace('t', ''))) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) | ((opta_event_data_df.time_in_seconds < data_crosses[data_crosses.unique_event_id==cross_id].Time_in_Seconds.iloc[0]) & (opta_event_data_df.period_id==data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0])))]['unique_event_id'].unique())    
                 defending_team_goals_up_to_freekick_excluded = len(opta_event_data_df[(((opta_event_data_df.type_id==
                                                                                          16) & (opta_event_data_df.team_id!=int(data_crosses[data_crosses.unique_event_id==
-                                                                                                                                             cross_id].team_id.iloc[0].replace('t', ''))) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==int(data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0].replace('t', ''))) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) | (opta_event_data_df.time_in_seconds < data_crosses[data_crosses.unique_event_id==cross_id].Time_in_Seconds.iloc[0]))]['unique_event_id'].unique())
+                                                                                                                                             cross_id].team_id.iloc[0].replace('t', ''))) & (~opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)]))) | ((opta_event_data_df.type_id==16) & (opta_event_data_df.team_id==int(data_crosses[data_crosses.unique_event_id==cross_id].team_id.iloc[0].replace('t', ''))) & (opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id[(opta_event_data_df.type_id==16) & (opta_event_data_df.qualifier_id==28)])))) & ((opta_event_data_df.period_id < data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0]) | ((opta_event_data_df.time_in_seconds < data_crosses[data_crosses.unique_event_id==cross_id].Time_in_Seconds.iloc[0]) & (opta_event_data_df.period_id==data_crosses[data_crosses.unique_event_id==cross_id].period_id.iloc[0])))]['unique_event_id'].unique())    
                 goal_diff_attack_v_defense = attacking_team_goals_up_to_freekick_excluded - defending_team_goals_up_to_freekick_excluded
                 game_state = np.sign(goal_diff_attack_v_defense)
                 game_state_word = np.where(game_state==-1, 'losing', np.where(game_state==0, 'drawing', 'winning')).tolist()

@@ -1448,6 +1448,8 @@ class SetPieceClassificationTansformer:
         player_names_raw['@uID'] = 'p' + player_names_raw['player_id'].astype(str)
         player_names_raw['player_name'] = player_names_raw['full_name']
 
+        if 'p' in str(list(opta_event_data_df['player_id'].values)):
+            opta_event_data_df['player_id'] = opta_event_data_df['player_id'].astype(str).str.replace("p","").astype(float) #remove p
 
         #here teh actual loop starts
         #summary_list = []
@@ -1457,6 +1459,7 @@ class SetPieceClassificationTansformer:
         freekicks_taken = opta_event_data_df.loc[(((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==6].unique().tolist()))) & (opta_event_data_df.type_id==1)) | (((opta_event_data_df.unique_event_id.isin(opta_event_data_df.unique_event_id.loc[opta_event_data_df.qualifier_id==263].unique().tolist()))) & (opta_event_data_df.type_id.isin([13,14,15,16])))].reset_index(drop = True) #we include all free kicks instances
         freekicks_taken['time_in_seconds'] = freekicks_taken['min']*60.0 + freekicks_taken['sec']
         freekicks_taken['time_in_seconds'] = freekicks_taken['time_in_seconds'].astype(float)
+
 
 
         #| (opta_event_data_df.type_id.isin([1,2,13,14,15,16]))
@@ -1642,7 +1645,7 @@ class SetPieceClassificationTansformer:
 
             if passes_in_window.shape[0] >= 1:
                 #as relevant pass we can use the first pass that targets an end zone, assuming it is longer than 5 meters
-                index_longest_pass = np.where((((passes_in_window[:,2] >= 83.0) & ((((passes_in_window[:,3] >= 36.8) & (passes_in_window[:,1] < 50.0)) | (passes_in_window[:,-4]==1)) | (((passes_in_window[:,3] <= 63.2) & (passes_in_window[:,1] > 50)) | (passes_in_window[:,-4]==1))))) | (passes_in_window[:,11]==1) | (passes_in_window[:,-3] > 0) | ((passes_in_window[:,-4] == 1) & (passes_in_window[:,2] >= edge_box_elliptical(passes_in_window[:,3])) & (passes_in_window[:,0] > 88.5) & (np.abs(passes_in_window[:,1] - 50.0) >= 29.0)) | ((passes_in_window[:,-4] == 1) & (passes_in_window[:,9]==freekick_event_id) & (passes_in_window[:,2] >= edge_box_elliptical(passes_in_window[:,3]))))
+                index_longest_pass = np.where((((passes_in_window[:,2] >= 83.0) & ((((passes_in_window[:,3] >= 36.8) & (passes_in_window[:,1] < 50.0)) | (passes_in_window[:,-4]==1)) | (((passes_in_window[:,3] <= 63.2) & (passes_in_window[:,1] > 50)) | (passes_in_window[:,-4]==1))))) | (passes_in_window[:,11]==1) | (passes_in_window[:,-3] > 0) | ((passes_in_window[:,-4] == 1) & (passes_in_window[:,2] >= self.edge_box_elliptical(passes_in_window[:,3])) & (passes_in_window[:,0] > 88.5) & (np.abs(passes_in_window[:,1] - 50.0) >= 29.0)) | ((passes_in_window[:,-4] == 1) & (passes_in_window[:,9]==freekick_event_id) & (passes_in_window[:,2] >= self.edge_box_elliptical(passes_in_window[:,3]))))
                 if type(index_longest_pass) == tuple:
                     index_longest_pass = index_longest_pass[0]
                 if index_longest_pass.shape[0] > 0:
@@ -1725,7 +1728,7 @@ class SetPieceClassificationTansformer:
             #define when the corner pass is delivered to the edge of the box. We also put a 'played in behind' indicator as there are cases in which the main pass goes behind the 79 threshold on the X
             played_in_behind = 0
             if (passes_in_window[0,2] < 83) & (passes_in_window[0,3] >= 21.1) & (passes_in_window[0,3] <= 78.9):
-                if passes_in_window[0,2] >= edge_box_elliptical(passes_in_window[0, 3]):
+                if passes_in_window[0,2] >= self.edge_box_elliptical(passes_in_window[0, 3]):
                     passed_to_edge = 1
                 else:
                     passed_to_edge = 0

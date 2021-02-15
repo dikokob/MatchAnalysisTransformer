@@ -45,23 +45,27 @@ class SetPieceClassificationTansformer:
 
         for i in range(num_of_squads):
             # potentially, change from for loop to generator built the above load functionality
-            # 
+            #
             data_players_in = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['Player'])
             if '@loan' in data_players_in.columns:
                 data_players_in = data_players_in.drop(['@loan'], axis = 1)
-            data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
-            if '@loan' in data_players_out.columns:
-                data_players_out = data_players_out.drop(['@loan'], axis = 1)
-            data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+            if 'PlayerChanges' in list(opta_squads['SoccerFeed']['SoccerDocument'].keys()):
+                try:
+                    data_players_out = pd.DataFrame(opta_squads['SoccerFeed']['SoccerDocument']['PlayerChanges']['Team'][i]['Player'])
+                    if '@loan' in data_players_out.columns:
+                        data_players_out = data_players_out.drop(['@loan'], axis = 1)
+                    data_players = pd.concat([data_players_in, data_players_out]).reset_index(drop=True)
+                except:
+                    data_players = data_players_in.reset_index(drop=True)
+            else:
+                data_players = data_players_in.reset_index(drop=True)
             data_players['team_id'] = opta_squads['SoccerFeed']['SoccerDocument']['Team'][i]['@uID']
             list_squads.append(data_players)
 
         data_squads = pd.concat(list_squads).reset_index(drop=True)
-        data_squads['preferred_foot'] = [
-            pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type'] == 'preferred_foot'].iloc[0] \
-            if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat
-        ]
-        data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates().reset_index(drop=True)
+        data_squads = data_squads[pd.Series([type(x) for x in data_squads.Stat])==list].reset_index(drop=True)
+        data_squads['preferred_foot'] = [pd.DataFrame(x)['#text'][pd.DataFrame(x)['@Type']=='preferred_foot'].iloc[0] if 'preferred_foot' in pd.DataFrame(x)['@Type'].tolist() else 'Not Available' for x in data_squads.Stat]
+        data_squads = data_squads.drop('Stat', axis = 1).drop_duplicates(['@uID']).reset_index(drop=True)
         return data_squads
 
     def extract_set_piece_statistics(self, df_opta_output_final_freekicks: pd.DataFrame,

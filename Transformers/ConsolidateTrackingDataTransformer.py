@@ -2,12 +2,10 @@ import pandas as pd
 import numpy as np
 import logging
 import os
-import json
 import time
-import xmltodict
 
 
-class TrackingDataTransformer:
+class ConsolidateTrackingDataTransformer:
     config = None
     logger = None
     data_source = None
@@ -18,100 +16,38 @@ class TrackingDataTransformer:
         self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
     def transform(self, df_second_phase_set_pieces, df_crosses_output, df_opta_core_stats,
-                  df_opta_events, df_tracking_data_crosses, df_tracking_data_crosses, df_tracking_data_set_pieces):
+                  df_opta_events, df_tracking_data_crosses, df_tracking_data_set_pieces):
         """[summary]
 
         Args:
-            df_second_phase_set_pieces (pd.DataFrame): [track_players_df]
-            df_crosses_output (pd.DataFrame): [crosses v4]
-            df_opta_core_stats (pd.DataFrame): [Crosses Output]
-            df_second_phase_set_pieces (pd.DataFrame): [Set Pieces with 2nd Phase Output]
-            df_player_names_raw (pd.DataFrame): [player_names_raw]
-            players_df_lineup (pd.DataFrame): [players_df_lineup]
-            opta_match_info (dict): [opta_event_file_manipulation, is a dict see SecondSpectrumTransformer]
-            match_info (dict): [match meta_data, is a dict see SecondSpectrumTransformer]
-            df_opta_events (pd.DataFrame): [event_data opta_event_file_manipulation, see SecondSpectrumTransformer]
+            df_second_phase_set_pieces (pd.DataFrame): []
+            df_crosses_output (pd.DataFrame): []
+            df_opta_core_stats (pd.DataFrame): []
+            df_opta_events (pd.DataFrame): []
+            df_tracking_data_crosses (pd.DataFrame): []
+            df_tracking_data_set_pieces (pd.DataFrame): []
 
         Returns:
-            pd.DataFrame: [tracking data set pieces]
-            pd.DataFrame: [tracking data crosses]
-
+            pd.DataFrame: [Tracking Info From set pieces]
+            pd.DataFrame: [Tracking Info From data crosses]
 
         """
 
+        df_second_phase_set_pieces = df_second_phase_set_pieces[(~df_second_phase_set_pieces['Relevant OPTA Event ID'].duplicated()) | df_second_phase_set_pieces['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
 
-        file_names = ['Set Pieces with 2nd Phase Output', 'Crosses Output']
+        if df_second_phase_set_pieces.shape[0] > len(df_second_phase_set_pieces['OPTA Event ID'].unique()):
+            df_second_phase_set_pieces = df_second_phase_set_pieces.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
 
-        for file_name in file_names:
+        if df_crosses_output.shape[0] > len(df_crosses_output['OPTA Event ID'].unique()):
+            df_crosses_output = df_crosses_output.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
 
-            ###import crosses alongside set pieces and corners and start to work out
-            #path_crosses = '\\\ctgshares\\Drogba\\Analysts\\FB\\2019-20\\set pieces classification\\crosses'
-            path_crosses = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\{}.xlsx'.format(file_name))
-            data_crosses = pd.read_excel(path_crosses)
+        trackingInfoFromCrosses = self.tracking_data_output(df_crosses_output, df_tracking_data_crosses,
+                                                            df_opta_core_stats, df_opta_events)
 
-            if 'set pieces' in file_name.lower():
-                data_crosses = data_crosses[(~data_crosses['Relevant OPTA Event ID'].duplicated()) | data_crosses['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
-                writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
-                data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-                worksheet = writer.sheets['Sheet1']  # pull worksheet object
-                for idx, col in enumerate(data_crosses):  # loop through all columns
-                    series = data_crosses[col]
-                    max_len = max((
-                        series.astype(str).map(len).max(),  # len of largest item
-                        len(str(series.name))  # len of column name/header
-                    )) + 1  # adding a little extra space
-                    worksheet.set_column(idx, idx, max_len)  # set column width
-                writer.save()
+        trackingInfoFromSetPieces = self.tracking_data_output(df_second_phase_set_pieces, df_tracking_data_set_pieces,
+                                                              df_opta_core_stats, df_opta_events)
 
-                data_crosses_old = pd.read_excel(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx'))
-                data_crosses_old = data_crosses_old[(~data_crosses_old['Relevant OPTA Event ID'].duplicated()) | data_crosses_old['Relevant OPTA Event ID'].isnull()].reset_index(drop=True)
-                writer = pd.ExcelWriter(os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\Set Pieces Output.xlsx'), engine='xlsxwriter')
-                data_crosses_old.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-                worksheet = writer.sheets['Sheet1']  # pull worksheet object
-                for idx, col in enumerate(data_crosses_old):  # loop through all columns
-                    series = data_crosses_old[col]
-                    max_len = max((
-                        series.astype(str).map(len).max(),  # len of largest item
-                        len(str(series.name))  # len of column name/header
-                    )) + 1  # adding a little extra space
-                    worksheet.set_column(idx, idx, max_len)  # set column width
-                writer.save()
-
-            if 'crosses' in file_name.lower():
-                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data crosses')
-            if 'set pieces' in file_name.lower():
-                path_crosses_tracking = os.path.join(parent_folder, competition, 'Set Pieces & Crosses\\tracking data set pieces')
-
-            data_crosses_tracking = pd.concat([pd.read_excel(os.path.join(path_crosses_tracking,x)) for x in os.listdir(path_crosses_tracking)], axis = 0).reset_index(drop=True)
-
-            if data_crosses.shape[0] > len(data_crosses['OPTA Event ID'].unique()):
-                data_crosses = data_crosses.drop_duplicates(['OPTA Event ID']).reset_index(drop=True)
-                writer = pd.ExcelWriter(path_crosses, engine='xlsxwriter')
-                data_crosses.to_excel(writer, index = False, sheet_name = 'Sheet1')  # send df to writer
-                worksheet = writer.sheets['Sheet1']  # pull worksheet object
-                for idx, col in enumerate(data_crosses):  # loop through all columns
-                    series = data_crosses[col]
-                    max_len = max((
-                        series.astype(str).map(len).max(),  # len of largest item
-                        len(str(series.name))  # len of column name/header
-                    )) + 1  # adding a little extra space
-                    worksheet.set_column(idx, idx, max_len)  # set column width
-                writer.save()
-                data_crosses = pd.read_excel(path_crosses)
-
-            tracking_data_output(data_crosses, data_crosses_tracking, data_core_stats, season, competition)
-
-            if 'Set Pieces' in file_name:
-                file_name = 'Set Pieces'
-            if 'Crosses' in file_name:
-                file_name = 'Crosses'
-            data_events = pd.read_excel(os.path.join(parent_folder,
-                                                     competition, 'Set Pieces & Crosses',
-                                                     'Tracking Data Info From {} Output.xlsx'.format(file_name)))
-            data_events_grouped = data_events.groupby(list(data_events)[0])['Player ID'].count().reset_index()
-
-            print ('Range of players in box is {} - {} for {} in {} {}. Number of {} is {} and number of tracking {} is {}.'.format(min(data_events_grouped['Player ID']),
-                                                                                                                                    max(data_events_grouped['Player ID']), file_name, competition, season, file_name, data_crosses.shape[0], file_name, data_events_grouped.shape[0]))
+        return trackingInfoFromCrosses, trackingInfoFromSetPieces
 
     def tracking_data_output(self, data, data_tracking, df_opta_core_stats, df_opta_events):
         """[summary]
@@ -124,7 +60,6 @@ class TrackingDataTransformer:
 
         Returns:
             pd.DataFrame: []
-
 
         """
 
@@ -852,8 +787,7 @@ class TrackingDataTransformer:
             list_tracking_info.append(df)
 
             cnt += 1
-            print ('{} crosses have been processed in {} seconds for {} {}.'.format(cnt, time.process_time() - start_time, competition,
-                                                                                    season))
+            #print ('{} crosses have been processed in {} seconds for {} {}.'.format(cnt, time.process_time() - start_time, competition, season))
 
 
         summary_df = pd.concat(list_tracking_info, axis = 0).reset_index(drop=True)
@@ -897,7 +831,16 @@ class TrackingDataTransformer:
         return summary_df
 
     @staticmethod
-    def numbers_in_box (df):
+    def numbers_in_box(df):
+        """[summary]
+
+        Args:
+            df (pd.DataFrame): []
+
+        Returns:
+            pd.DataFrame: []
+
+        """
         attackers = df[(df['Attacker/Defender']=='Attacker') & (df['Present In The Box']=='Yes')].shape[0]
         defenders = df[(df['Attacker/Defender']=='Defender') & (df['Present In The Box']=='Yes')].shape[0]
         if sum(df['Present In The Box'].isnull()) > 0:

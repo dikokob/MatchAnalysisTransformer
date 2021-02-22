@@ -94,6 +94,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'))
             df_opta_crosses = pd.read_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'))
             df_opta_shots = pd.read_csv(os.path.join(processed_folder, 'df_opta_shots.csv'))
+            df_crosses_label = pd.read_csv(os.path.join(processed_folder, 'df_crosses_label.csv'))
 
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
@@ -106,6 +107,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event = optaTransformer.opta_core_stats_with_time_possession_from_events(df_opta_core_stats, df_opta_events)
             df_opta_crosses = optaTransformer.opta_crosses_classification(df_opta_events)
             df_opta_shots = optaTransformer.opta_shots(df_opta_events, df_player_names_raw, opta_match_info)
+            df_crosses_label = optaTransformer.cross_label(df_opta_events)
 
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
@@ -115,6 +117,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event.to_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'), index=False)
             df_opta_crosses.to_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'), index=False)
             df_opta_shots.to_csv(os.path.join(processed_folder, 'df_opta_shots.csv'), index=False)
+            df_crosses_label.to_csv(os.path.join(processed_folder, 'df_crosses_label.csv'), index=False)
 
         # ===========================================================================================================================
 

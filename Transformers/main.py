@@ -87,7 +87,7 @@ if __name__ == "__main__":
         # ===========================================================================================================================
 
         df_opta_core_stats, df_opta_core_stats_time_possession, \
-        df_opta_core_stats_time_possession_from_event, df_opta_crosses, df_opta_shots = [None for i in range(5)]
+        df_opta_core_stats_time_possession_from_event, df_opta_crosses, df_opta_shots= [None for i in range(5)]
 
         # Get processed files 
         try:
@@ -96,7 +96,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event = pd.read_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'))
             df_opta_crosses = pd.read_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'))
             df_opta_shots = pd.read_csv(os.path.join(processed_folder, 'df_opta_shots.csv'))
-            df_crosses_label = pd.read_csv(os.path.join(processed_folder, 'df_crosses_label.csv'))
+            #df_crosses_label = pd.read_csv(os.path.join(processed_folder, 'df_crosses_label.csv'))
 
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
@@ -109,7 +109,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event = optaTransformer.opta_core_stats_with_time_possession_from_events(df_opta_core_stats, df_opta_events)
             df_opta_crosses = optaTransformer.opta_crosses_classification(df_opta_events)
             df_opta_shots = optaTransformer.opta_shots(df_opta_events, df_player_names_raw, opta_match_info)
-            df_crosses_label = optaTransformer.cross_label(df_opta_events)
+            #df_crosses_label = optaTransformer.cross_label(df_opta_events)
 
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
             df_opta_core_stats_time_possession_from_event.to_csv(os.path.join(processed_folder, 'df_opta_core_stats_time_possession_from_event.csv'), index=False)
             df_opta_crosses.to_csv(os.path.join(processed_folder, 'df_opta_crosses.csv'), index=False)
             df_opta_shots.to_csv(os.path.join(processed_folder, 'df_opta_shots.csv'), index=False)
-            df_crosses_label.to_csv(os.path.join(processed_folder, 'df_crosses_label.csv'), index=False)
+            #df_crosses_label.to_csv(os.path.join(processed_folder, 'df_crosses_label.csv'), index=False)
 
         # ===========================================================================================================================
 
@@ -198,25 +198,27 @@ if __name__ == "__main__":
 
         # ===========================================================================================================================
 
-            df_tracking_data_set_pieces, df_tracking_data_crosses = [None for i in range(2)]
+        df_tracking_data_set_pieces, df_tracking_data_crosses = [None for i in range(2)]
+        
+        # Get processed files 
+        try:
+            df_tracking_data_set_pieces = pd.read_csv(os.path.join(processed_folder,'df_tracking_data_set_pieces.csv'))
+            df_tracking_data_crosses = pd.read_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'))
+            print(df_tracking_data_crosses.head())
+        except Exception as e:
+            print('Getting raw processed files from local, however failed to load them: {}'.format(e))
+
+        # If processed files don't exsit process
+        if any(x is None for x in [df_tracking_data_set_pieces,df_tracking_data_crosses]):
+
+            df_tracking_data_set_pieces = trackingDataTransformer.transform(df_track_players,df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Set Piece')
+            df_tracking_data_crosses = trackingDataTransformer.transform(df_track_players,df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Cross')
+
+            if not os.path.exists(processed_folder):
+                os.makedirs(processed_folder)
+
+            print(df_tracking_data_crosses.head())
             
-            # Get processed files 
-            try:
-                df_tracking_data_set_pieces = pd.read_csv(os.path.join(processed_folder,'df_tracking_data_set_pieces.csv'))
-                df_tracking_data_crosses = pd.read_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'))
-
-            except Exception as e:
-                print('Getting raw processed files from local, however failed to load them: {}'.format(e))
-
-            # If processed files don't exsit process
-            if any(x is None for x in [df_tracking_data_set_pieces,df_tracking_data_crosses]):
-
-                df_tracking_data_set_pieces = trackingDataTransformer.transform(df_track_players,df_crosses_label,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,'Set Piece')
-                df_tracking_data_crosses = trackingDataTransformer.transform(df_track_players,df_crosses_label,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,'Cross')
-
-                if not os.path.exists(processed_folder):
-                    os.makedirs(processed_folder)
-
-                df_tracking_data_set_pieces.to_csv(os.path.join(processed_folder, 'df_tracking_data_set_pieces.csv'), index=False)
-                df_tracking_data_crosses.to_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'), index=False)
+            df_tracking_data_set_pieces.to_csv(os.path.join(processed_folder, 'df_tracking_data_set_pieces.csv'), index=False)
+            df_tracking_data_crosses.to_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'), index=False)
                

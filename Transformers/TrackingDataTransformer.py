@@ -15,7 +15,7 @@ class TrackingDataTransformer:
 
     def __init__(self):
         #self.config = config
-        self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
+       self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
     def transform(self, df_track_players, df_crosses_label, df_crosses_output,
                   df_second_phase_set_pieces, df_player_names_raw, players_df_lineup,
@@ -40,21 +40,28 @@ class TrackingDataTransformer:
 
         """
 
-       #prep
-       
-       crosses_label = df_crosses_label
-       crosses_output = df_crosses_output
-       second_phase_set_pieces = df_second_phase_set_pieces
-       players_lineup =  players_df_lineup
-       match_info_opta =  opta_match_info
-       match_information = match_info
-       type_event = event_type
+        #prep
+        
+        crosses_label = df_crosses_label
+        crosses_output = df_crosses_output
+        second_phase_set_pieces = df_second_phase_set_pieces
+        players_lineup =  players_df_lineup
+        match_info_opta =  opta_match_info
+        match_information = match_info
+        type_event = event_type
 
-       track_players_df = df_track_players 
-       player_names_raw = df_player_names_raw
-       event_data = df_opta_events
+        track_players_df = df_track_players 
+        player_names_raw = df_player_names_raw
+        event_data = df_opta_events
+        
+        player_names_raw['@uID'] = 'p' + player_names_raw['player_id'].astype(str)
+        player_names_raw['player_name'] = player_names_raw['full_name']
+        players_df_lineup['@PlayerRef'] = players_df_lineup['player_id'].astype(str)
+        players_df_lineup['@SubPosition'] = players_df_lineup['sub_position']
+        players_df_lineup['@Position'] = players_df_lineup['position_in_pitch']
+        track_players_df['game_id'] = opta_match_info['match_id']
 
-       if event_type=='Cross':
+        if event_type=='Cross':
             all_crosses_file_filtered = df_crosses_label
             crosses_classified = df_crosses_output
             all_crosses_file_filtered = all_crosses_file_filtered.merge(crosses_classified[['OPTA Event ID', 'Cross Type']], 
@@ -78,11 +85,11 @@ class TrackingDataTransformer:
         
         #we need the crosses_file anyways to make sure that set piece crosses are treated exactly in the same way as crosses
         crosses_file = df_crosses_label
-    
+
         
 
         all_crosses_file_filtered['Time_in_Seconds'] = np.where(all_crosses_file_filtered['period_id']==1, all_crosses_file_filtered['Time_in_Seconds'], all_crosses_file_filtered['Time_in_Seconds'] - 45*60.0)
-    
+
         track_players_df = track_players_df[track_players_df.Period_ID<=4].reset_index(drop=True) #make sure any penalty shootout is excluded, if present.
 
 
@@ -103,7 +110,7 @@ class TrackingDataTransformer:
         venue = match_info['venue']
         home_formation = match_info['home_formation']
         away_formation = match_info['away_formation']
-  
+
         player_names_df = player_names_raw.copy()
         player_names_df['player_id'] = [int(x.replace('p', '')) for x in player_names_df['@uID']]
         player_names_df = player_names_df[['player_id', 'player_name']]
@@ -185,9 +192,9 @@ class TrackingDataTransformer:
         event_data_crosses = event_data_open_play_crosses_final[['game_id', 'unique_event_id', 'away_team_id', 'home_team_id', 'event_id', 'type_id', 'period_id', 'team_id', 'Time_in_Seconds', 'total_seconds_in_period']].reset_index(drop=True)
         event_data_crosses['cross_id'] = range(1, event_data_crosses.shape[0]+1)
         event_data_crosses = event_data_crosses.sort_values(['game_id', 'period_id', 'Time_in_Seconds'])
-        event_data_after_crosses = get_events_after_crosses(event_data_filtered, event_data_open_play_crosses_final)
+        event_data_after_crosses = self.get_events_after_crosses(event_data_filtered, event_data_open_play_crosses_final)
         event_data_after_crosses = event_data_after_crosses.sort_values(['game_id', 'period_id', 'Time_in_Seconds', 'total_seconds_in_period'])
-        event_data_before_crosses = get_events_before_crosses(event_data_filtered, event_data_open_play_crosses_final)
+        event_data_before_crosses = self.get_events_before_crosses(event_data_filtered, event_data_open_play_crosses_final)
         event_data_before_crosses = event_data_before_crosses.sort_values(['game_id', 'period_id', 'Time_in_Seconds', 'total_seconds_in_period'])
         event_data_crosses_and_before_crosses_and_after_crosses = event_data_crosses.append(event_data_after_crosses).append(event_data_before_crosses).sort_values(['game_id', 'period_id', 'Time_in_Seconds'])
 
@@ -207,13 +214,13 @@ class TrackingDataTransformer:
         # final_event_data_only_events_before_crosses.to_csv('C:\\Users\\fbettuzzi\\Desktop\\Chelsea\\Tracking provider files\\Man Utd v Huddersfield 26-01-19\\Second Spectrum\\json\\event data events preceding crosses.csv', header = True, index = False, sep = ',', decimal = '.')
         # final_event_data_only_crosses.to_csv('C:\\Users\\fbettuzzi\\Desktop\\Chelsea\\Tracking provider files\\Man Utd v Huddersfield 26-01-19\\Second Spectrum\\json\\event data crosses.csv', header = True, index = False, sep = ',', decimal = '.')
 
-        player_names_raw['@uID'] = list(map(remove_first_letter, player_names_raw['@uID']))
+        player_names_raw['@uID'] = list(map(self.remove_first_letter, player_names_raw['@uID']))
         player_names_raw['@uID'] = player_names_raw['@uID'].astype(int)
-        players_df_lineup['@PlayerRef'] = list(map(remove_first_letter, players_df_lineup['@PlayerRef']))
+        players_df_lineup['@PlayerRef'] = list(map(self.remove_first_letter, players_df_lineup['@PlayerRef']))
         players_df_lineup['@PlayerRef'] = players_df_lineup['@PlayerRef'].astype(int)
         players_df_lineup['position_in_pitch'] = np.where(players_df_lineup['@SubPosition'].notnull(), players_df_lineup['@SubPosition'], players_df_lineup['@Position'])
         #players_df_lineup = players_df_lineup.drop(['@Captain', '@Formation_Place', '@ShirtNumber', '@Position', '@SubPosition', 'team_id'], axis = 1)
-        player_names_raw = player_names_raw.drop(['@Position', 'PersonName'], axis = 1)
+        #player_names_raw = player_names_raw.drop(['@Position', 'PersonName'], axis = 1)
 
 
         #import type and qualifiers definitions
@@ -308,7 +315,7 @@ class TrackingDataTransformer:
 
         data_export = []
         #cross_id = np.where(np.array(event_ids) == min(event_ids))[0][0]
-   
+
         for cross_id in range(len(event_ids)):
 
             current_period = int(event_data_open_play_crosses_final.period_id.iloc[cross_id])
@@ -584,7 +591,7 @@ class TrackingDataTransformer:
             #dist_crosser_from_centre_of_goal_tracking = np.round(np.sqrt((x_crosser_tracking/100.0*length - length)**2 + (y_crosser_tracking/100.0*width - 0.5*width)**2), 2)
             angle_crosser_from_centre_of_goal = np.round(180/np.pi*np.arccos((length - x_crosser_tracking/100*length)/dist_crosser_from_centre_of_goal), 2)
 
-   
+
             
             merged_data_event_subset_players['distance_opponents_from_crosser'] = list(map(distance_coordinates_start2, merged_data_event_subset_players.x_Player_percent, merged_data_event_subset_players.y_Player_percent, merged_data_event_subset_players.x_Player_percent_crosser, merged_data_event_subset_players.y_Player_percent_crosser))
             #opponents to crosser info
@@ -828,7 +835,7 @@ class TrackingDataTransformer:
             avg_x_position_defending_not_in_box_third_part = [np.round(np.mean(merged_data_event_subset_players_not_in_box.x_Player_percent[(merged_data_event_subset_players_not_in_box.Player_ID==x) & (merged_data_event_subset_players_not_in_box.Frame_ID.isin(frames_third_part))]), 2) for x in defending_players_not_in_box]
             avg_y_position_attacking_not_in_box_third_part = [np.round(np.mean(merged_data_event_subset_players_not_in_box.y_Player_percent[(merged_data_event_subset_players_not_in_box.Player_ID==x) & (merged_data_event_subset_players_not_in_box.Frame_ID.isin(frames_third_part))]), 2) for x in attacking_players_not_in_box]
             avg_y_position_defending_not_in_box_third_part = [np.round(np.mean(merged_data_event_subset_players_not_in_box.y_Player_percent[(merged_data_event_subset_players_not_in_box.Player_ID==x) & (merged_data_event_subset_players_not_in_box.Frame_ID.isin(frames_third_part))]), 2) for x in defending_players_not_in_box]
-    
+
             #three splits downsampled
             downsampled_x_position_attacking_first_part_no_box = []
             downsampled_y_position_attacking_first_part_no_box = []
@@ -1225,7 +1232,7 @@ class TrackingDataTransformer:
                 ';'.join([str(x) for x in frame_attacking_first_part_downsampled_no_box]), ';'.join([str(x) for x in frame_attacking_second_part_downsampled_no_box]), ';'.join([str(x) for x in frame_attacking_third_part_downsampled_no_box]),
                 ';'.join([str(x) for x in frame_defending_first_part_downsampled_no_box]), ';'.join([str(x) for x in frame_defending_second_part_downsampled_no_box]), ';'.join([str(x) for x in frame_defending_third_part_downsampled_no_box])]
         
-    
+
             data_box_df = pd.DataFrame([data_box], columns = ['Attacking Player IDs In Box', 'Attacking Player Names In Box', 
                 'Defending Player IDs In Box', 'Defending Player Names In Box', 'Attacking Player IDs In Box First Part', 'Attacking Player Names In Box First Part', 
                 'Defending Player IDs In Box First Part', 'Defending Player Names In Box First Part', 'Attacking Player IDs In Box Second Part', 'Attacking Player Names In Box Second Part', 
@@ -1439,6 +1446,8 @@ class TrackingDataTransformer:
             data_export = pd.concat(data_export).sort_values(['Period ID', 'Time In Seconds'])
 
             return data_export
+
+
     @staticmethod
     def which_team_from_left_to_right(period):
         """[summary]

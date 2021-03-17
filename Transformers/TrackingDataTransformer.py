@@ -12,6 +12,9 @@ class TrackingDataTransformer:
     logger = None
     data_source = None
     match_date = None
+    event_data_filtered = None
+    width = None
+    length = None
 
     def __init__(self):
         #self.config = config
@@ -50,6 +53,9 @@ class TrackingDataTransformer:
         match_information = match_info
         type_event = event_type
 
+        game_id = opta_match_info['match_id']
+        game_date = opta_match_info['match_date']
+
         track_players_df = df_track_players 
         player_names_raw = df_player_names_raw
         event_data = df_opta_events
@@ -59,7 +65,10 @@ class TrackingDataTransformer:
         players_df_lineup['@PlayerRef'] = players_df_lineup['player_id'].astype(str)
         players_df_lineup['@SubPosition'] = players_df_lineup['sub_position']
         players_df_lineup['@Position'] = players_df_lineup['position_in_pitch']
+        players_df_lineup['@Status'] = players_df_lineup['status']
         track_players_df['game_id'] = opta_match_info['match_id']
+
+        track_players_df['Is_Ball_Live'] = track_players_df['Is_Ball_Live'].astype(str).str.lower()
 
         if event_type=='Cross':
             all_crosses_file_filtered = df_crosses_label
@@ -110,6 +119,10 @@ class TrackingDataTransformer:
         venue = match_info['venue']
         home_formation = match_info['home_formation']
         away_formation = match_info['away_formation']
+        length = match_info['pitchLength']
+        width = match_info['pitchWidth']
+        self.length = match_info['pitchLength']
+        self.width = match_info['pitchWidth']
 
         player_names_df = player_names_raw.copy()
         player_names_df['player_id'] = [int(x.replace('p', '')) for x in player_names_df['@uID']]
@@ -216,7 +229,7 @@ class TrackingDataTransformer:
 
         player_names_raw['@uID'] = list(map(self.remove_first_letter, player_names_raw['@uID']))
         player_names_raw['@uID'] = player_names_raw['@uID'].astype(int)
-        players_df_lineup['@PlayerRef'] = list(map(self.remove_first_letter, players_df_lineup['@PlayerRef']))
+        #players_df_lineup['@PlayerRef'] = list(map(self.remove_first_letter, players_df_lineup['@PlayerRef']))
         players_df_lineup['@PlayerRef'] = players_df_lineup['@PlayerRef'].astype(int)
         players_df_lineup['position_in_pitch'] = np.where(players_df_lineup['@SubPosition'].notnull(), players_df_lineup['@SubPosition'], players_df_lineup['@Position'])
         #players_df_lineup = players_df_lineup.drop(['@Captain', '@Formation_Place', '@ShirtNumber', '@Position', '@SubPosition', 'team_id'], axis = 1)
@@ -246,10 +259,10 @@ class TrackingDataTransformer:
         #check whether tracking data and OPTA data are recorded from same side of pitch, else switch all coordinates signs
         avg_x_pos_start_home = track_players_df.x_Player.loc[(track_players_df.Is_Home_Away=='home') & (track_players_df.Frame_ID==track_players_df.Frame_ID.loc[(track_players_df.Period_ID==1) & (track_players_df.Is_Ball_Live=='true')].unique()[0])].mean()
         #track_players_df.x_Player.loc[(track_players_df.Is_Home_Away=='home') & (track_players_df.Frame_ID==track_players_df.Frame_ID.loc[(track_players_df.Period_ID==2) & (track_players_df.Is_Ball_Live=='true')].unique()[0])].mean()
-        team_left_to_right_first_half = which_team_from_left_to_right(1)
+        team_left_to_right_first_half = self.which_team_from_left_to_right(event_data_filtered, 1)
         if track_players_df.Period_ID.max() > 2:
             avg_x_pos_start_third_period_home = track_players_df.x_Player.loc[(track_players_df.Is_Home_Away=='home') & (track_players_df.Frame_ID==track_players_df.Frame_ID.loc[(track_players_df.Period_ID==3) & (track_players_df.Is_Ball_Live=='true')].unique()[0])].mean()
-            team_left_to_right_third_period = which_team_from_left_to_right(3)
+            team_left_to_right_third_period = self.which_team_from_left_to_right(event_data_filtered, 3)
 
         
         if track_players_df.Period_ID.max() == 2:
@@ -381,7 +394,7 @@ class TrackingDataTransformer:
 
 
         #this method to transform coordinates can actually work well to take into account both teams - we are transferring everything to the perspective of the attacking team
-            if which_team_from_left_to_right(current_period) == current_team_id:
+            if self.which_team_from_left_to_right(event_data_filtered, current_period) == current_team_id:
                 merged_data_event.loc[:,'x_Player_percent'] = 100*(merged_data_event.loc[:,'x_Player_consistent'] + 0.5*length)/length
                 merged_data_event.loc[:,'y_Player_percent'] = 100*(merged_data_event.loc[:,'y_Player_consistent'] + 0.5*width)/width
                 merged_data_event.loc[:,'x_Ball_percent'] = 100*(merged_data_event.loc[:,'x_Ball_consistent'] + 0.5*length)/length
@@ -419,7 +432,7 @@ class TrackingDataTransformer:
             dat_for_ball = merged_data_event_subset_players_large_window[['Period_ID', 'Time', 'x_Player_percent', 'y_Player_percent', 'x_Ball_percent', 'y_Ball_percent', 'z_Ball', 'Speed_Ball']][merged_data_event_subset_players_large_window.Player_ID == current_player].drop_duplicates()
             #dat_for_ball['distance_start'] = list(map(distance_coordinates_start, dat_for_ball.x_Player_percent, dat_for_ball.y_Player_percent))
             #dat_for_ball['distance_end'] = list(map(distance_coordinates_end, dat_for_ball.x_Ball_percent, dat_for_ball.y_Ball_percent))
-            dat_for_ball['distance_ball_from_centre_y'] = list(map(distance_coordinates_centre_y, dat_for_ball.y_Ball_percent))
+            dat_for_ball['distance_ball_from_centre_y'] = list(map(self.distance_coordinates_centre_y, dat_for_ball.y_Ball_percent))
 
             # from matplotlib import pyplot as plt 
             # plt.plot(dat_for_ball['x_Ball_percent']*length/100.0, dat_for_ball['y_Ball_percent']*width/100.0)
@@ -593,7 +606,7 @@ class TrackingDataTransformer:
 
 
             
-            merged_data_event_subset_players['distance_opponents_from_crosser'] = list(map(distance_coordinates_start2, merged_data_event_subset_players.x_Player_percent, merged_data_event_subset_players.y_Player_percent, merged_data_event_subset_players.x_Player_percent_crosser, merged_data_event_subset_players.y_Player_percent_crosser))
+            merged_data_event_subset_players['distance_opponents_from_crosser'] = list(map(self.distance_coordinates_start2, merged_data_event_subset_players.x_Player_percent, merged_data_event_subset_players.y_Player_percent, merged_data_event_subset_players.x_Player_percent_crosser, merged_data_event_subset_players.y_Player_percent_crosser))
             #opponents to crosser info
             x_crosser_tracking = np.round(x_crosser_tracking, 2)
             y_crosser_tracking = np.round(y_crosser_tracking, 2)
@@ -693,7 +706,7 @@ class TrackingDataTransformer:
                 temporary_y = [y_crosser_tracking_second_part, y_crosser_tracking_third_part, y_crosser_tracking_end]
                 temporary_frame = [np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==current_player) & (merged_data_event_subset_players.Frame_ID.isin(frames_second_part))].mean(), 2), np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==current_player) & (merged_data_event_subset_players.Frame_ID.isin(frames_third_part))].mean(), 2), end_frame]
                 list_frames = [frames_first_part, frames_second_part, frames_third_part]
-                frame_crosser_tracking_first_part_downsampled, frame_crosser_tracking_second_part_downsampled, frame_crosser_tracking_third_part_downsampled, x_crosser_tracking_first_part_downsampled, x_crosser_tracking_second_part_downsampled, x_crosser_tracking_third_part_downsampled, y_crosser_tracking_first_part_downsampled, y_crosser_tracking_second_part_downsampled, y_crosser_tracking_third_part_downsampled = largest_triangle_sampling(x_crosser_tracking_downsampled, y_crosser_tracking_downsampled, frame_crosser_tracking_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, current_player)
+                frame_crosser_tracking_first_part_downsampled, frame_crosser_tracking_second_part_downsampled, frame_crosser_tracking_third_part_downsampled, x_crosser_tracking_first_part_downsampled, x_crosser_tracking_second_part_downsampled, x_crosser_tracking_third_part_downsampled, y_crosser_tracking_first_part_downsampled, y_crosser_tracking_second_part_downsampled, y_crosser_tracking_third_part_downsampled = self.largest_triangle_sampling(x_crosser_tracking_downsampled, y_crosser_tracking_downsampled, frame_crosser_tracking_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, current_player, merged_data_event_subset_players)
 
             else:
                 x_crosser_tracking_first_part_downsampled = np.nan 
@@ -750,7 +763,7 @@ class TrackingDataTransformer:
                     temporary_y = [avg_y_position_attacking_second_part[att_player_index], avg_y_position_attacking_third_part[att_player_index], np.round(merged_data_event_subset_players_in_box.y_Player_percent[merged_data_event_subset_players_in_box.Player_ID==attacking_players[att_player_index]].iloc[-1], 2)]
                     temporary_frame = [np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==attacking_players[att_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_second_part))].mean(), 2), np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==attacking_players[att_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_third_part))].mean(), 2), end_frame]
                     list_frames = [frames_first_part, frames_second_part, frames_third_part]
-                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, attacking_players[att_player_index])
+                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = self.largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, attacking_players[att_player_index], merged_data_event_subset_players)
                     downsampled_x_position_attacking_first_part.append(x_first_part_downsampled)
                     downsampled_y_position_attacking_first_part.append(y_first_part_downsampled)
                     downsampled_x_position_attacking_second_part.append(x_second_part_downsampled)
@@ -792,7 +805,7 @@ class TrackingDataTransformer:
                     temporary_y = [avg_y_position_defending_second_part[def_player_index], avg_y_position_defending_third_part[def_player_index], np.round(merged_data_event_subset_players_in_box.y_Player_percent[merged_data_event_subset_players_in_box.Player_ID==defending_players[def_player_index]].iloc[-1], 2)]
                     temporary_frame = [np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==defending_players[def_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_second_part))].mean(), 2), np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==defending_players[def_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_third_part))].mean(), 2), end_frame]
                     list_frames = [frames_first_part, frames_second_part, frames_third_part]
-                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, defending_players[def_player_index])
+                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = self.largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, defending_players[def_player_index], merged_data_event_subset_players)
                     downsampled_x_position_defending_first_part.append(x_first_part_downsampled)
                     downsampled_y_position_defending_first_part.append(y_first_part_downsampled)
                     downsampled_x_position_defending_second_part.append(x_second_part_downsampled)
@@ -856,7 +869,7 @@ class TrackingDataTransformer:
                     temporary_y = [avg_y_position_attacking_not_in_box_second_part[att_player_index], avg_y_position_attacking_not_in_box_third_part[att_player_index], np.round(merged_data_event_subset_players_not_in_box.y_Player_percent[merged_data_event_subset_players_not_in_box.Player_ID==attacking_players_not_in_box[att_player_index]].iloc[-1], 2)]
                     temporary_frame = [np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==attacking_players_not_in_box[att_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_second_part))].mean(), 2), np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==attacking_players_not_in_box[att_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_third_part))].mean(), 2), end_frame]
                     list_frames = [frames_first_part, frames_second_part, frames_third_part]
-                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, attacking_players_not_in_box[att_player_index])
+                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = self.largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, attacking_players_not_in_box[att_player_index], merged_data_event_subset_players)
                     downsampled_x_position_attacking_first_part_no_box.append(x_first_part_downsampled)
                     downsampled_y_position_attacking_first_part_no_box.append(y_first_part_downsampled)
                     downsampled_x_position_attacking_second_part_no_box.append(x_second_part_downsampled)
@@ -898,7 +911,7 @@ class TrackingDataTransformer:
                     temporary_y = [avg_y_position_defending_not_in_box_second_part[def_player_index], avg_y_position_defending_not_in_box_third_part[def_player_index], np.round(merged_data_event_subset_players_not_in_box.y_Player_percent[merged_data_event_subset_players_not_in_box.Player_ID==defending_players_not_in_box[def_player_index]].iloc[-1], 2)]
                     temporary_frame = [np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==defending_players_not_in_box[def_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_second_part))].mean(), 2), np.round(merged_data_event_subset_players.Frame_ID.loc[(merged_data_event_subset_players.Player_ID==defending_players_not_in_box[def_player_index]) & (merged_data_event_subset_players.Frame_ID.isin(frames_third_part))].mean(), 2), end_frame]
                     list_frames = [frames_first_part, frames_second_part, frames_third_part]
-                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, defending_players_not_in_box[def_player_index])
+                    frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled = self.largest_triangle_sampling(x_downsampled, y_downsampled, frame_downsampled, temporary_x, temporary_y, temporary_frame, list_frames, defending_players_not_in_box[def_player_index], merged_data_event_subset_players)
                     downsampled_x_position_defending_first_part_no_box.append(x_first_part_downsampled)
                     downsampled_y_position_defending_first_part_no_box.append(y_first_part_downsampled)
                     downsampled_x_position_defending_second_part_no_box.append(x_second_part_downsampled)
@@ -1449,7 +1462,7 @@ class TrackingDataTransformer:
 
 
     @staticmethod
-    def which_team_from_left_to_right(period):
+    def which_team_from_left_to_right(event_data_filtered, period):
         """[summary]
 
         Args:
@@ -1583,9 +1596,9 @@ class TrackingDataTransformer:
         return (0.5*norm_a*norm_b*sin_theta)
 
 
-    @staticmethod
-    def largest_triangle_sampling (x_path, y_path, frame_path, temporary_x, temporary_y, temporary_frame,
-                                   list_frames, current_player):
+
+    def largest_triangle_sampling (self, x_path, y_path, frame_path, temporary_x, temporary_y, temporary_frame,
+                                   list_frames, current_player, merged_data_event_subset_players):
         """[summary]
 
         Args:
@@ -1620,7 +1633,7 @@ class TrackingDataTransformer:
             max_triangle_area = 0
 
             for index in range(len(frames_coordinates)):
-                current_area = area_triangle(previous_point, next_temporary_point, np.array([x_coordinates[index], y_coordinates[index], frames_coordinates[index]]))
+                current_area = self.area_triangle(previous_point, next_temporary_point, np.array([x_coordinates[index], y_coordinates[index], frames_coordinates[index]]))
                 if current_area > max_triangle_area:
                     stored_x = np.round(x_coordinates[index], 2)
                     stored_y = np.round(y_coordinates[index], 2)
@@ -1639,8 +1652,8 @@ class TrackingDataTransformer:
         return (frame_first_part_downsampled, frame_second_part_downsampled, frame_third_part_downsampled, x_first_part_downsampled, x_second_part_downsampled, x_third_part_downsampled, y_first_part_downsampled, y_second_part_downsampled, y_third_part_downsampled)
 
 
-    @staticmethod
-    def distance_coordinates_centre_y(y):
+
+    def distance_coordinates_centre_y(self, y):
         """[summary]
 
         Args:
@@ -1650,10 +1663,10 @@ class TrackingDataTransformer:
             float: [description]
 
         """
-        return abs(y/100*width - 0.5*width)
+        return abs(y/100*self.width - 0.5*self.width)
 
 
-    @staticmethod
-    def distance_coordinates_start2(x, y, xcrosser, ycrosser):
-        return np.sqrt((x/100*length - xcrosser/100*length)**2 + (y/100*width - ycrosser/100*width)**2)
+
+    def distance_coordinates_start2(self, x, y, xcrosser, ycrosser):
+        return np.sqrt((x/100*self.length - xcrosser/100*self.length)**2 + (y/100*self.width - ycrosser/100*self.width)**2)
 

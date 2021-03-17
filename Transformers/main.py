@@ -7,11 +7,13 @@ from SpectrumMatchAnalysisTransformer import SpectrumMatchAnalysisTransformer
 from OPTATransformer import OPTATransformer
 from SetPieceClassificationTansformer import SetPieceClassificationTansformer
 from TrackingDataTransformer import TrackingDataTransformer
+from ConsolidateTrackingDataTransformer import ConsolidateTrackingDataTransformer
 
 spectrumTransformer = SpectrumMatchAnalysisTransformer('SpectrumMatchAnalysis')
 optaTransformer = OPTATransformer()
 setPieceTransformer = SetPieceClassificationTansformer()
 trackingDataTransformer = TrackingDataTransformer()
+consolidateTrackingDataTransformer = ConsolidateTrackingDataTransformer()
 
 if __name__ == "__main__":
 
@@ -204,21 +206,46 @@ if __name__ == "__main__":
         try:
             df_tracking_data_set_pieces = pd.read_csv(os.path.join(processed_folder,'df_tracking_data_set_pieces.csv'))
             df_tracking_data_crosses = pd.read_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'))
-            print(df_tracking_data_crosses.head())
+
         except Exception as e:
             print('Getting raw processed files from local, however failed to load them: {}'.format(e))
 
         # If processed files don't exsit process
         if any(x is None for x in [df_tracking_data_set_pieces,df_tracking_data_crosses]):
 
-            df_tracking_data_set_pieces = trackingDataTransformer.transform(df_track_players,df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Set Piece')
-            df_tracking_data_crosses = trackingDataTransformer.transform(df_track_players,df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Cross')
+            df_tracking_data_set_pieces = trackingDataTransformer.transform(df_track_players, df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Set Piece')
+            df_tracking_data_crosses = trackingDataTransformer.transform(df_track_players, df_opta_crosses,df_crosses_output,df_second_phase_set_pieces,df_player_names_raw,players_df_lineup,opta_match_info,match_info,df_opta_events,'Cross')
 
             if not os.path.exists(processed_folder):
                 os.makedirs(processed_folder)
 
-            print(df_tracking_data_crosses.head())
             
             df_tracking_data_set_pieces.to_csv(os.path.join(processed_folder, 'df_tracking_data_set_pieces.csv'), index=False)
             df_tracking_data_crosses.to_csv(os.path.join(processed_folder, 'df_tracking_data_crosses.csv'), index=False)
+
+        # ===========================================================================================================================
+
+        df_tracking_info_from_set_pieces, df_tracking_info_from_crosses = [None for i in range(2)]
+
+        # Get processed files
+        try:
+            df_tracking_info_from_set_pieces = pd.read_csv(os.path.join(processed_folder,'df_tracking_info_from_set_pieces.csv'))
+            df_tracking_info_from_crosses = pd.read_csv(os.path.join(processed_folder, 'df_tracking_info_from_crosses.csv'))
+
+        except Exception as e:
+            print('Getting raw processed files from local, however failed to load them: {}'.format(e))
+
+        # If processed files don't exsit process
+        if any(x is None for x in [df_tracking_info_from_set_pieces, df_tracking_info_from_crosses]):
+
+            df_tracking_info_from_crosses, df_tracking_info_from_set_pieces = consolidateTrackingDataTransformer.\
+                                            transform(df_second_phase_set_pieces, df_crosses_output, df_opta_core_stats,
+                                                      df_opta_events, df_tracking_data_crosses,
+                                                      df_tracking_data_set_pieces)
+
+            if not os.path.exists(processed_folder):
+                os.makedirs(processed_folder)
+
+            df_tracking_info_from_set_pieces.to_csv(os.path.join(processed_folder, 'df_tracking_info_from_set_pieces.csv'), index=False)
+            df_tracking_info_from_crosses.to_csv(os.path.join(processed_folder, 'df_tracking_info_from_crosses.csv'), index=False)
                

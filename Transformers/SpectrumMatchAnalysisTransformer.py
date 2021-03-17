@@ -20,8 +20,7 @@ class SpectrumMatchAnalysisTransformer:
             data_source (str): [description]
         """
         self.data_source = data_source
-        self.logger = logging.getLogger(
-            '{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
+        self.logger = logging.getLogger('{}.{}'.format(os.environ['FLASK_APP'], os.environ['session_folder']))
 
     @staticmethod
     def is_numeric(s) -> bool:
